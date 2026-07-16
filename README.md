@@ -71,6 +71,12 @@ npm run build && npm run start   # production + service worker
 
 > Service worker faqat production rejimida ro'yxatdan o'tadi.
 
+### Deploy
+
+`main` branchga push qilinganda Vercel avtomatik production deploy qiladi.
+Qo'lda deploy: `npx vercel deploy --prod`.
+
+
 ## Demo hisoblar
 
 `supabase/seed.sql` dan keyin (hammasi uchun parol: **demo1234**):
