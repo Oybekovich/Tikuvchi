@@ -2,6 +2,8 @@
 
 O'zbekistondagi ayol tikuvchi-ustalar bilan mijozlarni bog'laydigan marketplace PWA ilovasi.
 
+**Jonli:** https://tikuvchi-uz.vercel.app — demo hisob: `mijoz@demo.uz` / `demo1234`
+
 **Stek:** Next.js 16 (App Router, TypeScript) · Tailwind CSS 4 · Supabase (Postgres, Auth, Realtime, Storage) · PWA (manifest + service worker)
 
 ## Imkoniyatlar
