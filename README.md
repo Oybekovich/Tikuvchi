@@ -75,11 +75,19 @@ npm run build && npm run start   # production + service worker
 
 `supabase/seed.sql` dan keyin (hammasi uchun parol: **demo1234**):
 
-| Rol | Email |
-|---|---|
-| Mijoz | `mijoz@demo.uz` |
-| Usta (Dilnoza) | `usta1@demo.uz` |
-| Usta (Madina … Nafisa) | `usta2@demo.uz` … `usta5@demo.uz` |
+| Email | Ism | Rol | Tuman |
+|---|---|---|---|
+| `usta1@demo.uz` | Dilnoza Karimova | usta | Chilonzor |
+| `usta2@demo.uz` | Madina Yusupova | usta | Yunusobod |
+| `usta3@demo.uz` | Gulnora Rashidova | usta | Mirzo Ulug'bek |
+| `usta4@demo.uz` | Zilola Tosheva | usta | Sergeli |
+| `usta5@demo.uz` | Nafisa Abdullayeva | usta | Olmazor |
+| `mijoz@demo.uz` | Malika Umarova | mijoz | — |
+| `mijoz2@demo.uz` | Nodira Saidova | mijoz | — |
+| `mijoz3@demo.uz` | Sevara Islomova | mijoz | — |
+| `mijoz4@demo.uz` | Feruza Qodirova | mijoz | — |
+
+`mijoz2` – `mijoz4` sharhlar muallifi sifatida ishlatilgan — ularda buyurtma va chat yo'q.
 
 `mijoz@demo.uz` bilan kirsangiz: tayyor buyurtmalar (turli holatlarda), saqlangan o'lchamlar va Dilnoza bilan chatda **kutilayotgan narx taklifi** bor — "Qabul qilish" tugmasini bossangiz, B-yo'l bo'yicha avtomatik buyurtma yaratiladi.
 
