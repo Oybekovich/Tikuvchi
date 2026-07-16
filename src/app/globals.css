@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Tikuvchi palitrasi: iliq krem fon + terrakota aksent */
+  --color-cream-50: #fdfaf5;
+  --color-cream-100: #faf5ec;
+  --color-cream-200: #f3e9da;
+  --color-cream-300: #e9d9c3;
+
+  --color-terra-50: #fbf1ec;
+  --color-terra-100: #f5ddd1;
+  --color-terra-200: #eabfa9;
+  --color-terra-300: #dc9a7b;
+  --color-terra-400: #cd7a55;
+  --color-terra-500: #c0674a;
+  --color-terra-600: #a9533a;
+  --color-terra-700: #8c452f;
+  --color-terra-800: #6f3826;
+  --color-terra-900: #582d20;
+
+  --color-ink-900: #3a2a20;
+  --color-ink-700: #5c4636;
+  --color-ink-500: #82695a;
+  --color-ink-300: #b3a094;
+
+  --color-gold-400: #d9a441;
+  --color-gold-100: #f7e9cd;
+
+  --color-sage-500: #6a7b74;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 1px 3px rgba(88, 45, 32, 0.07),
+    0 4px 14px rgba(88, 45, 32, 0.06);
+  --shadow-nav: 0 -2px 12px rgba(88, 45, 32, 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream-100);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  min-height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS PWA'da pastki xavfsiz zona */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Skeleton animatsiyasi */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-cream-200) 25%,
+    var(--color-cream-300) 37%,
+    var(--color-cream-200) 63%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+/* Gorizontal scroll panellarda scrollbarni yashirish */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

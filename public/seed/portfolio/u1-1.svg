@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6e7d8"/><stop offset="1" stop-color="#eacdb4"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <defs><g id="dmd"><path d="M50 12 L88 50 L50 88 L12 50 Z" fill="#274b69" opacity="0.10"/><path d="M50 30 L70 50 L50 70 L30 50 Z" fill="#274b69" opacity="0.14"/></g></defs><use href="#dmd" x="0" y="0"/><use href="#dmd" x="100" y="0"/><use href="#dmd" x="200" y="0"/><use href="#dmd" x="300" y="0"/><use href="#dmd" x="400" y="0"/><use href="#dmd" x="500" y="0"/><use href="#dmd" x="50" y="100"/><use href="#dmd" x="150" y="100"/><use href="#dmd" x="250" y="100"/><use href="#dmd" x="350" y="100"/><use href="#dmd" x="450" y="100"/><use href="#dmd" x="550" y="100"/><use href="#dmd" x="0" y="200"/><use href="#dmd" x="100" y="200"/><use href="#dmd" x="200" y="200"/><use href="#dmd" x="300" y="200"/><use href="#dmd" x="400" y="200"/><use href="#dmd" x="500" y="200"/><use href="#dmd" x="50" y="300"/><use href="#dmd" x="150" y="300"/><use href="#dmd" x="250" y="300"/><use href="#dmd" x="350" y="300"/><use href="#dmd" x="450" y="300"/><use href="#dmd" x="550" y="300"/><use href="#dmd" x="0" y="400"/><use href="#dmd" x="100" y="400"/><use href="#dmd" x="200" y="400"/><use href="#dmd" x="300" y="400"/><use href="#dmd" x="400" y="400"/><use href="#dmd" x="500" y="400"/><use href="#dmd" x="50" y="500"/><use href="#dmd" x="150" y="500"/><use href="#dmd" x="250" y="500"/><use href="#dmd" x="350" y="500"/><use href="#dmd" x="450" y="500"/><use href="#dmd" x="550" y="500"/><use href="#dmd" x="0" y="600"/><use href="#dmd" x="100" y="600"/><use href="#dmd" x="200" y="600"/><use href="#dmd" x="300" y="600"/><use href="#dmd" x="400" y="600"/><use href="#dmd" x="500" y="600"/><use href="#dmd" x="50" y="700"/><use href="#dmd" x="150" y="700"/><use href="#dmd" x="250" y="700"/><use href="#dmd" x="350" y="700"/><use href="#dmd" x="450" y="700"/><use href="#dmd" x="550" y="700"/>
+  <circle cx="300" cy="150" r="34" fill="#b3492f" opacity="0.95"/>
+  
+    <path d="M255 195 Q300 240 345 195 L362 218 Q356 300 342 375 L258 375 Q244 300 238 218 Z" fill="#b3492f"/>
+    <path d="M258 375 L342 375 Q412 545 432 668 Q300 716 168 668 Q188 545 258 375 Z" fill="#b3492f"/>
+    <path d="M238 218 L200 320 Q214 334 236 328 L256 240 Z" fill="#b3492f" opacity="0.92"/>
+    <path d="M362 218 L400 320 Q386 334 364 328 L344 240 Z" fill="#b3492f" opacity="0.92"/>
+  <path d="M255 214 q45 26 90 0" stroke="#d9a441" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.9"/>
+  <rect x="0" y="770" width="600" height="30" fill="#b3492f" opacity="0.15"/>
+</svg>
