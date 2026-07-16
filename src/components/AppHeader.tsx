@@ -16,7 +16,7 @@ import {
   IconSearch,
   IconUser,
 } from "@/components/Icons";
-import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/lib/auth";
 import { useUser } from "@/lib/useUser";
 import { t } from "@/lib/i18n";
 
@@ -65,10 +65,9 @@ export default function AppHeader({ back = false, backHref = "/", title }: Props
   }
 
   async function logout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut();
     setMenuOpen(false);
-    router.push("/");
+    router.push("/auth/login");
     router.refresh();
   }
 

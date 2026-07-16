@@ -1,20 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Kirish talab qilinadigan yo'llar
-const PROTECTED_PREFIXES = [
-  "/orders",
-  "/chat",
-  "/measurements",
-  "/profile",
-];
+// Ilova to'liq yopiq: kirmagan foydalanuvchi faqat shu yo'llarni ko'radi.
+// Qolgan hamma sahifa (bosh sahifa ham) login talab qiladi.
+const PUBLIC_PATHS = ["/auth/login", "/auth/register"];
 
-function isProtected(pathname: string): boolean {
-  if (PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
-    return true;
-  }
-  // /usta/[id]/buyurtma — buyurtma berish uchun ham kirish kerak
-  return /^\/usta\/[^/]+\/buyurtma/.test(pathname);
+function isPublic(pathname: string): boolean {
+  return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
 export async function proxy(request: NextRequest) {
@@ -48,10 +40,12 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if (!user && isProtected(pathname)) {
+  if (!user && !isPublic(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
-    url.searchParams.set("next", pathname);
+    url.search = "";
+    // Bosh sahifaga qaytarish ma'nosiz — u baribir login talab qiladi
+    if (pathname !== "/") url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 

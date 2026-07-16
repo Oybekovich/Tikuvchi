@@ -6,6 +6,7 @@ import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import { IconLogout } from "@/components/Icons";
 import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/lib/auth";
 import { t } from "@/lib/i18n";
 import type { Enums } from "@/lib/database.types";
 
@@ -51,9 +52,8 @@ export default function ProfileForm({ email, fullName, phone, role, userId }: Pr
 
   async function logout() {
     setLoggingOut(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/");
+    await signOut();
+    router.push("/auth/login");
     router.refresh();
   }
 
