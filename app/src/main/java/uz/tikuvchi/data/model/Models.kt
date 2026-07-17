@@ -83,6 +83,36 @@ data class UstaProfile(
     val profiles: Profile? = null,
 )
 
+// So'rovda faqat kerakli ustunlar tanlanadi, shuning uchun kartochka uchun alohida
+// modellar — web'dagi UstaCardData bilan bir xil. To'liq Profile/UstaService bu
+// yerda ishlamaydi: tanlanmagan majburiy maydonlar deserializatsiyani buzadi.
+
+@Serializable
+data class ProfileBrief(
+    @SerialName("full_name") val fullName: String,
+    @SerialName("avatar_url") val avatarUrl: String? = null,
+)
+
+@Serializable
+data class ServicePrice(
+    @SerialName("base_price") val basePrice: Long,
+)
+
+/** Bosh sahifa va qidiruvdagi usta kartochkasi. */
+@Serializable
+data class UstaCard(
+    @SerialName("user_id") val userId: String,
+    val district: String? = null,
+    @SerialName("rating_avg") val ratingAvg: Double = 0.0,
+    @SerialName("rating_count") val ratingCount: Int = 0,
+    val tags: List<String> = emptyList(),
+    val profiles: ProfileBrief,
+    @SerialName("usta_services") val services: List<ServicePrice> = emptyList(),
+) {
+    /** Kartochkada "dan boshlab" narxi; xizmat qo'shilmagan bo'lsa — null */
+    val minPrice: Long? get() = services.minOfOrNull { it.basePrice }
+}
+
 @Serializable
 data class ServiceCategory(
     val id: Long,

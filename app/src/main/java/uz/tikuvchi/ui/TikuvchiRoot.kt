@@ -3,7 +3,6 @@ package uz.tikuvchi.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,6 +15,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import uz.tikuvchi.data.supabase
 import uz.tikuvchi.ui.screens.auth.AuthScreen
+import uz.tikuvchi.ui.screens.home.HomeScreen
 import uz.tikuvchi.ui.theme.Terra600
 
 /**
@@ -35,7 +35,12 @@ fun TikuvchiRoot() {
 
     when (status) {
         null, is SessionStatus.Initializing -> Splash()
-        is SessionStatus.Authenticated -> HomePlaceholder()
+        is SessionStatus.Authenticated -> HomeScreen(
+            onMenu = {},
+            onProfile = {},
+            onCategory = {},
+            onUsta = {},
+        )
         // NotAuthenticated yoki RefreshFailure — ikkalasida ham kirish talab qilinadi
         else -> AuthScreen(onAuthenticated = { /* sessionStatus o'zi yangilanadi */ })
     }
@@ -45,12 +50,5 @@ fun TikuvchiRoot() {
 private fun Splash() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(color = Terra600)
-    }
-}
-
-@Composable
-private fun HomePlaceholder() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Kirdingiz — bosh sahifa keyingi bosqichda")
     }
 }

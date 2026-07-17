@@ -35,7 +35,20 @@
     <string name="nav_profile">Profil</string>
     <string name="menu_search">Qidirish</string>
 
-    <string name="common_error">Xatolik yuz berdi</string>
+    <string name="common_error">Xatolik yuz berdi. Qayta urinib ko\'ring.</string>
     <string name="common_retry">Qayta urinish</string>
     <string name="common_back">Orqaga</string>
+    <string name="common_close">Yopish</string>
+    <string name="common_from">dan boshlab</string>
+    <string name="common_loading">Yuklanmoqda…</string>
+
+    <string name="app_tagline">Sizga mos tikuvchi-usta shu yerda</string>
+    <string name="menu_title">Menyu</string>
+    <string name="menu_login">Kirish</string>
+    <string name="menu_logout">Chiqish</string>
+
+    <string name="home_search_placeholder">Usta, xizmat yoki tuman qidiring…</string>
+    <string name="home_categories">Kategoriyalar</string>
+    <string name="home_featured">Tavsiya etilgan ustalar</string>
+    <string name="home_empty_ustas">Hozircha ustalar yo\'q</string>
 </resources>
