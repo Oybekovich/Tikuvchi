@@ -1,5 +1,6 @@
 package uz.tikuvchi.util
 
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import kotlin.math.abs
@@ -31,10 +32,33 @@ private val UZ_MONTHS = listOf(
     "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
 )
 
-/** Sana: 16-iyul, 2026. Web'dagi kabi mahalliy vaqt mintaqasida ko'rsatiladi. */
-fun formatDate(iso: String): String {
-    val d = OffsetDateTime.parse(iso).atZoneSameInstant(ZoneId.systemDefault())
+/**
+ * DB'dan kelgan sanani o'qiydi. Ustunlar ikki xil: timestamptz
+ * ("2026-06-21T05:43:56+00:00") va oddiy date ("2026-07-19" — masalan
+ * orders.estimated_ready_at). Ikkalasi ham qabul qilinishi shart.
+ */
+private fun parseDbDate(value: String): LocalDate =
+    runCatching { OffsetDateTime.parse(value).atZoneSameInstant(ZoneId.systemDefault()).toLocalDate() }
+        .getOrElse { LocalDate.parse(value) }
+
+/** Sana: 16-iyul, 2026 */
+fun formatDate(value: String): String {
+    val d = parseDbDate(value)
     return "${d.dayOfMonth}-${UZ_MONTHS[d.monthValue - 1]}, ${d.year}"
+}
+
+/**
+ * Chat ro'yxati uchun qisqa vaqt: bugun bo'lsa soat, kecha bo'lsa "Kecha",
+ * aks holda sana. Web'dagi formatChatTime bilan bir xil.
+ */
+fun formatChatTime(iso: String, yesterdayLabel: String = "Kecha"): String {
+    val d = OffsetDateTime.parse(iso).atZoneSameInstant(ZoneId.systemDefault())
+    val today = LocalDate.now()
+    return when (d.toLocalDate()) {
+        today -> "%02d:%02d".format(d.hour, d.minute)
+        today.minusDays(1) -> yesterdayLabel
+        else -> "${d.dayOfMonth}-${UZ_MONTHS[d.monthValue - 1]}"
+    }
 }
 
 /** Ish vaqti: DB'da "09:00:00" — "09:00" ko'rinishiga keltiriladi. */

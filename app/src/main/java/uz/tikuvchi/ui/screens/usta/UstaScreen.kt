@@ -72,7 +72,7 @@ fun UstaScreen(
     ustaId: String,
     onBack: () -> Unit,
     onOrder: (String) -> Unit,
-    onChat: (String) -> Unit,
+    onChat: (id: String, name: String) -> Unit,
 ) {
     val vm: UstaViewModel = viewModel(
         key = ustaId,
@@ -191,7 +191,7 @@ fun UstaScreen(
                         )
                         SecondaryButton(
                             text = stringResource(R.string.usta_chat_cta),
-                            onClick = { onChat(ustaId) },
+                            onClick = { onChat(ustaId, name) },
                             modifier = Modifier.weight(0.6f),
                         )
                     }

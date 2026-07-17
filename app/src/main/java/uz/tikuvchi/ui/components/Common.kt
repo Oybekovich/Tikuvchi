@@ -82,6 +82,27 @@ fun PrimaryButton(
     }
 }
 
+/** Yorliqsiz kiritish maydoni — chat xabar qatori uchun. */
+@Composable
+fun PlainInput(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        // Uzun xabar bir necha qatorga chiqsin, lekin cheksiz o'smasin
+        maxLines = 4,
+        shape = RoundedCornerShape(16.dp),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        placeholder = fieldPlaceholder(placeholder),
+        colors = fieldColors(),
+    )
+}
+
 /** Qidiruv paneli — web'dagi SearchBar kabi: oq fon, chapda lupa. */
 @Composable
 fun SearchBar(

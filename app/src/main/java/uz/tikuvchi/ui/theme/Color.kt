@@ -30,3 +30,7 @@ val Sage500 = Color(0xFF6A7B74)
 
 val Red50 = Color(0xFFFEF2F2)
 val Red700 = Color(0xFFB91C1C)
+
+// Web'da bular @theme'da emas, Tailwind'ning standart ranglari — StatusChip'da ishlatiladi
+val Green100 = Color(0xFFDCFCE7)
+val Green800 = Color(0xFF166534)

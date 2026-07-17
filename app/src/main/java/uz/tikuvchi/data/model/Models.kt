@@ -113,6 +113,49 @@ data class UstaCard(
     val minPrice: Long? get() = services.minOfOrNull { it.basePrice }
 }
 
+/** Suhbatlar ro'yxatidagi qator — oxirgi xabar bilan. */
+@Serializable
+data class ConversationRow(
+    val id: String,
+    @SerialName("usta_id") val ustaId: String,
+    @SerialName("last_message_at") val lastMessageAt: String,
+    @SerialName("usta_profiles") val usta: OrderUsta,
+    // So'rovda limit(1) bilan faqat oxirgi xabar olinadi
+    val messages: List<MessagePreview> = emptyList(),
+) {
+    val last: MessagePreview? get() = messages.firstOrNull()
+}
+
+@Serializable
+data class MessagePreview(
+    val content: String? = null,
+    @SerialName("message_type") val messageType: MessageType = MessageType.TEXT,
+    @SerialName("created_at") val createdAt: String,
+)
+
+/** Buyurtmalar ro'yxatidagi qator — web'dagi orders/page.tsx so'rovi bilan bir xil. */
+@Serializable
+data class OrderRow(
+    val id: String,
+    val status: OrderStatus = OrderStatus.PENDING,
+    @SerialName("payment_status") val paymentStatus: PaymentStatus = PaymentStatus.PENDING,
+    @SerialName("total_price") val totalPrice: Long = 0,
+    @SerialName("estimated_ready_at") val estimatedReadyAt: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    val source: OrderSource = OrderSource.CATALOG,
+    @SerialName("usta_profiles") val usta: OrderUsta,
+    @SerialName("order_items") val items: List<OrderItemTitle> = emptyList(),
+) {
+    /** Kartochkada birinchi mahsulot nomi ko'rsatiladi. */
+    val title: String get() = items.firstOrNull()?.title ?: "—"
+}
+
+@Serializable
+data class OrderUsta(val profiles: ProfileBrief)
+
+@Serializable
+data class OrderItemTitle(val title: String)
+
 @Serializable
 data class ServicePriceCategory(
     @SerialName("base_price") val basePrice: Long,

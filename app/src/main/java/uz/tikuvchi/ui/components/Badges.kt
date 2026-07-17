@@ -20,11 +20,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import uz.tikuvchi.R
+import uz.tikuvchi.data.model.OrderStatus
+import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Gold100
 import uz.tikuvchi.ui.theme.Gold400
+import uz.tikuvchi.ui.theme.Green100
+import uz.tikuvchi.ui.theme.Green800
 import uz.tikuvchi.ui.theme.Ink500
+import uz.tikuvchi.ui.theme.Ink700
 import uz.tikuvchi.ui.theme.Ink900
+import uz.tikuvchi.ui.theme.Red50
+import uz.tikuvchi.ui.theme.Red700
+import uz.tikuvchi.ui.theme.Terra100
 import uz.tikuvchi.ui.theme.Terra700
+import uz.tikuvchi.ui.theme.Terra800
 import uz.tikuvchi.util.formatCurrency
 
 /** Reyting: ★ 4.9 (12) — web'dagi RatingBadge "soft" ko'rinishi. */
@@ -62,6 +71,37 @@ fun RatingBadge(
             )
         }
     }
+}
+
+/** Buyurtma holati — ranglar va matnlar web'dagi StatusChip bilan bir xil. */
+@Composable
+fun StatusChip(status: OrderStatus, modifier: Modifier = Modifier) {
+    val (bg, fg) = when (status) {
+        OrderStatus.PENDING -> Gold100 to Ink700
+        OrderStatus.ACCEPTED, OrderStatus.IN_PROGRESS -> Terra100 to Terra800
+        OrderStatus.READY -> Green100 to Green800
+        OrderStatus.COMPLETED -> Cream200 to Ink700
+        OrderStatus.CANCELLED -> Red50 to Red700
+    }
+    val label = when (status) {
+        OrderStatus.PENDING -> R.string.order_status_pending
+        OrderStatus.ACCEPTED -> R.string.order_status_accepted
+        OrderStatus.IN_PROGRESS -> R.string.order_status_in_progress
+        OrderStatus.READY -> R.string.order_status_ready
+        OrderStatus.COMPLETED -> R.string.order_status_completed
+        OrderStatus.CANCELLED -> R.string.order_status_cancelled
+    }
+    Text(
+        text = stringResource(label),
+        style = MaterialTheme.typography.labelSmall,
+        fontWeight = FontWeight.Bold,
+        color = fg,
+        maxLines = 1,
+        modifier = modifier
+            .clip(CircleShape)
+            .background(bg)
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+    )
 }
 
 /** Narx: 450 000 so'm [dan boshlab] */
