@@ -1,0 +1,16 @@
+# Gradle
+.gradle/
+.kotlin/
+build/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# SDK yo'li va Supabase kalitlari — bu yerda saqlanadi, git'ga tushmasligi kerak
+local.properties
+
+.DS_Store

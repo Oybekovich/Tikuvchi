@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Matnlar web ilovaning src/locales/uz.json faylidan ko'chirilgan -->
+<resources>
+    <string name="app_name">Tikuvchi</string>
+
+    <string name="auth_login_title">Xush kelibsiz!</string>
+    <string name="auth_login_subtitle">Hisobingizga kiring</string>
+    <string name="auth_register_title">Ro\'yxatdan o\'tish</string>
+    <string name="auth_register_subtitle">Bir daqiqada hisob oching</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_email_placeholder">ism@mail.uz</string>
+    <string name="auth_password">Parol</string>
+    <string name="auth_password_min">Kamida 6 ta belgi</string>
+    <string name="auth_full_name">Ism-familiya</string>
+    <string name="auth_full_name_placeholder">Ism familiya</string>
+    <string name="auth_phone">Telefon raqam (ixtiyoriy)</string>
+    <string name="auth_phone_placeholder">+998 90 123 45 67</string>
+    <string name="auth_login_btn">Kirish</string>
+    <string name="auth_register_btn">Ro\'yxatdan o\'tish</string>
+    <string name="auth_no_account">Hisobingiz yo\'qmi?</string>
+    <string name="auth_have_account">Hisobingiz bormi?</string>
+    <string name="auth_login_link">Kirish</string>
+    <string name="auth_register_link">Ro\'yxatdan o\'tish</string>
+    <string name="auth_invalid_credentials">Email yoki parol noto\'g\'ri</string>
+    <string name="auth_email_taken">Bu email allaqachon ro\'yxatdan o\'tgan</string>
+    <string name="auth_check_email">Emailingizga tasdiqlash havolasi yubordik. Pochtangizni tekshiring.</string>
+    <string name="auth_demo_title">Demo hisob</string>
+    <string name="auth_demo_hint">Sinab ko\'rish uchun: mijoz@demo.uz / demo1234</string>
+    <string name="auth_generic_error">Kirish amalga oshmadi. Qayta urinib ko\'ring.</string>
+
+    <string name="nav_home">Bosh sahifa</string>
+    <string name="nav_orders">Buyurtmalar</string>
+    <string name="nav_measurements">O\'lchovlar</string>
+    <string name="nav_chat">Xabarlar</string>
+    <string name="nav_profile">Profil</string>
+    <string name="menu_search">Qidirish</string>
+
+    <string name="common_error">Xatolik yuz berdi</string>
+    <string name="common_retry">Qayta urinish</string>
+    <string name="common_back">Orqaga</string>
+</resources>

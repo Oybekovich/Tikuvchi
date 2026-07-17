@@ -1,0 +1,187 @@
+package uz.tikuvchi.data.model
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+// Nomlar DB'dagi enum qiymatlari bilan aynan bir xil bo'lishi shart —
+// @SerialName shuning uchun har birida ochiq yozilgan.
+
+@Serializable
+enum class UserRole {
+    @SerialName("client") CLIENT,
+    @SerialName("usta") USTA,
+}
+
+@Serializable
+enum class GenderSegment {
+    @SerialName("women") WOMEN,
+    @SerialName("men") MEN,
+    @SerialName("unisex") UNISEX,
+}
+
+@Serializable
+enum class OrderStatus {
+    @SerialName("pending") PENDING,
+    @SerialName("accepted") ACCEPTED,
+    @SerialName("in_progress") IN_PROGRESS,
+    @SerialName("ready") READY,
+    @SerialName("completed") COMPLETED,
+    @SerialName("cancelled") CANCELLED,
+}
+
+@Serializable
+enum class PaymentStatus {
+    @SerialName("pending") PENDING,
+    @SerialName("partial") PARTIAL,
+    @SerialName("paid") PAID,
+}
+
+@Serializable
+enum class OrderSource {
+    @SerialName("catalog") CATALOG,
+    @SerialName("chat_negotiation") CHAT_NEGOTIATION,
+}
+
+@Serializable
+enum class MessageType {
+    @SerialName("text") TEXT,
+    @SerialName("price_offer") PRICE_OFFER,
+    @SerialName("image") IMAGE,
+}
+
+@Serializable
+enum class PriceOfferStatus {
+    @SerialName("pending") PENDING,
+    @SerialName("accepted") ACCEPTED,
+    @SerialName("declined") DECLINED,
+}
+
+@Serializable
+data class Profile(
+    val id: String,
+    @SerialName("full_name") val fullName: String,
+    @SerialName("avatar_url") val avatarUrl: String? = null,
+    val role: UserRole = UserRole.CLIENT,
+    val phone: String? = null,
+    @SerialName("created_at") val createdAt: String? = null,
+)
+
+@Serializable
+data class UstaProfile(
+    @SerialName("user_id") val userId: String,
+    val bio: String? = null,
+    @SerialName("cover_image_url") val coverImageUrl: String? = null,
+    @SerialName("rating_avg") val ratingAvg: Double = 0.0,
+    @SerialName("rating_count") val ratingCount: Int = 0,
+    @SerialName("location_text") val locationText: String? = null,
+    val district: String? = null,
+    @SerialName("work_hours_start") val workHoursStart: String? = null,
+    @SerialName("work_hours_end") val workHoursEnd: String? = null,
+    val tags: List<String> = emptyList(),
+    @SerialName("gender_segment") val genderSegment: GenderSegment = GenderSegment.WOMEN,
+    // Postgrest'da profiles!inner(...) bilan birga tortiladi
+    val profiles: Profile? = null,
+)
+
+@Serializable
+data class ServiceCategory(
+    val id: Long,
+    val name: String,
+    val icon: String? = null,
+    @SerialName("gender_segment") val genderSegment: GenderSegment = GenderSegment.WOMEN,
+)
+
+@Serializable
+data class UstaService(
+    val id: Long,
+    @SerialName("usta_id") val ustaId: String,
+    @SerialName("category_id") val categoryId: Long? = null,
+    val title: String,
+    val description: String? = null,
+    @SerialName("base_price") val basePrice: Long,
+)
+
+@Serializable
+data class PortfolioItem(
+    val id: Long,
+    @SerialName("usta_id") val ustaId: String,
+    @SerialName("image_url") val imageUrl: String,
+    val caption: String? = null,
+    @SerialName("sort_order") val sortOrder: Int = 0,
+)
+
+@Serializable
+data class Review(
+    val id: Long,
+    @SerialName("usta_id") val ustaId: String,
+    @SerialName("client_id") val clientId: String,
+    val rating: Int,
+    val comment: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    val profiles: Profile? = null,
+)
+
+@Serializable
+data class Order(
+    val id: String,
+    @SerialName("client_id") val clientId: String,
+    @SerialName("usta_id") val ustaId: String,
+    val source: OrderSource = OrderSource.CATALOG,
+    val status: OrderStatus = OrderStatus.PENDING,
+    @SerialName("total_price") val totalPrice: Long = 0,
+    @SerialName("payment_status") val paymentStatus: PaymentStatus = PaymentStatus.PENDING,
+    @SerialName("estimated_ready_at") val estimatedReadyAt: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("usta_profiles") val ustaProfile: UstaProfile? = null,
+    @SerialName("order_items") val items: List<OrderItem> = emptyList(),
+)
+
+@Serializable
+data class OrderItem(
+    val id: Long? = null,
+    @SerialName("order_id") val orderId: String? = null,
+    val title: String,
+    val material: String? = null,
+    @SerialName("image_url") val imageUrl: String? = null,
+    @SerialName("size_note") val sizeNote: String? = null,
+    @SerialName("model_note") val modelNote: String? = null,
+    val price: Long = 0,
+)
+
+@Serializable
+data class Measurement(
+    val id: String? = null,
+    @SerialName("client_id") val clientId: String? = null,
+    val label: String,
+    val chest: Double? = null,
+    val waist: Double? = null,
+    val hips: Double? = null,
+    val height: Double? = null,
+    val shoulder: Double? = null,
+    @SerialName("sleeve_length") val sleeveLength: Double? = null,
+    val notes: String? = null,
+    @SerialName("updated_at") val updatedAt: String? = null,
+)
+
+@Serializable
+data class Conversation(
+    val id: String,
+    @SerialName("client_id") val clientId: String,
+    @SerialName("usta_id") val ustaId: String,
+    @SerialName("last_message_at") val lastMessageAt: String,
+    @SerialName("usta_profiles") val ustaProfile: UstaProfile? = null,
+)
+
+@Serializable
+data class Message(
+    val id: String,
+    @SerialName("conversation_id") val conversationId: String,
+    @SerialName("sender_id") val senderId: String,
+    val content: String? = null,
+    @SerialName("message_type") val messageType: MessageType = MessageType.TEXT,
+    @SerialName("price_offer_amount") val priceOfferAmount: Long? = null,
+    @SerialName("price_offer_duration_days") val priceOfferDurationDays: Int? = null,
+    @SerialName("price_offer_note") val priceOfferNote: String? = null,
+    @SerialName("price_offer_status") val priceOfferStatus: PriceOfferStatus? = null,
+    @SerialName("created_at") val createdAt: String,
+)
