@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import uz.tikuvchi.data.ProfileRepository
 import uz.tikuvchi.data.model.UserRole
 import uz.tikuvchi.util.PHONE_PREFIX
+import uz.tikuvchi.util.formatPhone
 
 data class ProfileUiState(
     val loading: Boolean = true,
@@ -40,7 +41,9 @@ class ProfileViewModel : ViewModel() {
                         loading = false,
                         email = ProfileRepository.currentEmail(),
                         fullName = p?.fullName.orEmpty(),
-                        phone = p?.phone.orEmpty(),
+                        // DB'da raqam formatlanmagan bo'lishi mumkin (seed
+                        // ma'lumotlari shunday) — maydonda bir xil ko'rinsin
+                        phone = formatPhone(p?.phone.orEmpty()),
                         role = p?.role ?: UserRole.CLIENT,
                     )
                 }

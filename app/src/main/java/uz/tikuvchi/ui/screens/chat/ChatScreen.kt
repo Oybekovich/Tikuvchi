@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -36,9 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -59,6 +62,7 @@ import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra600
 import uz.tikuvchi.ui.theme.Terra700
 import uz.tikuvchi.util.formatCurrency
+import uz.tikuvchi.util.imageUrl
 
 @Composable
 fun ChatScreen(
@@ -155,16 +159,26 @@ private fun MessageBubble(m: Message, mine: Boolean) {
                 .background(
                     when {
                         m.messageType == MessageType.PRICE_OFFER -> Gold100
+                        m.messageType == MessageType.IMAGE -> Color.White
                         mine -> Terra600
                         else -> Color.White
                     },
                 )
-                .padding(12.dp),
+                .padding(if (m.messageType == MessageType.IMAGE) 4.dp else 12.dp),
         ) {
-            if (m.messageType == MessageType.PRICE_OFFER) {
-                PriceOffer(m)
-            } else {
-                Text(
+            when (m.messageType) {
+                MessageType.PRICE_OFFER -> PriceOffer(m)
+                // content — rasmning Storage'dagi manzili
+                MessageType.IMAGE -> AsyncImage(
+                    model = imageUrl(m.content),
+                    contentDescription = stringResource(R.string.chat_photo),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .widthIn(max = 240.dp)
+                        .heightIn(max = 320.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                )
+                MessageType.TEXT -> Text(
                     m.content.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (mine) Color.White else Ink900,

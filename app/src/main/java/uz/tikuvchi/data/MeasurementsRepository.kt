@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.Instant
 import uz.tikuvchi.data.model.Measurement
 
 object MeasurementsRepository {
@@ -42,9 +43,13 @@ object MeasurementsRepository {
     }
 
     /**
-     * Yoziladigan maydonlar. Modelning o'zini yuborib bo'lmaydi: id va updated_at
-     * ham null qiymat bilan ketib, DB'dagi qiymatlarni buzadi. Bo'sh qoldirilgan
-     * o'lchov null bo'lib yozilishi kerak — bu ataylab.
+     * Yoziladigan maydonlar. Modelning o'zini yuborib bo'lmaydi: id ham null
+     * qiymat bilan ketadi. Bo'sh qoldirilgan o'lchov null bo'lib yozilishi
+     * kerak — bu ataylab.
+     *
+     * updated_at ni DB o'zi yangilamaydi (trigger yo'q), shuning uchun web
+     * ilovadagi kabi shu yerda qo'lda qo'yiladi — aks holda "Yangilangan"
+     * sanasi eski qiymatda qotib qoladi.
      */
     private fun Measurement.fields() = Fields(
         label = label,
@@ -55,6 +60,7 @@ object MeasurementsRepository {
         shoulder = shoulder,
         sleeveLength = sleeveLength,
         notes = notes,
+        updatedAt = Instant.now().toString(),
     )
 
     @Serializable
@@ -67,6 +73,7 @@ object MeasurementsRepository {
         val shoulder: Double?,
         @SerialName("sleeve_length") val sleeveLength: Double?,
         val notes: String?,
+        @SerialName("updated_at") val updatedAt: String,
     )
 
     /** Insert'da client_id ham kerak — RLS shuni talab qiladi. */
@@ -81,10 +88,11 @@ object MeasurementsRepository {
         val shoulder: Double?,
         @SerialName("sleeve_length") val sleeveLength: Double?,
         val notes: String?,
+        @SerialName("updated_at") val updatedAt: String,
     ) {
         constructor(clientId: String, f: Fields) : this(
             clientId, f.label, f.chest, f.waist, f.hips, f.height, f.shoulder,
-            f.sleeveLength, f.notes,
+            f.sleeveLength, f.notes, f.updatedAt,
         )
     }
 }

@@ -283,21 +283,26 @@ private fun FormDialog(
                 }
             }
         },
+        // Ikkala tugma bitta Row'da — AlertDialog'ning o'z joylashuvida ular
+        // torayib, matn ikki qatorga bo'linib kesilib qolardi
         confirmButton = {
-            PrimaryButton(
-                text = stringResource(R.string.common_save),
-                onClick = vm::save,
-                loading = saving,
-                enabled = form.label.isNotBlank(),
-                modifier = Modifier.fillMaxWidth(0.5f),
-            )
-        },
-        dismissButton = {
-            SecondaryButton(
-                text = stringResource(R.string.common_cancel),
-                onClick = vm::closeForm,
-                modifier = Modifier.fillMaxWidth(0.4f),
-            )
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                SecondaryButton(
+                    text = stringResource(R.string.common_cancel),
+                    onClick = vm::closeForm,
+                    modifier = Modifier.weight(1f),
+                )
+                PrimaryButton(
+                    text = stringResource(R.string.common_save),
+                    onClick = vm::save,
+                    loading = saving,
+                    enabled = form.label.isNotBlank(),
+                    modifier = Modifier.weight(1f),
+                )
+            }
         },
     )
 }

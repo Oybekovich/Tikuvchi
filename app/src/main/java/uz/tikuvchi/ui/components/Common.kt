@@ -77,7 +77,7 @@ fun PrimaryButton(
                     color = MaterialTheme.colorScheme.onPrimary,
                 )
             }
-            Text(text, style = MaterialTheme.typography.labelLarge)
+            Text(text, style = MaterialTheme.typography.labelLarge, maxLines = 1)
         }
     }
 }
@@ -148,7 +148,7 @@ fun SecondaryButton(
             contentColor = Terra700,
         ),
     ) {
-        Text(text, style = MaterialTheme.typography.labelLarge)
+        Text(text, style = MaterialTheme.typography.labelLarge, maxLines = 1)
     }
 }
 
