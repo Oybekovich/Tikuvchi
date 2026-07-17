@@ -81,6 +81,8 @@ export default function ProfileForm({ email, fullName, phone, role, userId }: Pr
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="Nilufar Karimova"
+            autoComplete="name"
             className={inputCls}
           />
         </label>

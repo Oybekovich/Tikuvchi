@@ -107,6 +107,8 @@ export default function AuthForm({ mode }: Props) {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
+                placeholder="Nilufar Karimova"
+                autoComplete="name"
                 className={inputCls}
               />
             </label>
@@ -133,6 +135,8 @@ export default function AuthForm({ mode }: Props) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            placeholder="ism@mail.uz"
+            inputMode="email"
             autoComplete="email"
             className={inputCls}
           />
