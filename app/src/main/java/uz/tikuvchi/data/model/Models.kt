@@ -113,6 +113,39 @@ data class UstaCard(
     val minPrice: Long? get() = services.minOfOrNull { it.basePrice }
 }
 
+@Serializable
+data class ServicePriceCategory(
+    @SerialName("base_price") val basePrice: Long,
+    @SerialName("category_id") val categoryId: Long? = null,
+)
+
+/**
+ * Qidiruv natijasi. Web'dagi kabi: tuman va reyting server tomonda filtrlanadi,
+ * matn/kategoriya/narx esa shu qatorlar ustida — shuning uchun bio va xizmat
+ * kategoriyalari ham tortiladi.
+ */
+@Serializable
+data class UstaSearchRow(
+    @SerialName("user_id") val userId: String,
+    val district: String? = null,
+    val bio: String? = null,
+    @SerialName("rating_avg") val ratingAvg: Double = 0.0,
+    @SerialName("rating_count") val ratingCount: Int = 0,
+    val tags: List<String> = emptyList(),
+    val profiles: ProfileBrief,
+    @SerialName("usta_services") val services: List<ServicePriceCategory> = emptyList(),
+) {
+    fun toCard() = UstaCard(
+        userId = userId,
+        district = district,
+        ratingAvg = ratingAvg,
+        ratingCount = ratingCount,
+        tags = tags,
+        profiles = profiles,
+        services = services.map { ServicePrice(it.basePrice) },
+    )
+}
+
 /** Usta sahifasidagi xizmat. */
 @Serializable
 data class ServiceItem(

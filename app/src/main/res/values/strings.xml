@@ -52,6 +52,19 @@
     <string name="home_featured">Tavsiya etilgan ustalar</string>
     <string name="home_empty_ustas">Hozircha ustalar yo\'q</string>
 
+    <string name="search_title">Qidiruv</string>
+    <string name="search_found">%1$d ta usta topildi</string>
+    <string name="search_empty">Hech narsa topilmadi</string>
+    <string name="search_empty_hint">Filtrlarni o\'zgartirib ko\'ring</string>
+    <string name="search_filters">Filtrlar</string>
+    <string name="search_category">Kategoriya</string>
+    <string name="search_district">Tuman</string>
+    <string name="search_min_rating">Minimal reyting</string>
+    <string name="search_price_from">Narx (dan)</string>
+    <string name="search_price_to">Narx (gacha)</string>
+    <string name="search_reset">Tozalash</string>
+    <string name="common_all">Barchasi</string>
+
     <string name="usta_services">Xizmatlar va narxlar</string>
     <string name="usta_portfolio">Portfolio</string>
     <string name="usta_reviews">Mijozlar sharhlari</string>

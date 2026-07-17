@@ -21,6 +21,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import uz.tikuvchi.data.supabase
 import uz.tikuvchi.ui.screens.auth.AuthScreen
 import uz.tikuvchi.ui.screens.home.HomeScreen
+import uz.tikuvchi.ui.screens.search.SearchScreen
 import uz.tikuvchi.ui.screens.usta.UstaScreen
 import uz.tikuvchi.ui.theme.Terra600
 
@@ -50,7 +51,13 @@ fun TikuvchiRoot() {
 private object Route {
     const val HOME = "home"
     const val USTA = "usta/{id}"
+    const val SEARCH = "search?q={q}&category={category}"
+
     fun usta(id: String) = "usta/$id"
+
+    /** Bo'sh qiymatlar "-" bilan uzatiladi: NavHost bo'sh string argumentni yo'qotadi. */
+    fun search(q: String = "", category: Long? = null) =
+        "search?q=${q.ifBlank { "-" }}&category=${category ?: "-"}"
 }
 
 @Composable
@@ -61,10 +68,30 @@ private fun AppNav() {
             HomeScreen(
                 onMenu = {},
                 onProfile = {},
-                onCategory = {},
+                onSearch = { q -> nav.navigate(Route.search(q = q)) },
+                onCategory = { id -> nav.navigate(Route.search(category = id)) },
                 onUsta = { id -> nav.navigate(Route.usta(id)) },
             )
         }
+
+        composable(
+            Route.SEARCH,
+            arguments = listOf(
+                navArgument("q") { type = NavType.StringType; defaultValue = "-" },
+                navArgument("category") { type = NavType.StringType; defaultValue = "-" },
+            ),
+        ) { entry ->
+            val q = entry.arguments?.getString("q").orEmpty()
+            val category = entry.arguments?.getString("category")
+            SearchScreen(
+                initialText = if (q == "-") "" else q,
+                initialCategory = category?.toLongOrNull(),
+                onBack = { nav.popBackStack() },
+                onProfile = {},
+                onUsta = { id -> nav.navigate(Route.usta(id)) },
+            )
+        }
+
         composable(
             Route.USTA,
             arguments = listOf(navArgument("id") { type = NavType.StringType }),

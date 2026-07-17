@@ -8,12 +8,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
@@ -75,6 +80,32 @@ fun PrimaryButton(
             Text(text, style = MaterialTheme.typography.labelLarge)
         }
     }
+}
+
+/** Qidiruv paneli — web'dagi SearchBar kabi: oq fon, chapda lupa. */
+@Composable
+fun SearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    onSearch: (() -> Unit)? = null,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.fillMaxWidth(),
+        singleLine = true,
+        shape = RoundedCornerShape(16.dp),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        placeholder = fieldPlaceholder(placeholder),
+        leadingIcon = {
+            Icon(Icons.Filled.Search, contentDescription = null, tint = Ink500)
+        },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { onSearch?.invoke() }),
+        colors = fieldColors(),
+    )
 }
 
 /** Ikkilamchi harakat: terra kontur, cream fon — web'dagi chat tugmasi kabi. */

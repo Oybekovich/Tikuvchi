@@ -22,6 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,6 +37,7 @@ import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.CategoryCard
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.PrimaryButton
+import uz.tikuvchi.ui.components.SearchBar
 import uz.tikuvchi.ui.components.UstaCardItem
 import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink500
@@ -44,10 +48,13 @@ import uz.tikuvchi.ui.theme.Terra600
 fun HomeScreen(
     onMenu: () -> Unit,
     onProfile: () -> Unit,
+    onSearch: (String) -> Unit,
     onCategory: (Long) -> Unit,
     onUsta: (String) -> Unit,
     vm: HomeViewModel = viewModel(),
 ) {
+    // Qidiruv matni shu yerda turadi — natijalar alohida ekranda ochiladi
+    var searchText by rememberSaveable { mutableStateOf("") }
     val s by vm.state.collectAsStateWithLifecycle()
 
     // enableEdgeToEdge yoqilgani uchun header status bar ostiga kirib ketmasligi
@@ -86,6 +93,16 @@ fun HomeScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                item {
+                    SearchBar(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        placeholder = stringResource(R.string.home_search_placeholder),
+                        onSearch = { onSearch(searchText) },
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
+
                 item {
                     SectionTitle(stringResource(R.string.home_categories))
                     LazyRow(
