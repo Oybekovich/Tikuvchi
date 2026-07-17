@@ -5,8 +5,10 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import uz.tikuvchi.data.model.ReviewItem
 import uz.tikuvchi.data.model.ServiceCategory
 import uz.tikuvchi.data.model.UstaCard
+import uz.tikuvchi.data.model.UstaDetail
 
 /**
  * Katalog: kategoriyalar va ustalar. So'rovlar web ilovadagilar bilan bir xil —
@@ -32,6 +34,37 @@ object CatalogRepository {
         supabase.from("usta_profiles")
             .select(Columns.raw(USTA_CARD_COLUMNS)) {
                 order("rating_avg", Order.DESCENDING)
+            }
+            .decodeList()
+    }
+
+    /** Usta sahifasi. Topilmasa — null. */
+    suspend fun usta(id: String): UstaDetail? = withContext(Dispatchers.IO) {
+        supabase.from("usta_profiles")
+            .select(
+                Columns.raw(
+                    "user_id, bio, cover_image_url, rating_avg, rating_count, " +
+                        "location_text, district, work_hours_start, work_hours_end, tags, " +
+                        "profiles!inner(full_name, avatar_url), " +
+                        "usta_services(id, title, description, base_price), " +
+                        "portfolio_items(id, image_url, caption, sort_order)"
+                )
+            ) {
+                filter { eq("user_id", id) }
+            }
+            .decodeSingleOrNull()
+    }
+
+    suspend fun reviews(ustaId: String): List<ReviewItem> = withContext(Dispatchers.IO) {
+        supabase.from("reviews")
+            .select(
+                Columns.raw(
+                    "id, rating, comment, created_at, " +
+                        "profiles!reviews_client_id_fkey(full_name, avatar_url)"
+                )
+            ) {
+                filter { eq("usta_id", ustaId) }
+                order("created_at", Order.DESCENDING)
             }
             .decodeList()
     }

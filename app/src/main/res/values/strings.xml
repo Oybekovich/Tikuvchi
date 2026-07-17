@@ -51,4 +51,14 @@
     <string name="home_categories">Kategoriyalar</string>
     <string name="home_featured">Tavsiya etilgan ustalar</string>
     <string name="home_empty_ustas">Hozircha ustalar yo\'q</string>
+
+    <string name="usta_services">Xizmatlar va narxlar</string>
+    <string name="usta_portfolio">Portfolio</string>
+    <string name="usta_reviews">Mijozlar sharhlari</string>
+    <string name="usta_work_hours">Ish vaqti: %1$s – %2$s</string>
+    <string name="usta_order_cta">Buyurtma berish</string>
+    <string name="usta_chat_cta">Yozish</string>
+    <string name="usta_no_reviews">Hozircha sharhlar yo\'q</string>
+    <string name="usta_no_portfolio">Portfolio hali qo\'shilmagan</string>
+    <string name="usta_not_found">Usta topilmadi</string>
 </resources>

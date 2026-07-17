@@ -1,5 +1,7 @@
 package uz.tikuvchi.util
 
+import java.time.OffsetDateTime
+import java.time.ZoneId
 import kotlin.math.abs
 import kotlin.math.roundToLong
 
@@ -23,6 +25,23 @@ fun formatCurrency(amount: Double): String = formatCurrency(amount.roundToLong()
  */
 fun formatOrderNumber(id: String): String =
     id.replace("-", "").takeLast(6).uppercase()
+
+private val UZ_MONTHS = listOf(
+    "yanvar", "fevral", "mart", "aprel", "may", "iyun",
+    "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
+)
+
+/** Sana: 16-iyul, 2026. Web'dagi kabi mahalliy vaqt mintaqasida ko'rsatiladi. */
+fun formatDate(iso: String): String {
+    val d = OffsetDateTime.parse(iso).atZoneSameInstant(ZoneId.systemDefault())
+    return "${d.dayOfMonth}-${UZ_MONTHS[d.monthValue - 1]}, ${d.year}"
+}
+
+/** Ish vaqti: DB'da "09:00:00" — "09:00" ko'rinishiga keltiriladi. */
+fun formatTime(value: String?): String {
+    if (value.isNullOrEmpty()) return "—"
+    return value.take(5)
+}
 
 /**
  * Boshidagi 998 mamlakat kodimi? Maydonda prefiks turgan bo'lsa — ha. Tashqaridan

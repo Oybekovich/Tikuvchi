@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -31,11 +33,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import uz.tikuvchi.ui.theme.Cream100
 import uz.tikuvchi.ui.theme.Cream200
+import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink300
 import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra400
 import uz.tikuvchi.ui.theme.Terra600
+import uz.tikuvchi.ui.theme.Terra700
 import uz.tikuvchi.util.formatPhoneInput
 
 /** Web'dagi Button komponenti: to'liq kenglik, 12px radius, yuklanish holati. */
@@ -70,6 +74,29 @@ fun PrimaryButton(
             }
             Text(text, style = MaterialTheme.typography.labelLarge)
         }
+    }
+}
+
+/** Ikkilamchi harakat: terra kontur, cream fon — web'dagi chat tugmasi kabi. */
+@Composable
+fun SecondaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier.fillMaxWidth().height(52.dp),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(2.dp, Terra600),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = Cream50,
+            contentColor = Terra700,
+        ),
+    ) {
+        Text(text, style = MaterialTheme.typography.labelLarge)
     }
 }
 

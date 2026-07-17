@@ -11,11 +11,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import uz.tikuvchi.data.supabase
 import uz.tikuvchi.ui.screens.auth.AuthScreen
 import uz.tikuvchi.ui.screens.home.HomeScreen
+import uz.tikuvchi.ui.screens.usta.UstaScreen
 import uz.tikuvchi.ui.theme.Terra600
 
 /**
@@ -35,14 +41,41 @@ fun TikuvchiRoot() {
 
     when (status) {
         null, is SessionStatus.Initializing -> Splash()
-        is SessionStatus.Authenticated -> HomeScreen(
-            onMenu = {},
-            onProfile = {},
-            onCategory = {},
-            onUsta = {},
-        )
+        is SessionStatus.Authenticated -> AppNav()
         // NotAuthenticated yoki RefreshFailure — ikkalasida ham kirish talab qilinadi
         else -> AuthScreen(onAuthenticated = { /* sessionStatus o'zi yangilanadi */ })
+    }
+}
+
+private object Route {
+    const val HOME = "home"
+    const val USTA = "usta/{id}"
+    fun usta(id: String) = "usta/$id"
+}
+
+@Composable
+private fun AppNav() {
+    val nav = rememberNavController()
+    NavHost(navController = nav, startDestination = Route.HOME) {
+        composable(Route.HOME) {
+            HomeScreen(
+                onMenu = {},
+                onProfile = {},
+                onCategory = {},
+                onUsta = { id -> nav.navigate(Route.usta(id)) },
+            )
+        }
+        composable(
+            Route.USTA,
+            arguments = listOf(navArgument("id") { type = NavType.StringType }),
+        ) { entry ->
+            UstaScreen(
+                ustaId = entry.arguments?.getString("id").orEmpty(),
+                onBack = { nav.popBackStack() },
+                onOrder = {},
+                onChat = {},
+            )
+        }
     }
 }
 

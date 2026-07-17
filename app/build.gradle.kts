@@ -28,6 +28,8 @@ android {
 
         buildConfigField("String", "SUPABASE_URL", "\"${localProp("SUPABASE_URL")}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProp("SUPABASE_ANON_KEY")}\"")
+        // Seed rasmlari web ilovaning public/ papkasidan xizmat qilinadi
+        buildConfigField("String", "WEB_ORIGIN", "\"${localProp("WEB_ORIGIN")}\"")
     }
 
     buildTypes {
@@ -79,6 +81,7 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.svg)
 
     testImplementation(libs.junit)
 }

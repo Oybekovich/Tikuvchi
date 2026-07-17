@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import uz.tikuvchi.util.imageUrl
 
 /** Web'dagi Avatar bilan bir xil ranglar — bir xil ism ikkala platformada bir xil rangda. */
 private val FallbackColors = listOf(
@@ -56,9 +57,10 @@ fun Avatar(
     modifier: Modifier = Modifier,
 ) {
     val shape = CircleShape
-    if (src != null) {
+    val url = imageUrl(src)
+    if (url != null) {
         AsyncImage(
-            model = src,
+            model = url,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = modifier.size(size.dp).clip(shape),

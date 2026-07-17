@@ -113,6 +113,52 @@ data class UstaCard(
     val minPrice: Long? get() = services.minOfOrNull { it.basePrice }
 }
 
+/** Usta sahifasidagi xizmat. */
+@Serializable
+data class ServiceItem(
+    val id: Long,
+    val title: String,
+    val description: String? = null,
+    @SerialName("base_price") val basePrice: Long,
+)
+
+/** Usta sahifasidagi portfolio rasmi. */
+@Serializable
+data class PortfolioImage(
+    val id: Long,
+    @SerialName("image_url") val imageUrl: String,
+    val caption: String? = null,
+    @SerialName("sort_order") val sortOrder: Int = 0,
+)
+
+/** Usta sahifasidagi sharh. */
+@Serializable
+data class ReviewItem(
+    val id: Long,
+    val rating: Int,
+    val comment: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    val profiles: ProfileBrief,
+)
+
+/** Usta sahifasi — web'dagi usta/[id]/page.tsx so'rovi bilan bir xil. */
+@Serializable
+data class UstaDetail(
+    @SerialName("user_id") val userId: String,
+    val bio: String? = null,
+    @SerialName("cover_image_url") val coverImageUrl: String? = null,
+    @SerialName("rating_avg") val ratingAvg: Double = 0.0,
+    @SerialName("rating_count") val ratingCount: Int = 0,
+    @SerialName("location_text") val locationText: String? = null,
+    val district: String? = null,
+    @SerialName("work_hours_start") val workHoursStart: String? = null,
+    @SerialName("work_hours_end") val workHoursEnd: String? = null,
+    val tags: List<String> = emptyList(),
+    val profiles: ProfileBrief,
+    @SerialName("usta_services") val services: List<ServiceItem> = emptyList(),
+    @SerialName("portfolio_items") val portfolio: List<PortfolioImage> = emptyList(),
+)
+
 @Serializable
 data class ServiceCategory(
     val id: Long,
