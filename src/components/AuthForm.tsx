@@ -6,6 +6,7 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import { IconScissors } from "@/components/Icons";
 import { createClient } from "@/lib/supabase/client";
+import { PHONE_PREFIX, formatPhone } from "@/lib/format";
 import { t } from "@/lib/i18n";
 
 type Props = { mode: "login" | "register" };
@@ -49,6 +50,8 @@ export default function AuthForm({ mode }: Props) {
           return;
         }
       } else {
+        // Enter bilan yuborilsa onBlur ishlamay qolishi mumkin — prefiksni bu yerda ham tekshiramiz
+        const phoneValue = phone.trim() === PHONE_PREFIX.trim() ? "" : phone.trim();
         const { data, error: err } = await supabase.auth.signUp({
           email: email.trim(),
           password,
@@ -56,7 +59,7 @@ export default function AuthForm({ mode }: Props) {
             data: {
               full_name: fullName.trim(),
               role: "client",
-              phone: phone.trim() || null,
+              phone: phoneValue || null,
             },
           },
         });
@@ -107,7 +110,7 @@ export default function AuthForm({ mode }: Props) {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                placeholder="Nilufar Karimova"
+                placeholder="Ism familiya"
                 autoComplete="name"
                 className={inputCls}
               />
@@ -118,9 +121,17 @@ export default function AuthForm({ mode }: Props) {
               </span>
               <input
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                onFocus={() => {
+                  if (!phone) setPhone(PHONE_PREFIX);
+                }}
+                onBlur={() => {
+                  // Faqat prefiks qolgan bo'lsa — raqam kiritilmagan hisoblanadi
+                  if (phone.trim() === PHONE_PREFIX.trim()) setPhone("");
+                }}
                 placeholder="+998 90 123 45 67"
                 inputMode="tel"
+                autoComplete="tel"
                 className={inputCls}
               />
             </label>

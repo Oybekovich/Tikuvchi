@@ -23,6 +23,41 @@ export function formatOrderNumber(id: string): string {
   return id.replace(/-/g, "").slice(-6).toUpperCase();
 }
 
+/** Telefon maydoni fokuslanganda avtomatik qo'yiladigan boshlanish */
+export const PHONE_PREFIX = "+998 ";
+
+/**
+ * Telefon raqamni yozilayotgan payt formatlaydi: +998 90 123 45 67
+ * Kiritilgan har qanday ko'rinish (998901234567, +998901234567, 901234567)
+ * bir xil natijaga keltiriladi.
+ *
+ * Bo'sh satr qaytsa — maydon tozalangan degani: foydalanuvchi "+998" ni ham
+ * o'chira olishi kerak, aks holda raqamni butunlay olib tashlab bo'lmaydi.
+ */
+export function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+
+  // Prefiks ichiga kirib o'chirilyapti — maydonni bo'shatamiz
+  if (raw === "+998" || digits.length < 3) return "";
+
+  // Maydonda prefiks turgan bo'lsa, boshidagi 998 — mamlakat kodi.
+  // Tashqaridan nusxalanganda esa u faqat raqam 9 tadan uzun bo'lsagina
+  // mamlakat kodi: "99 812 34 56" kabi abonent raqamlari ham 998 bilan
+  // boshlanadi (99 — operator kodi).
+  const hasPrefix = raw.startsWith(PHONE_PREFIX.trim());
+  const isCountryCode =
+    digits.startsWith("998") && (hasPrefix || digits.length > 9);
+  const rest = (isCountryCode ? digits.slice(3) : digits).slice(0, 9);
+  const groups = [
+    rest.slice(0, 2),
+    rest.slice(2, 5),
+    rest.slice(5, 7),
+    rest.slice(7, 9),
+  ].filter(Boolean);
+
+  return PHONE_PREFIX + groups.join(" ");
+}
+
 const UZ_MONTHS = [
   "yanvar",
   "fevral",
