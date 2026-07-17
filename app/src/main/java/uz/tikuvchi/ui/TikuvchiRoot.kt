@@ -31,6 +31,7 @@ import uz.tikuvchi.ui.screens.chat.ChatListScreen
 import uz.tikuvchi.ui.screens.chat.ChatScreen
 import uz.tikuvchi.ui.screens.home.HomeScreen
 import uz.tikuvchi.ui.screens.measurements.MeasurementsScreen
+import uz.tikuvchi.ui.screens.order.OrderWizardScreen
 import uz.tikuvchi.ui.screens.orders.OrdersScreen
 import uz.tikuvchi.ui.screens.profile.ProfileScreen
 import uz.tikuvchi.ui.screens.search.SearchScreen
@@ -69,9 +70,12 @@ private object Route {
     const val MEASUREMENTS = "measurements"
     const val CHAT = "chat"
     const val CHAT_WITH = "chat/{ustaId}?name={name}"
+    const val ORDER_NEW = "usta/{id}/buyurtma"
 
     fun chatWith(ustaId: String, name: String?) =
         "chat/$ustaId?name=${name?.ifBlank { null } ?: "-"}"
+
+    fun orderNew(ustaId: String) = "usta/$ustaId/buyurtma"
 
     fun usta(id: String) = "usta/$id"
 
@@ -149,7 +153,7 @@ private fun AppNav() {
                 UstaScreen(
                     ustaId = entry.arguments?.getString("id").orEmpty(),
                     onBack = { nav.popBackStack() },
-                    onOrder = {},
+                    onOrder = { id -> nav.navigate(Route.orderNew(id)) },
                     onChat = { id, name -> nav.navigate(Route.chatWith(id, name)) },
                 )
             }
@@ -163,6 +167,23 @@ private fun AppNav() {
                     onMenu = { scope.launch { drawer.open() } },
                     onProfile = { nav.navigate(Route.PROFILE) },
                     onOrder = {},
+                )
+            }
+
+            composable(
+                Route.ORDER_NEW,
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            ) { entry ->
+                OrderWizardScreen(
+                    ustaId = entry.arguments?.getString("id").orEmpty(),
+                    onClose = { nav.popBackStack() },
+                    onCreated = {
+                        // Buyurtma yaratilgach ro'yxatga o'tamiz, wizard stack'da qolmasin
+                        nav.navigate(Route.ORDERS) {
+                            popUpTo(Route.HOME)
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
 

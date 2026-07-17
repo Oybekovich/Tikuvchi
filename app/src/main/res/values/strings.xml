@@ -59,6 +59,30 @@
     <string name="home_featured">Tavsiya etilgan ustalar</string>
     <string name="home_empty_ustas">Hozircha ustalar yo\'q</string>
 
+    <string name="order_flow_title">Yangi buyurtma</string>
+    <string name="order_flow_step_type">Tur</string>
+    <string name="order_flow_step_size">O\'lcham</string>
+    <string name="order_flow_step_finish">Yakun</string>
+    <string name="order_flow_choose_service">Qaysi xizmatni tanlaysiz?</string>
+    <string name="order_flow_material">Mato / material</string>
+    <string name="order_flow_material_placeholder">Masalan: atlas, o\'zimda bor</string>
+    <string name="order_flow_model_note">Model haqida izoh</string>
+    <string name="order_flow_model_note_placeholder">Qanday bichim, uzunlik, yeng xohlaysiz?</string>
+    <string name="order_flow_choose_measurement">O\'lchamni tanlang</string>
+    <string name="order_flow_new_measurement">Yangi o\'lcham kiritish</string>
+    <string name="order_flow_no_measurements">Saqlangan o\'lchamlaringiz yo\'q — yangi kiriting</string>
+    <string name="order_flow_size_note">O\'lchamga izoh (ixtiyoriy)</string>
+    <string name="order_flow_size_note_placeholder">Masalan: yeng biroz uzunroq bo\'lsin</string>
+    <string name="order_flow_summary">Buyurtma xulosasi</string>
+    <string name="order_flow_service">Xizmat</string>
+    <string name="order_flow_usta">Usta</string>
+    <string name="order_flow_measurement">O\'lcham</string>
+    <string name="order_flow_price">Narx</string>
+    <string name="order_flow_estimated_ready">Taxminiy tayyor bo\'lish sanasi</string>
+    <string name="order_flow_confirm">Buyurtmani tasdiqlash</string>
+    <string name="order_flow_select_service_first">Davom etish uchun xizmatni tanlang</string>
+    <string name="order_flow_select_measurement_first">Davom etish uchun o\'lchamni tanlang yoki kiriting</string>
+
     <string name="chat_title">Suhbatlar</string>
     <string name="chat_empty">Suhbatlaringiz yo\'q</string>
     <string name="chat_empty_hint">Usta profilidan "Yozish" tugmasini bosing</string>
