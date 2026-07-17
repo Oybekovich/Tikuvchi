@@ -33,12 +33,15 @@ export const PHONE_PREFIX = "+998 ";
  *
  * Bo'sh satr qaytsa — maydon tozalangan degani: foydalanuvchi "+998" ni ham
  * o'chira olishi kerak, aks holda raqamni butunlay olib tashlab bo'lmaydi.
+ * Boshqa holatda prefiks o'zi qo'yib boriladi — maydon tozalangandan keyin
+ * ham (fokus yo'qolmagani uchun onFocus qayta ishlamaydi) yozish mumkin
+ * bo'lishi kerak.
  */
 export function formatPhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
 
-  // Prefiks ichiga kirib o'chirilyapti — maydonni bo'shatamiz
-  if (raw === "+998" || digits.length < 3) return "";
+  // Prefiksning o'zi o'chirildi yoki hech narsa yozilmagan — maydon bo'shaydi
+  if (raw === "+998" || digits.length === 0) return "";
 
   // Maydonda prefiks turgan bo'lsa, boshidagi 998 — mamlakat kodi.
   // Tashqaridan nusxalanganda esa u faqat raqam 9 tadan uzun bo'lsagina
