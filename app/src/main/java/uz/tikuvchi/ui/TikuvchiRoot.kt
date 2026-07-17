@@ -32,6 +32,7 @@ import uz.tikuvchi.ui.screens.chat.ChatScreen
 import uz.tikuvchi.ui.screens.home.HomeScreen
 import uz.tikuvchi.ui.screens.measurements.MeasurementsScreen
 import uz.tikuvchi.ui.screens.order.OrderWizardScreen
+import uz.tikuvchi.ui.screens.orders.OrderDetailScreen
 import uz.tikuvchi.ui.screens.orders.OrdersScreen
 import uz.tikuvchi.ui.screens.profile.ProfileScreen
 import uz.tikuvchi.ui.screens.search.SearchScreen
@@ -71,6 +72,9 @@ private object Route {
     const val CHAT = "chat"
     const val CHAT_WITH = "chat/{ustaId}?name={name}"
     const val ORDER_NEW = "usta/{id}/buyurtma"
+    const val ORDER_DETAIL = "orders/{id}"
+
+    fun orderDetail(id: String) = "orders/$id"
 
     fun chatWith(ustaId: String, name: String?) =
         "chat/$ustaId?name=${name?.ifBlank { null } ?: "-"}"
@@ -166,7 +170,18 @@ private fun AppNav() {
                 OrdersScreen(
                     onMenu = { scope.launch { drawer.open() } },
                     onProfile = { nav.navigate(Route.PROFILE) },
-                    onOrder = {},
+                    onOrder = { id -> nav.navigate(Route.orderDetail(id)) },
+                )
+            }
+
+            composable(
+                Route.ORDER_DETAIL,
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            ) { entry ->
+                OrderDetailScreen(
+                    orderId = entry.arguments?.getString("id").orEmpty(),
+                    onBack = { nav.popBackStack() },
+                    onUsta = { id -> nav.navigate(Route.usta(id)) },
                 )
             }
 

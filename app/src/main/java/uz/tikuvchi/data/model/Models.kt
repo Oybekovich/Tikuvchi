@@ -151,7 +151,36 @@ data class OrderRow(
 }
 
 @Serializable
-data class OrderUsta(val profiles: ProfileBrief)
+data class OrderUsta(
+    val district: String? = null,
+    val profiles: ProfileBrief,
+)
+
+/** Buyurtma tafsiloti — web'dagi orders/[id] so'rovi bilan bir xil. */
+@Serializable
+data class OrderDetail(
+    val id: String,
+    val status: OrderStatus = OrderStatus.PENDING,
+    @SerialName("payment_status") val paymentStatus: PaymentStatus = PaymentStatus.PENDING,
+    val source: OrderSource = OrderSource.CATALOG,
+    @SerialName("total_price") val totalPrice: Long = 0,
+    @SerialName("estimated_ready_at") val estimatedReadyAt: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("usta_id") val ustaId: String,
+    @SerialName("usta_profiles") val usta: OrderUsta,
+    @SerialName("order_items") val items: List<OrderItemDetail> = emptyList(),
+)
+
+@Serializable
+data class OrderItemDetail(
+    val id: Long,
+    val title: String,
+    val material: String? = null,
+    @SerialName("image_url") val imageUrl: String? = null,
+    @SerialName("size_note") val sizeNote: String? = null,
+    @SerialName("model_note") val modelNote: String? = null,
+    val price: Long = 0,
+)
 
 @Serializable
 data class OrderItemTitle(val title: String)

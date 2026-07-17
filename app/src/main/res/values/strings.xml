@@ -123,6 +123,19 @@
     <string name="orders_empty_hint">Usta tanlab, birinchi buyurtmangizni bering</string>
     <string name="orders_order_number">Buyurtma №</string>
     <string name="orders_estimated_ready">Taxminiy tayyor: %1$s</string>
+    <string name="orders_details_title">Buyurtma holati</string>
+    <string name="orders_composition">Buyurtma tarkibi</string>
+    <string name="orders_total">Jami</string>
+    <string name="orders_cancel_order">Buyurtmani bekor qilish</string>
+    <string name="orders_cancel_confirm">Buyurtmani bekor qilishga ishonchingiz komilmi?</string>
+    <string name="orders_created_at">Berilgan sana: %1$s</string>
+    <string name="orders_source_catalog">Katalog orqali</string>
+    <string name="orders_source_chat_negotiation">Chat orqali kelishilgan</string>
+    <string name="orders_not_found">Buyurtma topilmadi</string>
+    <string name="payment_title">To\'lov holati</string>
+    <string name="payment_pending">Kutilmoqda</string>
+    <string name="payment_partial">Bo\'nak to\'langan (30%)</string>
+    <string name="payment_paid">To\'liq to\'langan</string>
 
     <string name="order_status_pending">Kutilmoqda</string>
     <string name="order_status_accepted">Qabul qilindi</string>

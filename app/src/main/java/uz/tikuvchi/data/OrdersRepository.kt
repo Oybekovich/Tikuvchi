@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import uz.tikuvchi.data.model.OrderDetail
 import uz.tikuvchi.data.model.OrderRow
 import uz.tikuvchi.data.model.ServiceItem
 
@@ -50,6 +51,30 @@ object OrdersRepository {
         )
         orderId
     }
+
+    suspend fun detail(id: String): OrderDetail? = withContext(Dispatchers.IO) {
+        supabase.from("orders")
+            .select(
+                Columns.raw(
+                    "id, status, payment_status, source, total_price, " +
+                        "estimated_ready_at, created_at, usta_id, " +
+                        "usta_profiles!inner(district, profiles!inner(full_name, avatar_url)), " +
+                        "order_items(id, title, material, image_url, size_note, model_note, price)"
+                )
+            ) {
+                filter { eq("id", id) }
+            }
+            .decodeSingleOrNull()
+    }
+
+    /** Faqat "pending" holatdagi buyurtmani bekor qilish mumkin — web'dagi kabi. */
+    suspend fun cancel(id: String) = withContext(Dispatchers.IO) {
+        supabase.from("orders")
+            .update(StatusUpdate("cancelled")) { filter { eq("id", id) } }
+    }
+
+    @Serializable
+    private data class StatusUpdate(val status: String)
 
     @Serializable
     private data class IdRow(val id: String)
