@@ -23,8 +23,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -140,7 +139,7 @@ fun ChatScreen(
                     .background(if (s.input.isNotBlank()) Terra600 else Cream200),
             ) {
                 Icon(
-                    Icons.AutoMirrored.Filled.Send,
+                    painter = painterResource(R.drawable.ic_send),
                     contentDescription = stringResource(R.string.chat_send),
                     tint = if (s.input.isNotBlank()) Color.White else Ink500,
                 )

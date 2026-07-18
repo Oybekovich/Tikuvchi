@@ -23,9 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -41,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -95,7 +93,7 @@ fun MeasurementsScreen(
                 if (s.items.isEmpty()) {
                     item {
                         EmptyState(
-                            icon = "📏",
+                            icon = R.drawable.ic_ruler,
                             title = stringResource(R.string.measurements_empty),
                             hint = stringResource(R.string.measurements_empty_hint),
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -176,14 +174,14 @@ private fun MeasurementCard(
                 }
             }
             Icon(
-                Icons.Filled.Edit,
+                painter = painterResource(R.drawable.ic_edit),
                 contentDescription = stringResource(R.string.common_edit),
                 tint = Ink500,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = onEdit).padding(10.dp),
             )
             Icon(
-                Icons.Filled.Delete,
+                painter = painterResource(R.drawable.ic_delete),
                 contentDescription = stringResource(R.string.common_delete),
                 tint = Red700,
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))

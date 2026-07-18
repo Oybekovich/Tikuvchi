@@ -9,8 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,11 +29,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import uz.tikuvchi.R
 import uz.tikuvchi.ui.theme.Cream100
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Cream50
@@ -121,7 +121,7 @@ fun SearchBar(
         textStyle = MaterialTheme.typography.bodyMedium,
         placeholder = fieldPlaceholder(placeholder),
         leadingIcon = {
-            Icon(Icons.Filled.Search, contentDescription = null, tint = Ink500)
+            Icon(painter = painterResource(R.drawable.ic_search), contentDescription = null, tint = Ink500)
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { onSearch?.invoke() }),

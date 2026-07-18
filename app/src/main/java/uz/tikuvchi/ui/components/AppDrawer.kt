@@ -13,13 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -28,7 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,13 +34,13 @@ import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra600
 
 /** Menyu bandlari — web'dagi AppHeader MENU_ITEMS bilan bir xil tartibda. */
-enum class MenuItem(val labelRes: Int, val icon: ImageVector) {
-    HOME(R.string.nav_home, Icons.Filled.Home),
-    SEARCH(R.string.menu_search, Icons.Filled.Search),
-    ORDERS(R.string.nav_orders, Icons.AutoMirrored.Filled.List),
-    MEASUREMENTS(R.string.nav_measurements, Icons.Filled.Straighten),
-    CHAT(R.string.nav_chat, Icons.AutoMirrored.Filled.Chat),
-    PROFILE(R.string.nav_profile, Icons.Filled.Person),
+enum class MenuItem(val labelRes: Int, @DrawableRes val icon: Int) {
+    HOME(R.string.nav_home, R.drawable.ic_home),
+    SEARCH(R.string.menu_search, R.drawable.ic_search),
+    ORDERS(R.string.nav_orders, R.drawable.ic_orders),
+    MEASUREMENTS(R.string.nav_measurements, R.drawable.ic_ruler),
+    CHAT(R.string.nav_chat, R.drawable.ic_chat),
+    PROFILE(R.string.nav_profile, R.drawable.ic_profile),
 }
 
 @Composable
@@ -85,7 +79,7 @@ fun AppDrawer(onSelect: (MenuItem) -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            item.icon,
+                            painter = painterResource(item.icon),
                             contentDescription = null,
                             tint = Terra600,
                             modifier = Modifier.size(20.dp),

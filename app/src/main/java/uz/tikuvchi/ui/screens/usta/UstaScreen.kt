@@ -21,9 +21,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +33,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -92,7 +91,7 @@ fun UstaScreen(
                 Modifier.fillMaxSize().padding(24.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                EmptyState(icon = "🔍", title = stringResource(R.string.usta_not_found))
+                EmptyState(icon = R.drawable.ic_search_off, title = stringResource(R.string.usta_not_found))
             }
 
             else -> {
@@ -136,7 +135,7 @@ fun UstaScreen(
                         if (usta.portfolio.isEmpty()) {
                             item {
                                 EmptyState(
-                                    icon = "🖼️",
+                                    icon = R.drawable.ic_images,
                                     title = stringResource(R.string.usta_no_portfolio),
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                 )
@@ -161,7 +160,7 @@ fun UstaScreen(
                         if (s.reviews.isEmpty()) {
                             item {
                                 EmptyState(
-                                    icon = "💬",
+                                    icon = R.drawable.ic_chat,
                                     title = stringResource(R.string.usta_no_reviews),
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                 )
@@ -261,8 +260,8 @@ private fun InfoCard(
                     fontWeight = FontWeight.ExtraBold,
                     color = Ink900,
                 )
-                location?.let { IconLine(Icons.Filled.LocationOn, it) }
-                workHours?.let { IconLine(Icons.Outlined.Schedule, it) }
+                location?.let { IconLine(R.drawable.ic_location, it) }
+                workHours?.let { IconLine(R.drawable.ic_clock, it) }
             }
         }
         if (tags.isNotEmpty()) {
@@ -289,13 +288,18 @@ private fun InfoCard(
 }
 
 @Composable
-private fun IconLine(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+private fun IconLine(@DrawableRes icon: Int, text: String) {
     Row(
         Modifier.padding(top = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, contentDescription = null, tint = Ink500, modifier = Modifier.size(15.dp))
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint = Ink500,
+            modifier = Modifier.size(15.dp),
+        )
         Text(text, style = MaterialTheme.typography.bodyMedium, color = Ink500)
     }
 }

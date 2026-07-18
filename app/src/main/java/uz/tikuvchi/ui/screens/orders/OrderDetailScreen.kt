@@ -20,8 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -37,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -98,7 +97,7 @@ fun OrderDetailScreen(
             }
 
             s.order == null -> Box(Modifier.fillMaxSize().padding(16.dp)) {
-                EmptyState(icon = "📦", title = stringResource(R.string.orders_not_found))
+                EmptyState(icon = R.drawable.ic_package, title = stringResource(R.string.orders_not_found))
             }
 
             else -> {
@@ -210,7 +209,7 @@ private fun StatusStepper(order: OrderDetail) {
                 ) {
                     if (done) {
                         Icon(
-                            Icons.Filled.Check,
+                            painter = painterResource(R.drawable.ic_check),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(16.dp),

@@ -17,14 +17,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,6 +53,7 @@ import uz.tikuvchi.ui.components.SearchBar
 import uz.tikuvchi.ui.components.UstaCardItem
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Cream50
+import uz.tikuvchi.ui.theme.Gold400
 import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink700
 import uz.tikuvchi.ui.theme.Ink900
@@ -92,7 +94,7 @@ fun SearchScreen(
                     .padding(14.dp),
             ) {
                 Icon(
-                    Icons.Filled.Tune,
+                    painter = painterResource(R.drawable.ic_filters),
                     contentDescription = stringResource(R.string.search_filters),
                     tint = if (s.filtersOpen) Color.White else Ink700,
                 )
@@ -130,7 +132,7 @@ fun SearchScreen(
                 if (s.results.isEmpty()) {
                     item {
                         EmptyState(
-                            icon = "🔍",
+                            icon = R.drawable.ic_search_off,
                             title = stringResource(R.string.search_empty),
                             hint = stringResource(R.string.search_empty_hint),
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -178,7 +180,12 @@ private fun Filters(s: SearchUiState, vm: SearchViewModel) {
         FilterRow(stringResource(R.string.search_min_rating)) {
             Chip(stringResource(R.string.common_all), s.query.minRating == null) { vm.setMinRating(null) }
             listOf(4.0, 4.5, 4.8).forEach { r ->
-                Chip("★ $r", s.query.minRating == r) { vm.setMinRating(r) }
+                Chip(
+                    text = "$r",
+                    selected = s.query.minRating == r,
+                    leadingIcon = R.drawable.ic_star,
+                    onClick = { vm.setMinRating(r) },
+                )
             }
         }
 
@@ -223,16 +230,36 @@ private fun FilterRow(label: String, chips: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Chip(text: String, selected: Boolean, onClick: () -> Unit) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelSmall,
-        color = if (selected) Color.White else Ink700,
-        fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
-        modifier = Modifier
+private fun Chip(
+    text: String,
+    selected: Boolean,
+    @DrawableRes leadingIcon: Int? = null,
+    onClick: () -> Unit,
+) {
+    val fg = if (selected) Color.White else Ink700
+    Row(
+        Modifier
             .clip(CircleShape)
             .background(if (selected) Terra600 else Cream200)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 6.dp),
-    )
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        leadingIcon?.let {
+            Icon(
+                painter = painterResource(it),
+                contentDescription = null,
+                // Tanlanganda oq, aks holda oltin — nishondagi yulduz bilan bir xil
+                tint = if (selected) Color.White else Gold400,
+                modifier = Modifier.size(13.dp),
+            )
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = fg,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
+        )
+    }
 }

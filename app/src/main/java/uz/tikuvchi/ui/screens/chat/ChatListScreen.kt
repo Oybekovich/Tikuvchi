@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -72,7 +75,7 @@ fun ChatListScreen(
 
             s.conversations.isEmpty() -> Box(Modifier.fillMaxSize().padding(16.dp)) {
                 EmptyState(
-                    icon = "💬",
+                    icon = R.drawable.ic_chat,
                     title = stringResource(R.string.chat_empty),
                     hint = stringResource(R.string.chat_empty_hint),
                 )
@@ -106,11 +109,15 @@ private fun ConversationRowItem(
     val last = c.last
     val preview = when {
         last == null -> ""
-        last.messageType == MessageType.PRICE_OFFER ->
-            "💰 " + stringResource(R.string.chat_price_offer)
-        last.messageType == MessageType.IMAGE ->
-            "🖼️ " + stringResource(R.string.chat_photo)
+        last.messageType == MessageType.PRICE_OFFER -> stringResource(R.string.chat_price_offer)
+        last.messageType == MessageType.IMAGE -> stringResource(R.string.chat_photo)
         else -> last.content.orEmpty()
+    }
+    // Matnli xabarda ikonka yo'q — faqat maxsus turlar belgilanadi
+    val previewIcon = when (last?.messageType) {
+        MessageType.PRICE_OFFER -> R.drawable.ic_tag
+        MessageType.IMAGE -> R.drawable.ic_image
+        else -> null
     }
 
     Row(
@@ -133,13 +140,26 @@ private fun ConversationRowItem(
                 overflow = TextOverflow.Ellipsis,
             )
             if (preview.isNotEmpty()) {
-                Text(
-                    preview,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Ink500,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    previewIcon?.let {
+                        Icon(
+                            painter = painterResource(it),
+                            contentDescription = null,
+                            tint = Ink500,
+                            modifier = Modifier.size(14.dp),
+                        )
+                    }
+                    Text(
+                        preview,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Ink500,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
         Text(

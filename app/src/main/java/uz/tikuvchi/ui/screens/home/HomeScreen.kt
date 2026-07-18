@@ -108,7 +108,7 @@ fun HomeScreen(
                 if (s.ustas.isEmpty()) {
                     item {
                         EmptyState(
-                            icon = "🪡",
+                            icon = R.drawable.ic_needle,
                             title = stringResource(R.string.home_empty_ustas),
                             modifier = Modifier.padding(horizontal = 16.dp),
                         )

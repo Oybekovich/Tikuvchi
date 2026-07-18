@@ -22,8 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -220,7 +219,7 @@ private fun ServiceRow(service: ServiceItem, selected: Boolean, onClick: () -> U
         }
         PriceTag(amount = service.basePrice)
         if (selected) {
-            Icon(Icons.Filled.Check, contentDescription = null, tint = Terra600)
+            Icon(painter = painterResource(R.drawable.ic_check), contentDescription = null, tint = Terra600)
         }
     }
 }
@@ -258,7 +257,7 @@ private fun StepSize(s: OrderWizardUiState, vm: OrderWizardViewModel) {
             modifier = Modifier.weight(1f),
         )
         if (s.measurementId == NEW_MEASUREMENT) {
-            Icon(Icons.Filled.Check, contentDescription = null, tint = Terra600)
+            Icon(painter = painterResource(R.drawable.ic_check), contentDescription = null, tint = Terra600)
         }
     }
 
@@ -307,7 +306,7 @@ private fun MeasurementRow(m: Measurement, selected: Boolean, onClick: () -> Uni
                 )
             }
         }
-        if (selected) Icon(Icons.Filled.Check, contentDescription = null, tint = Terra600)
+        if (selected) Icon(painter = painterResource(R.drawable.ic_check), contentDescription = null, tint = Terra600)
     }
 }
 

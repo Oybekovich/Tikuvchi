@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -50,7 +47,7 @@ fun AppHeader(
         if (onBack != null) {
             IconButton(onClick = onBack) {
                 Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
+                    painter = painterResource(R.drawable.ic_arrow_back),
                     contentDescription = stringResource(R.string.common_back),
                     tint = Ink900,
                 )
@@ -58,7 +55,7 @@ fun AppHeader(
         } else {
             IconButton(onClick = { onMenu?.invoke() }) {
                 Icon(
-                    Icons.Filled.Menu,
+                    painter = painterResource(R.drawable.ic_menu),
                     contentDescription = stringResource(R.string.menu_title),
                     tint = Ink900,
                 )
@@ -80,7 +77,7 @@ fun AppHeader(
 
         IconButton(onClick = { onProfile?.invoke() }) {
             Icon(
-                Icons.Filled.Person,
+                painter = painterResource(R.drawable.ic_profile),
                 contentDescription = stringResource(R.string.nav_profile),
                 tint = Ink900,
             )

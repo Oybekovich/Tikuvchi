@@ -100,7 +100,7 @@ fun OrdersScreen(
 
             s.orders.isEmpty() -> Box(Modifier.fillMaxSize().padding(16.dp)) {
                 EmptyState(
-                    icon = "📦",
+                    icon = R.drawable.ic_package,
                     title = stringResource(R.string.orders_empty),
                     hint = stringResource(R.string.orders_empty_hint),
                 )

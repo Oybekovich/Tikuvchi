@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,14 +38,18 @@ import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink700
 import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra50
+import uz.tikuvchi.ui.theme.Terra600
 
-/** Web'dagi CategoryCard ICONS bilan bir xil. */
+/**
+ * Kategoriya ikonkalari — Phosphor Icons (MIT), chiziqli uslub.
+ * Kalit DB'dagi service_categories.icon ustuni bilan bir xil.
+ */
 private val CategoryIcons = mapOf(
-    "milliy" to "🧵",
-    "kechki" to "✨",
-    "kundalik" to "👗",
-    "muslima" to "🧕",
-    "toy" to "💍",
+    "milliy" to R.drawable.ic_cat_milliy,
+    "kechki" to R.drawable.ic_cat_kechki,
+    "kundalik" to R.drawable.ic_cat_kundalik,
+    "muslima" to R.drawable.ic_cat_muslima,
+    "toy" to R.drawable.ic_cat_toy,
 )
 
 @Composable
@@ -69,7 +72,12 @@ fun CategoryCard(
             Modifier.size(48.dp).clip(CircleShape).background(Terra50),
             contentAlignment = Alignment.Center,
         ) {
-            Text(CategoryIcons[category.icon] ?: "🪡", style = MaterialTheme.typography.titleLarge)
+            Icon(
+                painter = painterResource(CategoryIcons[category.icon] ?: R.drawable.ic_needle),
+                contentDescription = null,
+                tint = Terra600,
+                modifier = Modifier.size(24.dp),
+            )
         }
         Text(
             text = category.name,
@@ -119,7 +127,7 @@ fun UstaCardItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            Icons.Filled.LocationOn,
+                            painter = painterResource(R.drawable.ic_location),
                             contentDescription = null,
                             tint = Ink500,
                             modifier = Modifier.size(14.dp),
@@ -147,7 +155,7 @@ fun UstaCardItem(
             ) {
                 PriceTag(amount = price, from = true)
                 Icon(
-                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    painter = painterResource(R.drawable.ic_arrow_right),
                     contentDescription = null,
                     tint = Ink300,
                     modifier = Modifier.size(18.dp),
@@ -174,7 +182,7 @@ private fun Tag(text: String) {
 
 @Composable
 fun EmptyState(
-    icon: String,
+    @DrawableRes icon: Int,
     title: String,
     modifier: Modifier = Modifier,
     hint: String? = null,
@@ -192,7 +200,12 @@ fun EmptyState(
             Modifier.size(64.dp).clip(CircleShape).background(Terra50),
             contentAlignment = Alignment.Center,
         ) {
-            Text(icon, style = MaterialTheme.typography.headlineSmall)
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = null,
+                tint = Terra600,
+                modifier = Modifier.size(28.dp),
+            )
         }
         Text(
             text = title,
@@ -235,7 +248,12 @@ fun ErrorState(
             Modifier.size(64.dp).clip(CircleShape).background(Terra50),
             contentAlignment = Alignment.Center,
         ) {
-            Text("📡", style = MaterialTheme.typography.headlineSmall)
+            Icon(
+                painter = painterResource(R.drawable.ic_wifi_off),
+                contentDescription = null,
+                tint = Terra600,
+                modifier = Modifier.size(28.dp),
+            )
         }
         Text(
             text = stringResource(R.string.common_load_error),
