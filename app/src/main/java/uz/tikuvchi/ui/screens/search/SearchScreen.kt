@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import uz.tikuvchi.R
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.ErrorState
@@ -116,7 +117,7 @@ fun SearchScreen(
 
             else -> LazyColumn(
                 contentPadding = PaddingValues(
-                    bottom = 24.dp,
+                    bottom = bottomNavSpace(),
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {

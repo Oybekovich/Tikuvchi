@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.tikuvchi.R
@@ -63,18 +67,34 @@ enum class NavTab(val labelRes: Int, @DrawableRes val icon: Int) {
 private val SIDE_TABS_LEFT = listOf(NavTab.ORDERS, NavTab.MEASUREMENTS)
 private val SIDE_TABS_RIGHT = listOf(NavTab.CHAT, NavTab.PROFILE)
 
+/**
+ * Panel kontent ustida suzadi, shuning uchun ekranlar ro'yxat oxiriga shuncha
+ * bo'shliq qo'shishi kerak — aks holda oxirgi element panel ostida qolib ketadi.
+ */
+@Composable
+fun bottomNavSpace(): Dp =
+    88.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
 @Composable
 fun BottomNav(
     current: NavTab?,
     onSelect: (NavTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier.fillMaxWidth().background(Cream50)) {
-        Spacer(Modifier.fillMaxWidth().height(1.dp).background(Cream200))
+    Box(
+        modifier
+            .fillMaxWidth()
+            // Fon yo'q — panel kontent ustida suzadi, orqasida bo'sh tasma qolmaydi
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
+                // Soya clip'dan oldin — aks holda u kesilib ketadi
+                .shadow(10.dp, RoundedCornerShape(28.dp))
+                .clip(RoundedCornerShape(28.dp))
+                .background(Color.White)
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,

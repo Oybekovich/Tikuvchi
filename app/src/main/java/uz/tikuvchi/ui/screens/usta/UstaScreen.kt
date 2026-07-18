@@ -46,6 +46,7 @@ import coil3.compose.AsyncImage
 import uz.tikuvchi.R
 import uz.tikuvchi.data.model.ReviewItem
 import uz.tikuvchi.data.model.ServiceItem
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
@@ -177,7 +178,7 @@ fun UstaScreen(
                             .background(Cream50)
                             .padding(16.dp)
                             .padding(
-                                bottom = 16.dp,
+                                bottom = bottomNavSpace(),
                             ),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {

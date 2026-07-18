@@ -50,6 +50,7 @@ import uz.tikuvchi.data.model.OrderItemDetail
 import uz.tikuvchi.data.model.OrderSource
 import uz.tikuvchi.data.model.OrderStatus
 import uz.tikuvchi.data.model.PaymentStatus
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
@@ -107,7 +108,7 @@ fun OrderDetailScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(16.dp)
                         .padding(
-                            bottom = 16.dp,
+                            bottom = bottomNavSpace(),
                         ),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {

@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
 import uz.tikuvchi.data.model.Measurement
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.LabeledField
@@ -63,7 +64,6 @@ import uz.tikuvchi.util.formatDate
 
 @Composable
 fun MeasurementsScreen(
-    onMenu: () -> Unit,
     onProfile: () -> Unit,
     vm: MeasurementsViewModel = viewModel(),
 ) {
@@ -73,7 +73,6 @@ fun MeasurementsScreen(
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(
             title = stringResource(R.string.measurements_title),
-            onMenu = onMenu,
             onProfile = onProfile,
         )
 
@@ -85,7 +84,7 @@ fun MeasurementsScreen(
             else -> LazyColumn(
                 contentPadding = PaddingValues(
                     top = 16.dp,
-                    bottom = 24.dp,
+                    bottom = bottomNavSpace(),
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {

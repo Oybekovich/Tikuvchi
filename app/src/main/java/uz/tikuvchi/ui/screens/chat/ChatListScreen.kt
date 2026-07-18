@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
 import uz.tikuvchi.data.model.ConversationRow
 import uz.tikuvchi.data.model.MessageType
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
@@ -50,7 +51,6 @@ import uz.tikuvchi.util.formatChatTime
 
 @Composable
 fun ChatListScreen(
-    onMenu: () -> Unit,
     onProfile: () -> Unit,
     onConversation: (id: String, name: String) -> Unit,
     vm: ChatListViewModel = viewModel(),
@@ -60,7 +60,6 @@ fun ChatListScreen(
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(
             title = stringResource(R.string.chat_title),
-            onMenu = onMenu,
             onProfile = onProfile,
         )
 
@@ -84,7 +83,7 @@ fun ChatListScreen(
             else -> LazyColumn(
                 contentPadding = PaddingValues(
                     top = 16.dp,
-                    bottom = 24.dp,
+                    bottom = bottomNavSpace(),
                 ),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {

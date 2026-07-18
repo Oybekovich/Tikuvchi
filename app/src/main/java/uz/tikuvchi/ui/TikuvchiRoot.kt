@@ -4,12 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,12 +20,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.launch
 import uz.tikuvchi.data.supabase
-import uz.tikuvchi.ui.components.AppDrawer
 import uz.tikuvchi.ui.components.BottomNav
 import uz.tikuvchi.ui.components.NavTab
-import uz.tikuvchi.ui.components.MenuItem
 import uz.tikuvchi.ui.screens.auth.AuthScreen
 import uz.tikuvchi.ui.screens.chat.ChatListScreen
 import uz.tikuvchi.ui.screens.chat.ChatScreen
@@ -95,12 +88,9 @@ private object Route {
 @Composable
 private fun AppNav() {
     val nav = rememberNavController()
-    val drawer = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     fun go(route: String) {
-        scope.launch { drawer.close() }
-        // Menyudan o'tishda stack o'smasin — bosh sahifagacha tozalaymiz
+        // Tabdan tabga o'tishda stack o'smasin — bosh sahifagacha tozalaymiz
         nav.navigate(route) {
             popUpTo(Route.HOME) { inclusive = route == Route.HOME }
             launchSingleTop = true
@@ -127,33 +117,14 @@ private fun AppNav() {
         else -> null
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawer,
-        drawerContent = {
-            AppDrawer(onSelect = { item ->
-                go(
-                    when (item) {
-                        MenuItem.HOME -> Route.HOME
-                        MenuItem.SEARCH -> Route.search()
-                        MenuItem.ORDERS -> Route.ORDERS
-                        MenuItem.MEASUREMENTS -> Route.MEASUREMENTS
-                        MenuItem.CHAT -> Route.CHAT
-                        MenuItem.PROFILE -> Route.PROFILE
-                        // TODO: chat ekrani keyingi qadamda
-                    },
-                )
-            })
-        },
-    ) {
-        Column(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         NavHost(
             navController = nav,
             startDestination = Route.HOME,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxSize(),
         ) {
             composable(Route.HOME) {
                 HomeScreen(
-                    onMenu = { scope.launch { drawer.open() } },
                     onProfile = { nav.navigate(Route.PROFILE) },
                     onSearch = { q -> nav.navigate(Route.search(q = q)) },
                     onCategory = { id -> nav.navigate(Route.search(category = id)) },
@@ -197,7 +168,6 @@ private fun AppNav() {
 
             composable(Route.ORDERS) {
                 OrdersScreen(
-                    onMenu = { scope.launch { drawer.open() } },
                     onProfile = { nav.navigate(Route.PROFILE) },
                     onOrder = { id -> nav.navigate(Route.orderDetail(id)) },
                 )
@@ -233,14 +203,12 @@ private fun AppNav() {
 
             composable(Route.MEASUREMENTS) {
                 MeasurementsScreen(
-                    onMenu = { scope.launch { drawer.open() } },
                     onProfile = { nav.navigate(Route.PROFILE) },
                 )
             }
 
             composable(Route.CHAT) {
                 ChatListScreen(
-                    onMenu = { scope.launch { drawer.open() } },
                     onProfile = { nav.navigate(Route.PROFILE) },
                     onConversation = { ustaId, name -> nav.navigate(Route.chatWith(ustaId, name)) },
                 )
@@ -264,6 +232,7 @@ private fun AppNav() {
 
         if (showBottomNav) {
             BottomNav(
+                modifier = Modifier.align(Alignment.BottomCenter),
                 current = currentTab,
                 onSelect = { tab ->
                     go(
@@ -277,7 +246,6 @@ private fun AppNav() {
                     )
                 },
             )
-        }
         }
     }
 }

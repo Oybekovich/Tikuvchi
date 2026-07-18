@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
 import uz.tikuvchi.data.model.OrderRow
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
@@ -55,7 +56,6 @@ import uz.tikuvchi.util.formatOrderNumber
 
 @Composable
 fun OrdersScreen(
-    onMenu: () -> Unit,
     onProfile: () -> Unit,
     onOrder: (String) -> Unit,
     vm: OrdersViewModel = viewModel(),
@@ -65,7 +65,6 @@ fun OrdersScreen(
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(
             title = stringResource(R.string.orders_title),
-            onMenu = onMenu,
             onProfile = onProfile,
         )
 
@@ -108,7 +107,7 @@ fun OrdersScreen(
 
             else -> LazyColumn(
                 contentPadding = PaddingValues(
-                    bottom = 24.dp,
+                    bottom = bottomNavSpace(),
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {

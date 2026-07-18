@@ -3,6 +3,7 @@ package uz.tikuvchi.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,7 +33,6 @@ fun AppHeader(
     modifier: Modifier = Modifier,
     title: String? = null,
     onBack: (() -> Unit)? = null,
-    onMenu: (() -> Unit)? = null,
     onProfile: (() -> Unit)? = null,
 ) {
     Row(
@@ -53,13 +53,8 @@ fun AppHeader(
                 )
             }
         } else {
-            IconButton(onClick = { onMenu?.invoke() }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_menu),
-                    contentDescription = stringResource(R.string.menu_title),
-                    tint = Ink900,
-                )
-            }
+            // Sarlavha markazda qolishi uchun o'ngdagi profil tugmasiga teng bo'shliq
+            Spacer(Modifier.size(48.dp))
         }
 
         Text(

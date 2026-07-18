@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.CategoryCard
 import uz.tikuvchi.ui.components.EmptyState
@@ -45,7 +46,6 @@ import uz.tikuvchi.ui.theme.Terra600
 
 @Composable
 fun HomeScreen(
-    onMenu: () -> Unit,
     onProfile: () -> Unit,
     onSearch: (String) -> Unit,
     onCategory: (Long) -> Unit,
@@ -59,7 +59,7 @@ fun HomeScreen(
     // enableEdgeToEdge yoqilgani uchun header status bar ostiga kirib ketmasligi
     // kerak; ro'yxat esa pastdagi navigatsiya paneli ostidan silliq chiqadi
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
-        AppHeader(onMenu = onMenu, onProfile = onProfile)
+        AppHeader(onProfile = onProfile)
 
         when {
             s.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -73,7 +73,7 @@ fun HomeScreen(
             else -> LazyColumn(
                 contentPadding = PaddingValues(
                     top = 16.dp,
-                    bottom = 24.dp,
+                    bottom = bottomNavSpace(),
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
