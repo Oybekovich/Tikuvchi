@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Matnlar web ilovaning src/locales/uz.json faylidan ko'chirilgan -->
+<resources>
+    <string name="app_name">Tikuvchi</string>
+
+    <string name="auth_login_title">Xush kelibsiz!</string>
+    <string name="auth_login_subtitle">Hisobingizga kiring</string>
+    <string name="auth_register_title">Ro\'yxatdan o\'tish</string>
+    <string name="auth_register_subtitle">Bir daqiqada hisob oching</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_email_placeholder">ism@mail.uz</string>
+    <string name="auth_password">Parol</string>
+    <string name="auth_password_min">Kamida 6 ta belgi</string>
+    <string name="auth_full_name">Ism-familiya</string>
+    <string name="auth_full_name_placeholder">Ism familiya</string>
+    <string name="auth_phone">Telefon raqam (ixtiyoriy)</string>
+    <string name="auth_phone_placeholder">+998 90 123 45 67</string>
+    <string name="auth_login_btn">Kirish</string>
+    <string name="auth_register_btn">Ro\'yxatdan o\'tish</string>
+    <string name="auth_no_account">Hisobingiz yo\'qmi?</string>
+    <string name="auth_have_account">Hisobingiz bormi?</string>
+    <string name="auth_login_link">Kirish</string>
+    <string name="auth_register_link">Ro\'yxatdan o\'tish</string>
+    <string name="auth_invalid_credentials">Email yoki parol noto\'g\'ri</string>
+    <string name="auth_email_taken">Bu email allaqachon ro\'yxatdan o\'tgan</string>
+    <string name="auth_check_email">Emailingizga tasdiqlash havolasi yubordik. Pochtangizni tekshiring.</string>
+    <string name="auth_demo_title">Demo hisob</string>
+    <string name="auth_demo_hint">Sinab ko\'rish uchun: mijoz@demo.uz / demo1234</string>
+    <string name="auth_generic_error">Kirish amalga oshmadi. Qayta urinib ko\'ring.</string>
+
+    <string name="nav_home">Bosh sahifa</string>
+    <string name="nav_orders">Buyurtmalar</string>
+    <string name="nav_measurements">O\'lchovlar</string>
+    <string name="nav_chat">Xabarlar</string>
+    <string name="nav_profile">Profil</string>
+    <string name="menu_search">Qidirish</string>
+
+    <!-- common_error — saqlash/yuborish xatosi uchun; yuklash xatosi alohida (common_load_error) -->
+    <string name="common_error">Xatolik yuz berdi. Qayta urinib ko\'ring.</string>
+    <string name="common_load_error">Ma\'lumotni yuklab bo\'lmadi</string>
+    <string name="common_load_error_hint">Internet aloqasini tekshirib, qayta urinib ko\'ring</string>
+    <string name="common_retry">Qayta urinish</string>
+    <string name="common_back">Orqaga</string>
+    <string name="common_close">Yopish</string>
+    <string name="common_cancel">Bekor qilish</string>
+    <string name="common_save">Saqlash</string>
+    <string name="common_delete">O\'chirish</string>
+    <string name="common_edit">Tahrirlash</string>
+    <string name="common_confirm">Tasdiqlash</string>
+    <string name="common_next">Davom etish</string>
+    <string name="common_days">kun</string>
+    <string name="common_from">dan boshlab</string>
+    <string name="common_loading">Yuklanmoqda…</string>
+
+    <string name="app_tagline">Sizga mos tikuvchi-usta shu yerda</string>
+    <string name="menu_title">Menyu</string>
+    <string name="menu_login">Kirish</string>
+    <string name="menu_logout">Chiqish</string>
+
+    <string name="home_search_placeholder">Usta, xizmat yoki tuman qidiring…</string>
+    <string name="home_categories">Kategoriyalar</string>
+    <string name="home_featured">Tavsiya etilgan ustalar</string>
+    <string name="home_empty_ustas">Hozircha ustalar yo\'q</string>
+
+    <string name="order_flow_title">Yangi buyurtma</string>
+    <string name="order_flow_step_type">Tur</string>
+    <string name="order_flow_step_size">O\'lcham</string>
+    <string name="order_flow_step_finish">Yakun</string>
+    <string name="order_flow_choose_service">Qaysi xizmatni tanlaysiz?</string>
+    <string name="order_flow_material">Mato / material</string>
+    <string name="order_flow_material_placeholder">Masalan: atlas, o\'zimda bor</string>
+    <string name="order_flow_model_note">Model haqida izoh</string>
+    <string name="order_flow_model_note_placeholder">Qanday bichim, uzunlik, yeng xohlaysiz?</string>
+    <string name="order_flow_choose_measurement">O\'lchamni tanlang</string>
+    <string name="order_flow_new_measurement">Yangi o\'lcham kiritish</string>
+    <string name="order_flow_no_measurements">Saqlangan o\'lchamlaringiz yo\'q — yangi kiriting</string>
+    <string name="order_flow_size_note">O\'lchamga izoh (ixtiyoriy)</string>
+    <string name="order_flow_size_note_placeholder">Masalan: yeng biroz uzunroq bo\'lsin</string>
+    <string name="order_flow_summary">Buyurtma xulosasi</string>
+    <string name="order_flow_service">Xizmat</string>
+    <string name="order_flow_usta">Usta</string>
+    <string name="order_flow_measurement">O\'lcham</string>
+    <string name="order_flow_price">Narx</string>
+    <string name="order_flow_estimated_ready">Taxminiy tayyor bo\'lish sanasi</string>
+    <string name="order_flow_confirm">Buyurtmani tasdiqlash</string>
+    <string name="order_flow_select_service_first">Davom etish uchun xizmatni tanlang</string>
+    <string name="order_flow_select_measurement_first">Davom etish uchun o\'lchamni tanlang yoki kiriting</string>
+
+    <string name="chat_title">Suhbatlar</string>
+    <string name="chat_empty">Suhbatlaringiz yo\'q</string>
+    <string name="chat_empty_hint">Usta profilidan "Yozish" tugmasini bosing</string>
+    <string name="chat_input_placeholder">Xabar yozing…</string>
+    <string name="chat_send">Yuborish</string>
+    <string name="chat_price_offer">Narx taklifi</string>
+    <string name="chat_offer_amount">Narx</string>
+    <string name="chat_offer_duration">Muddat</string>
+    <string name="chat_offer_duration_days">%1$d kun</string>
+    <string name="chat_accept">Qabul qilish</string>
+    <string name="chat_decline">Rad etish</string>
+    <string name="chat_offer_accepted">Taklif qabul qilindi</string>
+    <string name="chat_offer_declined">Taklif rad etildi</string>
+    <string name="chat_photo">Rasm</string>
+
+    <string name="measurements_title">Mening o\'lchamlarim</string>
+    <string name="measurements_empty">Saqlangan o\'lchamlar yo\'q</string>
+    <string name="measurements_empty_hint">Buyurtma berishda kerak bo\'ladi — hoziroq qo\'shing</string>
+    <string name="measurements_add">Yangi o\'lcham qo\'shish</string>
+    <string name="measurements_edit_title">O\'lchamni tahrirlash</string>
+    <string name="measurements_label">Nomi</string>
+    <string name="measurements_label_placeholder">Masalan: Asosiy o\'lchamlarim</string>
+    <string name="measurements_chest">Ko\'krak aylanasi</string>
+    <string name="measurements_waist">Bel aylanasi</string>
+    <string name="measurements_hips">Son aylanasi</string>
+    <string name="measurements_height">Bo\'y</string>
+    <string name="measurements_shoulder">Yelka kengligi</string>
+    <string name="measurements_sleeve_length">Yeng uzunligi</string>
+    <string name="measurements_notes">Qo\'shimcha izoh</string>
+    <string name="measurements_cm">sm</string>
+    <string name="measurements_updated_at">Yangilangan: %1$s</string>
+    <string name="measurements_delete_confirm">Bu o\'lchamni o\'chirishga ishonchingiz komilmi?</string>
+
+    <string name="orders_title">Buyurtmalarim</string>
+    <string name="orders_active">Faol</string>
+    <string name="orders_finished">Tugallangan</string>
+    <string name="orders_empty">Buyurtmalaringiz yo\'q</string>
+    <string name="orders_empty_hint">Usta tanlab, birinchi buyurtmangizni bering</string>
+    <string name="orders_order_number">Buyurtma №</string>
+    <string name="orders_estimated_ready">Taxminiy tayyor: %1$s</string>
+    <string name="orders_details_title">Buyurtma holati</string>
+    <string name="orders_composition">Buyurtma tarkibi</string>
+    <string name="orders_total">Jami</string>
+    <string name="orders_cancel_order">Buyurtmani bekor qilish</string>
+    <string name="orders_cancel_confirm">Buyurtmani bekor qilishga ishonchingiz komilmi?</string>
+    <string name="orders_created_at">Berilgan sana: %1$s</string>
+    <string name="orders_source_catalog">Katalog orqali</string>
+    <string name="orders_source_chat_negotiation">Chat orqali kelishilgan</string>
+    <string name="orders_not_found">Buyurtma topilmadi</string>
+    <string name="payment_title">To\'lov holati</string>
+    <string name="payment_pending">Kutilmoqda</string>
+    <string name="payment_partial">Bo\'nak to\'langan (30%)</string>
+    <string name="payment_paid">To\'liq to\'langan</string>
+
+    <string name="order_status_pending">Kutilmoqda</string>
+    <string name="order_status_accepted">Qabul qilindi</string>
+    <string name="order_status_in_progress">Tayyorlanmoqda</string>
+    <string name="order_status_ready">Tayyor</string>
+    <string name="order_status_completed">Yakunlangan</string>
+    <string name="order_status_cancelled">Bekor qilingan</string>
+
+    <string name="profile_title">Profil</string>
+    <string name="profile_full_name">Ism-familiya</string>
+    <string name="profile_phone">Telefon raqam</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_save_changes">O\'zgarishlarni saqlash</string>
+    <string name="profile_saved">Saqlandi</string>
+    <string name="profile_logout">Chiqish</string>
+    <string name="profile_logout_confirm">Hisobdan chiqishga ishonchingiz komilmi?</string>
+    <string name="profile_settings">Sozlamalar</string>
+    <string name="profile_role_client">Mijoz</string>
+    <string name="profile_role_usta">Usta</string>
+
+    <string name="search_title">Qidiruv</string>
+    <string name="search_found">%1$d ta usta topildi</string>
+    <string name="search_empty">Hech narsa topilmadi</string>
+    <string name="search_empty_hint">Filtrlarni o\'zgartirib ko\'ring</string>
+    <string name="search_filters">Filtrlar</string>
+    <string name="search_category">Kategoriya</string>
+    <string name="search_district">Tuman</string>
+    <string name="search_min_rating">Minimal reyting</string>
+    <string name="search_price_from">Narx (dan)</string>
+    <string name="search_price_to">Narx (gacha)</string>
+    <string name="search_reset">Tozalash</string>
+    <string name="common_all">Barchasi</string>
+
+    <string name="usta_services">Xizmatlar va narxlar</string>
+    <string name="usta_portfolio">Portfolio</string>
+    <string name="usta_reviews">Mijozlar sharhlari</string>
+    <string name="usta_work_hours">Ish vaqti: %1$s – %2$s</string>
+    <string name="usta_order_cta">Buyurtma berish</string>
+    <string name="usta_chat_cta">Yozish</string>
+    <string name="usta_no_reviews">Hozircha sharhlar yo\'q</string>
+    <string name="usta_no_portfolio">Portfolio hali qo\'shilmagan</string>
+    <string name="usta_not_found">Usta topilmadi</string>
+</resources>

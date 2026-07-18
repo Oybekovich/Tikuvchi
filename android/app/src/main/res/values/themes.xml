@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Tikuvchi" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#fdfaf5</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Tikuvchi.Main</item>
+    </style>
+    <style name="Theme.Tikuvchi.Main" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
