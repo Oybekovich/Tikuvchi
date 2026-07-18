@@ -5,6 +5,9 @@ import EmptyState from "@/components/EmptyState";
 import SearchBar from "@/components/SearchBar";
 import SearchFilters from "@/components/SearchFilters";
 import UstaCard, { type UstaCardData } from "@/components/UstaCard";
+import {
+  PhSearchOff,
+} from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/server";
 import { t } from "@/lib/i18n";
 
@@ -116,7 +119,7 @@ export default async function SearchPage({
             </div>
           ) : (
             <EmptyState
-              icon="🔍"
+              icon={<PhSearchOff size={30} />}
               title={t("search.empty")}
               hint={t("search.emptyHint")}
             />

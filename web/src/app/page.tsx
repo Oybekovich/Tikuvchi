@@ -4,6 +4,9 @@ import CategoryCard from "@/components/CategoryCard";
 import EmptyState from "@/components/EmptyState";
 import SearchBar from "@/components/SearchBar";
 import UstaCard from "@/components/UstaCard";
+import {
+  PhNeedle,
+} from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/server";
 import { t } from "@/lib/i18n";
 
@@ -57,7 +60,7 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <EmptyState icon="🪡" title={t("home.emptyUstas")} />
+            <EmptyState icon={<PhNeedle size={30} />} title={t("home.emptyUstas")} />
           )}
         </section>
       </main>

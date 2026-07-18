@@ -4,6 +4,9 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
 import { IconEdit, IconPlus, IconTrash } from "@/components/Icons";
+import {
+  PhRuler,
+} from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -215,7 +218,7 @@ export default function MeasurementsManager({
       {/* Ro'yxat */}
       {items.length === 0 && editingId === null ? (
         <EmptyState
-          icon="📏"
+          icon={<PhRuler size={30} />}
           title={t("measurements.empty")}
           hint={t("measurements.emptyHint")}
         />

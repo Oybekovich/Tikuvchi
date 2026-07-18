@@ -18,7 +18,7 @@ export default function EmptyState({
 }: Props) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-6 py-12 text-center shadow-card">
-      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-terra-50 text-3xl text-terra-400">
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-terra-50 text-terra-400">
         {icon}
       </span>
       <p className="text-base font-bold text-ink-900">{title}</p>

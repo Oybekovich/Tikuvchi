@@ -7,6 +7,10 @@ import PriceTag from "@/components/PriceTag";
 import RatingBadge from "@/components/RatingBadge";
 import ReviewCard, { type ReviewData } from "@/components/ReviewCard";
 import { IconChat, IconClock, IconLocation } from "@/components/Icons";
+import {
+  PhChat,
+  PhImages,
+} from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/server";
 import { formatTime } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -163,7 +167,7 @@ export default async function UstaPage({
                 ))}
               </div>
             ) : (
-              <EmptyState icon="🖼️" title={t("usta.noPortfolio")} />
+              <EmptyState icon={<PhImages size={30} />} title={t("usta.noPortfolio")} />
             )}
           </section>
 
@@ -182,7 +186,7 @@ export default async function UstaPage({
                 ))}
               </div>
             ) : (
-              <EmptyState icon="💬" title={t("usta.noReviews")} />
+              <EmptyState icon={<PhChat size={30} />} title={t("usta.noReviews")} />
             )}
           </section>
         </div>

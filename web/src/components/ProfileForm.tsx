@@ -5,6 +5,7 @@ import { useState } from "react";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import { IconLogout } from "@/components/Icons";
+import { PhCheck } from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/lib/auth";
 import { t } from "@/lib/i18n";
@@ -110,7 +111,14 @@ export default function ProfileForm({ email, fullName, phone, role, userId }: Pr
           </p>
         )}
         <Button onClick={save} loading={saving} size="lg">
-          {saved ? `✓ ${t("profile.saved")}` : t("profile.saveChanges")}
+          {saved ? (
+            <span className="flex items-center justify-center gap-1.5">
+              <PhCheck size={16} className="shrink-0" />
+              {t("profile.saved")}
+            </span>
+          ) : (
+            t("profile.saveChanges")
+          )}
         </Button>
       </div>
 

@@ -3,6 +3,11 @@ import type { Metadata } from "next";
 import AppHeader from "@/components/AppHeader";
 import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/EmptyState";
+import {
+  PhChat,
+  PhImage,
+  PhTag,
+} from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/server";
 import { formatChatTime } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -28,14 +33,32 @@ export default async function ChatListPage() {
     .order("created_at", { referencedTable: "messages", ascending: false })
     .limit(1, { referencedTable: "messages" });
 
+  /**
+   * Matnli xabarda ikonka yo'q — faqat maxsus turlar belgilanadi.
+   * Android'dagi ChatListScreen bilan bir xil.
+   */
   function preview(message?: {
     content: string | null;
     message_type: string;
-  }): string {
-    if (!message) return "";
-    if (message.message_type === "price_offer") return `💰 ${t("chat.priceOffer")}`;
-    if (message.message_type === "image") return `🖼️ ${t("chat.photo")}`;
-    return message.content ?? "";
+  }) {
+    if (!message) return null;
+    if (message.message_type === "price_offer") {
+      return (
+        <>
+          <PhTag size={14} className="shrink-0" />
+          <span className="truncate">{t("chat.priceOffer")}</span>
+        </>
+      );
+    }
+    if (message.message_type === "image") {
+      return (
+        <>
+          <PhImage size={14} className="shrink-0" />
+          <span className="truncate">{t("chat.photo")}</span>
+        </>
+      );
+    }
+    return <span className="truncate">{message.content ?? ""}</span>;
   }
 
   return (
@@ -69,7 +92,7 @@ export default async function ChatListPage() {
                         {formatChatTime(conv.last_message_at)}
                       </span>
                     </div>
-                    <p className="mt-0.5 truncate text-sm text-ink-500">
+                    <p className="mt-0.5 flex items-center gap-1 text-sm text-ink-500">
                       {preview(last)}
                     </p>
                   </div>
@@ -78,7 +101,7 @@ export default async function ChatListPage() {
             })
           ) : (
             <EmptyState
-              icon="💬"
+              icon={<PhChat size={30} />}
               title={t("chat.empty")}
               hint={t("chat.emptyHint")}
               actionLabel={t("orders.goHome")}

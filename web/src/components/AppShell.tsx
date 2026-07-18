@@ -21,7 +21,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div className={hideNav ? "min-h-dvh" : "min-h-dvh pb-20"}>{children}</div>
+      {/* Panel endi kontent ustida suzadi, shuning uchun pastda ko'proq
+          bo'shliq kerak — aks holda oxirgi element panel ostida qolib ketadi */}
+      <div className={hideNav ? "min-h-dvh" : "min-h-dvh pb-24"}>{children}</div>
       {!hideNav && <BottomNav />}
     </>
   );

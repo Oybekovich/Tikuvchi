@@ -5,6 +5,9 @@ import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/EmptyState";
 import PriceTag from "@/components/PriceTag";
 import StatusChip from "@/components/StatusChip";
+import {
+  PhPackage,
+} from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatOrderNumber } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -115,7 +118,7 @@ export default async function OrdersPage({
             })
           ) : (
             <EmptyState
-              icon="📦"
+              icon={<PhPackage size={30} />}
               title={t("orders.empty")}
               hint={t("orders.emptyHint")}
               actionLabel={t("orders.goHome")}

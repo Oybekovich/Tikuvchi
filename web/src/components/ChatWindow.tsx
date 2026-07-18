@@ -7,6 +7,7 @@ import Avatar from "@/components/Avatar";
 import PriceOfferBubble from "@/components/PriceOfferBubble";
 import { Spinner } from "@/components/Button";
 import { IconImage, IconSend } from "@/components/Icons";
+import { PhCheck } from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/client";
 import { formatChatTime } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -319,9 +320,10 @@ export default function ChatWindow({
         {acceptedOrderId && (
           <Link
             href={`/orders/${acceptedOrderId}`}
-            className="block rounded-2xl bg-green-100 px-4 py-3 text-center text-sm font-bold text-green-800 hover:bg-green-200"
+            className="flex items-center justify-center gap-1.5 rounded-2xl bg-green-100 px-4 py-3 text-center text-sm font-bold text-green-800 hover:bg-green-200"
           >
-            ✅ {t("chat.offerAcceptedInfo")}
+            <PhCheck size={16} className="shrink-0" />
+            {t("chat.offerAcceptedInfo")}
           </Link>
         )}
         {error && (
