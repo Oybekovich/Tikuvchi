@@ -1,0 +1,5 @@
+# Har bir loyihaning o'z .gitignore'i bor (web/.gitignore, android/.gitignore).
+# Bu yerda faqat butun repozitoriyga tegishlilari.
+
+.DS_Store
+*.pem
