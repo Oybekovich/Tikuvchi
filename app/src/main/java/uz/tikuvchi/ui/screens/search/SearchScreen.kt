@@ -116,8 +116,7 @@ fun SearchScreen(
 
             else -> LazyColumn(
                 contentPadding = PaddingValues(
-                    bottom = 24.dp + WindowInsets.navigationBars.asPaddingValues()
-                        .calculateBottomPadding(),
+                    bottom = 24.dp,
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {

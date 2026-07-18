@@ -100,8 +100,7 @@ fun UstaScreen(
                 Box(Modifier.fillMaxSize()) {
                     LazyColumn(
                         contentPadding = PaddingValues(
-                            bottom = 96.dp + WindowInsets.navigationBars.asPaddingValues()
-                                .calculateBottomPadding(),
+                            bottom = 96.dp,
                         ),
                     ) {
                         item { Cover(usta.coverImageUrl, usta.ratingAvg, usta.ratingCount) }
@@ -178,8 +177,7 @@ fun UstaScreen(
                             .background(Cream50)
                             .padding(16.dp)
                             .padding(
-                                bottom = WindowInsets.navigationBars.asPaddingValues()
-                                    .calculateBottomPadding(),
+                                bottom = 16.dp,
                             ),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {

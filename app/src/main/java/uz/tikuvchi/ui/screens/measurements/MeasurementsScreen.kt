@@ -85,8 +85,7 @@ fun MeasurementsScreen(
             else -> LazyColumn(
                 contentPadding = PaddingValues(
                     top = 16.dp,
-                    bottom = 24.dp + WindowInsets.navigationBars.asPaddingValues()
-                        .calculateBottomPadding(),
+                    bottom = 24.dp,
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {

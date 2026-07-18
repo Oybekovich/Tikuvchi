@@ -1,6 +1,7 @@
 package uz.tikuvchi.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
@@ -25,6 +27,8 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.launch
 import uz.tikuvchi.data.supabase
 import uz.tikuvchi.ui.components.AppDrawer
+import uz.tikuvchi.ui.components.BottomNav
+import uz.tikuvchi.ui.components.NavTab
 import uz.tikuvchi.ui.components.MenuItem
 import uz.tikuvchi.ui.screens.auth.AuthScreen
 import uz.tikuvchi.ui.screens.chat.ChatListScreen
@@ -103,6 +107,26 @@ private fun AppNav() {
         }
     }
 
+    val currentRoute = nav.currentBackStackEntryAsState().value?.destination?.route
+
+    /**
+     * Web'dagi AppShell bilan bir xil: buyurtma sehrgari va chat oynasida
+     * pastki navigatsiya yashiriladi (chatda pastda xabar yozish paneli turadi,
+     * sehrgar esa chalg'itmaslik uchun to'liq ekranli).
+     */
+    val showBottomNav = currentRoute != null &&
+        currentRoute != Route.ORDER_NEW &&
+        currentRoute != Route.CHAT_WITH
+
+    val currentTab = when (currentRoute) {
+        Route.HOME -> NavTab.HOME
+        Route.ORDERS, Route.ORDER_DETAIL -> NavTab.ORDERS
+        Route.MEASUREMENTS -> NavTab.MEASUREMENTS
+        Route.CHAT -> NavTab.CHAT
+        Route.PROFILE -> NavTab.PROFILE
+        else -> null
+    }
+
     ModalNavigationDrawer(
         drawerState = drawer,
         drawerContent = {
@@ -121,7 +145,12 @@ private fun AppNav() {
             })
         },
     ) {
-        NavHost(navController = nav, startDestination = Route.HOME) {
+        Column(Modifier.fillMaxSize()) {
+        NavHost(
+            navController = nav,
+            startDestination = Route.HOME,
+            modifier = Modifier.weight(1f),
+        ) {
             composable(Route.HOME) {
                 HomeScreen(
                     onMenu = { scope.launch { drawer.open() } },
@@ -231,6 +260,24 @@ private fun AppNav() {
                     onBack = { nav.popBackStack() },
                 )
             }
+        }
+
+        if (showBottomNav) {
+            BottomNav(
+                current = currentTab,
+                onSelect = { tab ->
+                    go(
+                        when (tab) {
+                            NavTab.HOME -> Route.HOME
+                            NavTab.ORDERS -> Route.ORDERS
+                            NavTab.MEASUREMENTS -> Route.MEASUREMENTS
+                            NavTab.CHAT -> Route.CHAT
+                            NavTab.PROFILE -> Route.PROFILE
+                        },
+                    )
+                },
+            )
+        }
         }
     }
 }
