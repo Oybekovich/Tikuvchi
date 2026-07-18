@@ -55,6 +55,7 @@ import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
+import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.PriceTag
 import uz.tikuvchi.ui.components.SecondaryButton
 import uz.tikuvchi.ui.components.StatusChip
@@ -88,6 +89,12 @@ fun OrderDetailScreen(
         when {
             s.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Terra600)
+            }
+
+            // Faqat ko'rsatadigan narsa qolmaganda. cancel() ham error qo'yadi —
+            // u holda buyurtma o'z joyida turaveradi, butun ekran almashmaydi
+            s.error && s.order == null -> Box(Modifier.fillMaxSize().padding(16.dp)) {
+                ErrorState(onRetry = vm::load)
             }
 
             s.order == null -> Box(Modifier.fillMaxSize().padding(16.dp)) {

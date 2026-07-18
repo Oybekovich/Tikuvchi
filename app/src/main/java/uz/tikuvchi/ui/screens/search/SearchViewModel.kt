@@ -3,6 +3,7 @@ package uz.tikuvchi.ui.screens.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,12 +71,15 @@ class SearchViewModel(initialText: String, initialCategory: Long?) : ViewModel()
         viewModelScope.launch {
             try {
                 val q = _state.value.query
-                val ustasAsync = async { CatalogRepository.searchUstas(q.district, q.minRating) }
-                val categoriesAsync = async { CatalogRepository.categories() }
-                val districtsAsync = async { CatalogRepository.districts() }
-                rows = ustasAsync.await()
-                val categories = categoriesAsync.await()
-                val districts = districtsAsync.await()
+                // coroutineScope SHART — HomeViewModel'dagi bilan bir sabab:
+                // usiz async xatosi catch'ni chetlab o'tib ilovani yiqitadi
+                val (loadedRows, categories, districts) = coroutineScope {
+                    val ustasAsync = async { CatalogRepository.searchUstas(q.district, q.minRating) }
+                    val categoriesAsync = async { CatalogRepository.categories() }
+                    val districtsAsync = async { CatalogRepository.districts() }
+                    Triple(ustasAsync.await(), categoriesAsync.await(), districtsAsync.await())
+                }
+                rows = loadedRows
                 _state.update { s ->
                     s.copy(
                         loading = false,

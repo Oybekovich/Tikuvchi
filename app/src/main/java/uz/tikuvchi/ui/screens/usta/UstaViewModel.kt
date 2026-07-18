@@ -3,6 +3,7 @@ package uz.tikuvchi.ui.screens.usta
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,10 +31,12 @@ class UstaViewModel(private val ustaId: String) : ViewModel() {
         _state.update { it.copy(loading = true, error = false) }
         viewModelScope.launch {
             try {
-                val ustaAsync = async { CatalogRepository.usta(ustaId) }
-                val reviewsAsync = async { CatalogRepository.reviews(ustaId) }
-                val usta = ustaAsync.await()
-                val reviews = reviewsAsync.await()
+                // coroutineScope'siz async xatosi catch'ni chetlab o'tadi
+                val (usta, reviews) = coroutineScope {
+                    val ustaAsync = async { CatalogRepository.usta(ustaId) }
+                    val reviewsAsync = async { CatalogRepository.reviews(ustaId) }
+                    ustaAsync.await() to reviewsAsync.await()
+                }
                 _state.update {
                     if (usta == null) {
                         it.copy(loading = false, error = true)

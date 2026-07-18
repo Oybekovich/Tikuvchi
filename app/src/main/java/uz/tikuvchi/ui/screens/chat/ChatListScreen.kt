@@ -38,6 +38,7 @@ import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
+import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink900
@@ -63,6 +64,10 @@ fun ChatListScreen(
         when {
             s.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Terra600)
+            }
+
+            s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
+                ErrorState(onRetry = vm::load)
             }
 
             s.conversations.isEmpty() -> Box(Modifier.fillMaxSize().padding(16.dp)) {

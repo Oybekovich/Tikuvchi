@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import uz.tikuvchi.R
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.EmptyState
+import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.LabeledField
 import uz.tikuvchi.ui.components.SearchBar
 import uz.tikuvchi.ui.components.UstaCardItem
@@ -103,6 +104,12 @@ fun SearchScreen(
         when {
             s.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Terra600)
+            }
+
+            // Xatoni "topilmadi" dan ajratamiz: aks holda ilova tarmoq uzilganida
+            // "0 ta usta topildi, filtrlarni o'zgartiring" deb yanglish yo'naltiradi
+            s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
+                ErrorState(onRetry = vm::load)
             }
 
             else -> LazyColumn(

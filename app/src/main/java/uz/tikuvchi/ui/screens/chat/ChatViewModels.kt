@@ -57,7 +57,8 @@ class ChatViewModel(private val ustaId: String) : ViewModel() {
 
     fun setInput(v: String) = _state.update { it.copy(input = v) }
 
-    private fun load() {
+    fun load() {
+        _state.update { it.copy(loading = true, error = false) }
         viewModelScope.launch {
             try {
                 val id = ChatRepository.findConversation(ustaId)

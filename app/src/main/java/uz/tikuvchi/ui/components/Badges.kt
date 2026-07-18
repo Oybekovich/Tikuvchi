@@ -40,8 +40,8 @@ import uz.tikuvchi.util.formatCurrency
 @Composable
 fun RatingBadge(
     rating: Double,
-    count: Int? = null,
     modifier: Modifier = Modifier,
+    count: Int? = null,
 ) {
     Row(
         modifier

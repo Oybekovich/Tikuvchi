@@ -3,6 +3,7 @@ package uz.tikuvchi.ui.screens.order
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,10 +58,12 @@ class OrderWizardViewModel(private val ustaId: String) : ViewModel() {
     private fun load() {
         viewModelScope.launch {
             try {
-                val ustaAsync = async { CatalogRepository.usta(ustaId) }
-                val measurementsAsync = async { MeasurementsRepository.list() }
-                val usta = ustaAsync.await()
-                val measurements = measurementsAsync.await()
+                // coroutineScope'siz async xatosi catch'ni chetlab o'tadi
+                val (usta, measurements) = coroutineScope {
+                    val ustaAsync = async { CatalogRepository.usta(ustaId) }
+                    val measurementsAsync = async { MeasurementsRepository.list() }
+                    ustaAsync.await() to measurementsAsync.await()
+                }
                 _state.update {
                     it.copy(
                         loading = false,

@@ -41,6 +41,7 @@ import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
+import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.PriceTag
 import uz.tikuvchi.ui.components.StatusChip
 import uz.tikuvchi.ui.theme.Cream200
@@ -89,6 +90,12 @@ fun OrdersScreen(
         when {
             s.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Terra600)
+            }
+
+            // Xato bo'sh ro'yxatdan oldin tekshiriladi — aks holda tarmoq uzilganda
+            // foydalanuvchi buyurtmalarim yo'qolibdi deb o'ylaydi
+            s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
+                ErrorState(onRetry = vm::load)
             }
 
             s.orders.isEmpty() -> Box(Modifier.fillMaxSize().padding(16.dp)) {

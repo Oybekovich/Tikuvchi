@@ -51,6 +51,7 @@ import uz.tikuvchi.data.model.Message
 import uz.tikuvchi.data.model.MessageType
 import uz.tikuvchi.data.model.PriceOfferStatus
 import uz.tikuvchi.ui.components.AppHeader
+import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.PlainInput
 import uz.tikuvchi.ui.theme.Cream100
 import uz.tikuvchi.ui.theme.Cream200
@@ -88,6 +89,15 @@ fun ChatScreen(
         if (s.loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Terra600)
+            }
+            return@Column
+        }
+
+        // Yozishmalar yuklanmagan bo'lsa bo'sh suhbat ko'rsatilmaydi — foydalanuvchi
+        // eski xabarlar yo'qolgan deb o'ylab, qaytadan yozib yubormasligi uchun
+        if (s.error && s.messages.isEmpty()) {
+            Box(Modifier.fillMaxSize().padding(16.dp)) {
+                ErrorState(onRetry = vm::load)
             }
             return@Column
         }

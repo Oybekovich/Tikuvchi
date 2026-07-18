@@ -52,9 +52,9 @@ private fun colorFor(name: String): Color {
 @Composable
 fun Avatar(
     name: String,
+    modifier: Modifier = Modifier,
     src: String? = null,
     size: AvatarSize = AvatarSize.MD,
-    modifier: Modifier = Modifier,
 ) {
     val shape = CircleShape
     val url = imageUrl(src)

@@ -35,7 +35,10 @@
     <string name="nav_profile">Profil</string>
     <string name="menu_search">Qidirish</string>
 
+    <!-- common_error — saqlash/yuborish xatosi uchun; yuklash xatosi alohida (common_load_error) -->
     <string name="common_error">Xatolik yuz berdi. Qayta urinib ko\'ring.</string>
+    <string name="common_load_error">Ma\'lumotni yuklab bo\'lmadi</string>
+    <string name="common_load_error_hint">Internet aloqasini tekshirib, qayta urinib ko\'ring</string>
     <string name="common_retry">Qayta urinish</string>
     <string name="common_back">Orqaga</string>
     <string name="common_close">Yopish</string>

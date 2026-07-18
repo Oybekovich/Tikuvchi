@@ -36,11 +36,10 @@ import uz.tikuvchi.R
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.CategoryCard
 import uz.tikuvchi.ui.components.EmptyState
-import uz.tikuvchi.ui.components.PrimaryButton
+import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.SearchBar
 import uz.tikuvchi.ui.components.UstaCardItem
 import uz.tikuvchi.ui.theme.Cream50
-import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra600
 
@@ -67,22 +66,8 @@ fun HomeScreen(
                 CircularProgressIndicator(color = Terra600)
             }
 
-            s.error -> Column(
-                Modifier.fillMaxSize().padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    stringResource(R.string.common_error),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Ink500,
-                )
-                Spacer(Modifier.height(12.dp))
-                PrimaryButton(
-                    text = stringResource(R.string.common_retry),
-                    onClick = vm::load,
-                    modifier = Modifier.fillMaxWidth(0.6f),
-                )
+            s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
+                ErrorState(onRetry = vm::load)
             }
 
             else -> LazyColumn(

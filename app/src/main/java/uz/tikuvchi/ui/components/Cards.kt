@@ -25,10 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import uz.tikuvchi.R
 import uz.tikuvchi.data.model.ServiceCategory
 import uz.tikuvchi.data.model.UstaCard
 import uz.tikuvchi.ui.theme.Cream200
@@ -207,5 +209,52 @@ fun EmptyState(
                 textAlign = TextAlign.Center,
             )
         }
+    }
+}
+
+/**
+ * Tarmoq xatosi holati. EmptyState'dan ataylab ajratilgan: "ma'lumot yo'q" va
+ * "ma'lumotni ololmadik" — bu ikki boshqa narsa. Ilgari xato bo'lganda ekranlar
+ * bo'sh ro'yxat ko'rsatib, foydalanuvchiga buyurtmalari yo'qolgandek tuyulardi.
+ */
+@Composable
+fun ErrorState(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .padding(horizontal = 24.dp, vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(
+            Modifier.size(64.dp).clip(CircleShape).background(Terra50),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("📡", style = MaterialTheme.typography.headlineSmall)
+        }
+        Text(
+            text = stringResource(R.string.common_load_error),
+            style = MaterialTheme.typography.titleMedium,
+            color = Ink900,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(R.string.common_load_error_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Ink500,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(4.dp))
+        PrimaryButton(
+            text = stringResource(R.string.common_retry),
+            onClick = onRetry,
+            modifier = Modifier.fillMaxWidth(0.7f),
+        )
     }
 }
