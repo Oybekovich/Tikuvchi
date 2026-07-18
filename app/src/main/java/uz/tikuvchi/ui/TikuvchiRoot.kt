@@ -1,7 +1,10 @@
 package uz.tikuvchi.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -12,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -89,39 +94,18 @@ private object Route {
 private fun AppNav() {
     val nav = rememberNavController()
 
-    fun go(route: String) {
-        // Tabdan tabga o'tishda stack o'smasin — bosh sahifagacha tozalaymiz
-        nav.navigate(route) {
-            popUpTo(Route.HOME) { inclusive = route == Route.HOME }
-            launchSingleTop = true
-        }
-    }
-
-    val currentRoute = nav.currentBackStackEntryAsState().value?.destination?.route
-
-    /**
-     * Web'dagi AppShell bilan bir xil: buyurtma sehrgari va chat oynasida
-     * pastki navigatsiya yashiriladi (chatda pastda xabar yozish paneli turadi,
-     * sehrgar esa chalg'itmaslik uchun to'liq ekranli).
-     */
-    val showBottomNav = currentRoute != null &&
-        currentRoute != Route.ORDER_NEW &&
-        currentRoute != Route.CHAT_WITH
-
-    val currentTab = when (currentRoute) {
-        Route.HOME -> NavTab.HOME
-        Route.ORDERS, Route.ORDER_DETAIL -> NavTab.ORDERS
-        Route.MEASUREMENTS -> NavTab.MEASUREMENTS
-        Route.CHAT -> NavTab.CHAT
-        Route.PROFILE -> NavTab.PROFILE
-        else -> null
-    }
-
     Box(Modifier.fillMaxSize()) {
         NavHost(
             navController = nav,
             startDestination = Route.HOME,
             modifier = Modifier.fillMaxSize(),
+            // NavHost'ning o'z sozlamasi — 700 ms lik so'nish. Tab almashtirishda bu
+            // butun ekranni yarim soniyadan ko'proq xiralashtirib turadi va ilova
+            // sekin ishlayotgandek tuyuladi. Qisqa fade kifoya.
+            enterTransition = { fadeIn(tween(120)) },
+            exitTransition = { fadeOut(tween(90)) },
+            popEnterTransition = { fadeIn(tween(120)) },
+            popExitTransition = { fadeOut(tween(90)) },
         ) {
             composable(Route.HOME) {
                 HomeScreen(
@@ -230,24 +214,59 @@ private fun AppNav() {
             }
         }
 
-        if (showBottomNav) {
-            BottomNav(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                current = currentTab,
-                onSelect = { tab ->
-                    go(
-                        when (tab) {
-                            NavTab.HOME -> Route.HOME
-                            NavTab.ORDERS -> Route.ORDERS
-                            NavTab.MEASUREMENTS -> Route.MEASUREMENTS
-                            NavTab.CHAT -> Route.CHAT
-                            NavTab.PROFILE -> Route.PROFILE
-                        },
-                    )
-                },
-            )
-        }
+        NavBar(nav)
     }
+}
+
+/**
+ * Ataylab alohida composable: joriy yo'nalish shu yerda o'qiladi, AppNav'da emas.
+ * Aks holda har bir o'tishda AppNav qayta tuzilib, NavHost'ning butun ekranlar
+ * ro'yxati qaytadan yig'ilardi — panelning o'zi esa shundoq ham yangilanadi.
+ */
+@Composable
+private fun BoxScope.NavBar(nav: NavHostController) {
+    val currentRoute = nav.currentBackStackEntryAsState().value?.destination?.route
+
+    /**
+     * Web'dagi AppShell bilan bir xil: buyurtma sehrgari va chat oynasida
+     * pastki navigatsiya yashiriladi (chatda pastda xabar yozish paneli turadi,
+     * sehrgar esa chalg'itmaslik uchun to'liq ekranli).
+     */
+    val showBottomNav = currentRoute != null &&
+        currentRoute != Route.ORDER_NEW &&
+        currentRoute != Route.CHAT_WITH
+
+    if (!showBottomNav) return
+
+    val currentTab = when (currentRoute) {
+        Route.HOME -> NavTab.HOME
+        Route.ORDERS, Route.ORDER_DETAIL -> NavTab.ORDERS
+        Route.MEASUREMENTS -> NavTab.MEASUREMENTS
+        Route.CHAT -> NavTab.CHAT
+        Route.PROFILE -> NavTab.PROFILE
+        else -> null
+    }
+
+    BottomNav(
+        modifier = Modifier.align(Alignment.BottomCenter),
+        current = currentTab,
+        onSelect = { tab ->
+            val route = when (tab) {
+                NavTab.HOME -> Route.HOME
+                NavTab.ORDERS -> Route.ORDERS
+                NavTab.MEASUREMENTS -> Route.MEASUREMENTS
+                NavTab.CHAT -> Route.CHAT
+                NavTab.PROFILE -> Route.PROFILE
+            }
+            nav.navigate(route) {
+                // saveState/restoreState juftligi tab holatini saqlaydi: qaytganda
+                // ro'yxat o'sha joyidan ochiladi, ekran noldan yuklanmaydi
+                popUpTo(nav.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+    )
 }
 
 @Composable

@@ -2,7 +2,10 @@ package uz.tikuvchi.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -38,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -110,14 +114,34 @@ fun BottomNav(
     }
 }
 
+/**
+ * Panelning barcha harakatlari bitta vaqt bo'yicha ketadi. Spring emas, tween:
+ * spring uzoq "quyruq" qoldiradi va tugagandek tuyulmaydi, tween esa aniq
+ * 180 ms da to'xtaydi — shu tufayli bosish tezkor his qilinadi.
+ */
+private const val NAV_ANIM_MS = 180
+
 /** Markazdagi bosh sahifa — doim to'ldirilgan doira, shuning uchun darhol ko'zga tashlanadi. */
 @Composable
 private fun HomeButton(selected: Boolean, onClick: () -> Unit) {
+    // O'lcham emas, masshtab: graphicsLayer faqat GPU'da ishlaydi, qayta o'lchash
+    // va joylashtirishga sabab bo'lmaydi
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1f else 0.92f,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "homeScale",
+    )
+
     Box(
         Modifier
             .size(52.dp)
-            // Faol bo'lmaganda soya yumshoqroq — ortiqcha e'tibor tortmasin
-            .shadow(if (selected) 8.dp else 3.dp, CircleShape, clip = false)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            // Soya o'zgarmas: elevatsiyani jonlantirish har kadrda soyani
+            // qaytadan chizishga majbur qiladi, masshtab esa tekin
+            .shadow(6.dp, CircleShape, clip = false)
             .clip(CircleShape)
             .background(Terra600)
             .clickable(
@@ -131,7 +155,7 @@ private fun HomeButton(selected: Boolean, onClick: () -> Unit) {
             painter = painterResource(NavTab.HOME.icon),
             contentDescription = stringResource(NavTab.HOME.labelRes),
             tint = Color.White,
-            modifier = Modifier.size(if (selected) 26.dp else 24.dp),
+            modifier = Modifier.size(24.dp),
         )
     }
 }
@@ -140,19 +164,37 @@ private fun HomeButton(selected: Boolean, onClick: () -> Unit) {
 @Composable
 private fun SideTab(tab: NavTab, selected: Boolean, onClick: () -> Unit) {
     val label = stringResource(tab.labelRes)
-    val tint by animateColorAsState(if (selected) Terra600 else Ink500, label = "tabTint")
+    val spec = tween<Float>(NAV_ANIM_MS, easing = FastOutSlowInEasing)
+
+    // Rang, fon, kenglik va matn — hammasi bir xil vaqt va egri chiziqda.
+    // Avval fon va padding bir zumda sakrab, matn alohida kengayardi;
+    // shuning uchun harakat uzuq ko'rinardi.
+    val tint by animateColorAsState(
+        targetValue = if (selected) Terra600 else Ink500,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "tabTint",
+    )
+    val bg by animateColorAsState(
+        targetValue = if (selected) Terra50 else Color.Transparent,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "tabBg",
+    )
+    val sidePad by animateDpAsState(
+        targetValue = if (selected) 12.dp else 10.dp,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "tabPad",
+    )
 
     Row(
         Modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(if (selected) Terra50 else Color.Transparent)
+            .background(bg)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick,
             )
-            .padding(horizontal = if (selected) 12.dp else 10.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(if (selected) 6.dp else 0.dp),
+            .padding(horizontal = sidePad, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -164,8 +206,10 @@ private fun SideTab(tab: NavTab, selected: Boolean, onClick: () -> Unit) {
         )
         AnimatedVisibility(
             visible = selected,
-            enter = expandHorizontally(spring()) + fadeIn(),
-            exit = shrinkHorizontally(spring()) + fadeOut(),
+            enter = expandHorizontally(tween(NAV_ANIM_MS, easing = FastOutSlowInEasing)) +
+                fadeIn(spec),
+            exit = shrinkHorizontally(tween(NAV_ANIM_MS, easing = FastOutSlowInEasing)) +
+                fadeOut(spec),
         ) {
             Text(
                 text = label,
@@ -174,6 +218,9 @@ private fun SideTab(tab: NavTab, selected: Boolean, onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 color = Terra600,
                 maxLines = 1,
+                // Oraliq matn bilan birga kengayadi — Row'ning spacedBy'i
+                // sakrab o'zgarardi, bu esa silliq
+                modifier = Modifier.padding(start = 6.dp),
             )
         }
     }
