@@ -103,6 +103,7 @@ data class ServicePrice(
 data class UstaCard(
     @SerialName("user_id") val userId: String,
     val district: String? = null,
+    @SerialName("cover_image_url") val coverImageUrl: String? = null,
     @SerialName("rating_avg") val ratingAvg: Double = 0.0,
     @SerialName("rating_count") val ratingCount: Int = 0,
     val tags: List<String> = emptyList(),
@@ -201,6 +202,7 @@ data class UstaSearchRow(
     @SerialName("user_id") val userId: String,
     val district: String? = null,
     val bio: String? = null,
+    @SerialName("cover_image_url") val coverImageUrl: String? = null,
     @SerialName("rating_avg") val ratingAvg: Double = 0.0,
     @SerialName("rating_count") val ratingCount: Int = 0,
     val tags: List<String> = emptyList(),
@@ -210,6 +212,7 @@ data class UstaSearchRow(
     fun toCard() = UstaCard(
         userId = userId,
         district = district,
+        coverImageUrl = coverImageUrl,
         ratingAvg = ratingAvg,
         ratingCount = ratingCount,
         tags = tags,

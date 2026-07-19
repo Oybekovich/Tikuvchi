@@ -23,15 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import uz.tikuvchi.R
 import uz.tikuvchi.data.model.ServiceCategory
 import uz.tikuvchi.data.model.UstaCard
+import uz.tikuvchi.util.imageUrl
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Ink300
 import uz.tikuvchi.ui.theme.Ink500
@@ -99,67 +102,82 @@ fun UstaCardItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+            .clickable(onClick = onClick),
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Avatar(name = usta.profiles.fullName, src = usta.profiles.avatarUrl, size = AvatarSize.LG)
-            Column(Modifier.weight(1f)) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = usta.profiles.fullName,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Ink900,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    RatingBadge(usta.ratingAvg)
-                }
-                usta.district?.let { d ->
-                    Spacer(Modifier.height(2.dp))
+        // Cover lentasi — usta ishini kartochkadan chiqmasdan ko'rsatadi.
+        // Rasmi yo'q ustada butunlay tashlab ketiladi: bo'sh kulrang to'rtburchak
+        // hech narsa qo'shmaydi, faqat kartochkani cho'zadi.
+        usta.coverImageUrl?.let { cover ->
+            AsyncImage(
+                model = imageUrl(cover),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(88.dp)
+                    .background(Cream200),
+            )
+        }
+        Column(Modifier.padding(16.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Avatar(name = usta.profiles.fullName, src = usta.profiles.avatarUrl, size = AvatarSize.LG)
+                Column(Modifier.weight(1f)) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_location),
-                            contentDescription = null,
-                            tint = Ink500,
-                            modifier = Modifier.size(14.dp),
+                        Text(
+                            text = usta.profiles.fullName,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Ink900,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
                         )
-                        Text(d, style = MaterialTheme.typography.bodyMedium, color = Ink500)
+                        RatingBadge(usta.ratingAvg)
                     }
-                }
-                if (usta.tags.isNotEmpty()) {
-                    Spacer(Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        usta.tags.take(3).forEach { Tag(it) }
+                    usta.district?.let { d ->
+                        Spacer(Modifier.height(2.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_location),
+                                contentDescription = null,
+                                tint = Ink500,
+                                modifier = Modifier.size(14.dp),
+                            )
+                            Text(d, style = MaterialTheme.typography.bodyMedium, color = Ink500)
+                        }
+                    }
+                    if (usta.tags.isNotEmpty()) {
+                        Spacer(Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            usta.tags.take(3).forEach { Tag(it) }
+                        }
                     }
                 }
             }
-        }
 
-        usta.minPrice?.let { price ->
-            Spacer(Modifier.height(12.dp))
-            Box(Modifier.fillMaxWidth().height(1.dp).background(Cream200))
-            Spacer(Modifier.height(12.dp))
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                PriceTag(amount = price, from = true)
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_right),
-                    contentDescription = null,
-                    tint = Ink300,
-                    modifier = Modifier.size(18.dp),
-                )
+            usta.minPrice?.let { price ->
+                Spacer(Modifier.height(12.dp))
+                Box(Modifier.fillMaxWidth().height(1.dp).background(Cream200))
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    PriceTag(amount = price, from = true)
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_right),
+                        contentDescription = null,
+                        tint = Ink300,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
             }
         }
     }

@@ -20,7 +20,7 @@ import uz.tikuvchi.data.model.UstaSearchRow
 object CatalogRepository {
 
     private const val USTA_CARD_COLUMNS =
-        "user_id, district, rating_avg, rating_count, tags, " +
+        "user_id, district, cover_image_url, rating_avg, rating_count, tags, " +
             "profiles!inner(full_name, avatar_url), usta_services(base_price)"
 
     suspend fun categories(): List<ServiceCategory> = withContext(Dispatchers.IO) {
@@ -69,7 +69,7 @@ object CatalogRepository {
         supabase.from("usta_profiles")
             .select(
                 Columns.raw(
-                    "user_id, district, bio, rating_avg, rating_count, tags, " +
+                    "user_id, district, bio, cover_image_url, rating_avg, rating_count, tags, " +
                         "profiles!inner(full_name, avatar_url), " +
                         "usta_services(base_price, category_id)"
                 )

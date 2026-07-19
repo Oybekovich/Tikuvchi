@@ -7,6 +7,7 @@ import { IconChevronRight, IconLocation } from "@/components/Icons";
 export type UstaCardData = {
   user_id: string;
   district: string | null;
+  cover_image_url: string | null;
   rating_avg: number;
   rating_count: number;
   tags: string[];
@@ -22,45 +23,58 @@ export default function UstaCard({ usta }: { usta: UstaCardData }) {
   return (
     <Link
       href={`/usta/${usta.user_id}`}
-      className="block rounded-2xl bg-white p-4 shadow-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
+      className="block overflow-hidden rounded-2xl bg-white shadow-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
     >
-      <div className="flex items-start gap-3">
-        <Avatar
-          name={usta.profiles.full_name}
-          src={usta.profiles.avatar_url}
-          size="lg"
+      {/* Cover lentasi — Android'dagi UstaCardItem bilan bir xil balandlik.
+          Rasmi yo'q ustada butunlay tashlab ketiladi: bo'sh to'rtburchak
+          hech narsa qo'shmaydi, faqat kartani cho'zadi. */}
+      {usta.cover_image_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={usta.cover_image_url}
+          alt=""
+          className="h-[88px] w-full bg-cream-200 object-cover"
         />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="truncate text-base font-bold text-ink-900">
-              {usta.profiles.full_name}
-            </h3>
-            <RatingBadge rating={usta.rating_avg} />
-          </div>
-          {usta.district && (
-            <p className="mt-0.5 flex items-center gap-1 text-sm text-ink-500">
-              <IconLocation size={14} />
-              {usta.district}
-            </p>
-          )}
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {usta.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-cream-200 px-2.5 py-0.5 text-xs font-semibold text-ink-700"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-      {minPrice !== null && (
-        <div className="mt-3 flex items-center justify-between border-t border-cream-200 pt-3">
-          <PriceTag amount={minPrice} from size="sm" />
-          <IconChevronRight size={18} className="text-ink-300" />
-        </div>
       )}
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <Avatar
+            name={usta.profiles.full_name}
+            src={usta.profiles.avatar_url}
+            size="lg"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="truncate text-base font-bold text-ink-900">
+                {usta.profiles.full_name}
+              </h3>
+              <RatingBadge rating={usta.rating_avg} />
+            </div>
+            {usta.district && (
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-ink-500">
+                <IconLocation size={14} />
+                {usta.district}
+              </p>
+            )}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {usta.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-cream-200 px-2.5 py-0.5 text-xs font-semibold text-ink-700"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+        {minPrice !== null && (
+          <div className="mt-3 flex items-center justify-between border-t border-cream-200 pt-3">
+            <PriceTag amount={minPrice} from size="sm" />
+            <IconChevronRight size={18} className="text-ink-300" />
+          </div>
+        )}
+      </div>
     </Link>
   );
 }

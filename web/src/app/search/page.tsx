@@ -70,7 +70,7 @@ export default async function SearchPage({
   let query = supabase
     .from("usta_profiles")
     .select(
-      "user_id, district, bio, rating_avg, rating_count, tags, profiles!inner(full_name, avatar_url), usta_services(base_price, category_id)"
+      "user_id, district, bio, cover_image_url, rating_avg, rating_count, tags, profiles!inner(full_name, avatar_url), usta_services(base_price, category_id)"
     )
     .order("rating_avg", { ascending: false });
 
