@@ -55,11 +55,11 @@ end $$;
 
 -- Usta profillari
 insert into public.usta_profiles (user_id, bio, cover_image_url, location_text, district, work_hours_start, work_hours_end, tags, gender_segment) values
-('a0000000-0000-4000-8000-000000000001', '15 yildan beri milliy liboslar tikaman. Atlas va adrasdan zamonaviy hamda an''anaviy modellar — har bir mijozga individual andoza asosida.', '/seed/covers/u1.svg', 'Chilonzor tumani, Toshkent', 'Chilonzor', '09:00', '18:00', '{"milliy libos","atlas","adras"}', 'women'),
-('a0000000-0000-4000-8000-000000000002', 'Kechki va bayram liboslari bo''yicha mutaxassisman. Biser, payetka va qo''lda tikilgan bezaklar bilan ishlayman. Har bir ko''ylak — san''at asari.', '/seed/covers/u2.svg', 'Yunusobod tumani, Toshkent', 'Yunusobod', '10:00', '19:00', '{"kechki ko''ylak","biser bezak","individual andoza"}', 'women'),
-('a0000000-0000-4000-8000-000000000003', 'Muslima ayollar uchun yopiq, bejirim va zamonaviy liboslar tikaman. Abaya, hijob to''plamlari va yopiq kechki liboslar — sifatli matolardan.', '/seed/covers/u3.svg', 'Mirzo Ulug''bek tumani, Toshkent', 'Mirzo Ulug''bek', '09:00', '17:00', '{"abaya","hijob","yopiq libos"}', 'women'),
-('a0000000-0000-4000-8000-000000000004', 'Kundalik va ofis kiyimlari ustasi. Qulay, sifatli va har kuni kiyish mumkin bo''lgan liboslar — aniq o''lcham va tez muddatda.', '/seed/covers/u4.svg', 'Sergeli tumani, Toshkent', 'Sergeli', '10:00', '18:00', '{"kundalik","ofis uslubi","klassik"}', 'women'),
-('a0000000-0000-4000-8000-000000000005', 'To''y va marosim liboslari bo''yicha 10 yillik tajriba. Kelin liboslari, milliy to''y to''plamlari va zamonaviy modellar.', '/seed/covers/u5.svg', 'Olmazor tumani, Toshkent', 'Olmazor', '09:00', '19:00', '{"to''y libosi","milliy","zamonaviy"}', 'women');
+('a0000000-0000-4000-8000-000000000001', '15 yildan beri milliy liboslar tikaman. Atlas va adrasdan zamonaviy hamda an''anaviy modellar — har bir mijozga individual andoza asosida.', '/seed/covers/u1.jpg', 'Chilonzor tumani, Toshkent', 'Chilonzor', '09:00', '18:00', '{"milliy libos","atlas","adras"}', 'women'),
+('a0000000-0000-4000-8000-000000000002', 'Kechki va bayram liboslari bo''yicha mutaxassisman. Biser, payetka va qo''lda tikilgan bezaklar bilan ishlayman. Har bir ko''ylak — san''at asari.', '/seed/covers/u2.jpg', 'Yunusobod tumani, Toshkent', 'Yunusobod', '10:00', '19:00', '{"kechki ko''ylak","biser bezak","individual andoza"}', 'women'),
+('a0000000-0000-4000-8000-000000000003', 'Muslima ayollar uchun yopiq, bejirim va zamonaviy liboslar tikaman. Abaya, hijob to''plamlari va yopiq kechki liboslar — sifatli matolardan.', '/seed/covers/u3.jpg', 'Mirzo Ulug''bek tumani, Toshkent', 'Mirzo Ulug''bek', '09:00', '17:00', '{"abaya","hijob","yopiq libos"}', 'women'),
+('a0000000-0000-4000-8000-000000000004', 'Kundalik va ofis kiyimlari ustasi. Qulay, sifatli va har kuni kiyish mumkin bo''lgan liboslar — aniq o''lcham va tez muddatda.', '/seed/covers/u4.jpg', 'Sergeli tumani, Toshkent', 'Sergeli', '10:00', '18:00', '{"kundalik","ofis uslubi","klassik"}', 'women'),
+('a0000000-0000-4000-8000-000000000005', 'To''y va marosim liboslari bo''yicha 10 yillik tajriba. Kelin liboslari, milliy to''y to''plamlari va zamonaviy modellar.', '/seed/covers/u5.jpg', 'Olmazor tumani, Toshkent', 'Olmazor', '09:00', '19:00', '{"to''y libosi","milliy","zamonaviy"}', 'women');
 
 -- Xizmat kategoriyalari
 insert into public.service_categories (name, icon, gender_segment) values
@@ -89,26 +89,26 @@ insert into public.usta_services (usta_id, category_id, title, description, base
 
 -- Portfolio (rasm yo'llari /public/seed/portfolio ichida)
 insert into public.portfolio_items (usta_id, image_url, caption, sort_order) values
-('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-1.svg', 'Xonatlas ko''ylak — to''y marosimi uchun', 1),
-('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-2.svg', 'Adras libos to''plami', 2),
-('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-3.svg', 'Zamonaviy milliy ko''ylak', 3),
-('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-4.svg', 'Atlas lozim-ko''ylak to''plami', 4),
-('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-1.svg', 'Qora shifon kechki ko''ylak', 1),
-('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-2.svg', 'Biser bezakli libos', 2),
-('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-3.svg', 'Yashil atlas kechki ko''ylak', 3),
-('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-4.svg', 'Kokteyl ko''ylagi — kumush payetka', 4),
-('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-1.svg', 'Klassik qora abaya', 1),
-('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-2.svg', 'Yopiq kechki libos — to''q ko''k', 2),
-('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-3.svg', 'Hijob to''plami — bej', 3),
-('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-4.svg', 'Kundalik abaya — jigarrang', 4),
-('a0000000-0000-4000-8000-000000000004', '/seed/portfolio/u4-1.svg', 'Ofis ko''ylagi — kulrang klassik', 1),
-('a0000000-0000-4000-8000-000000000004', '/seed/portfolio/u4-2.svg', 'Yozgi kundalik ko''ylak', 2),
-('a0000000-0000-4000-8000-000000000004', '/seed/portfolio/u4-3.svg', 'Yubka-kostyum to''plami', 3),
-('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-1.svg', 'Kelin libosi — oq atlas', 1),
-('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-2.svg', 'Milliy to''y to''plami', 2),
-('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-3.svg', 'Fotosessiya uchun libos', 3),
-('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-4.svg', 'Zamonaviy to''y ko''ylagi', 4),
-('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-5.svg', 'Marosim libosi — pushti', 5);
+('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-1.jpg', 'Xonatlas ko''ylak va lozim', 1),
+('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-2.jpg', 'Milliy atlas libos — an''anaviy bichim', 2),
+('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-3.jpg', 'Zamonaviy milliy ko''ylak', 3),
+('a0000000-0000-4000-8000-000000000001', '/seed/portfolio/u1-4.jpg', 'Buxoro shoyisi — 1930-yillar naqshi', 4),
+('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-1.jpg', 'Bayram to''ni — ipak, qo''lda tikilgan', 1),
+('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-2.jpg', 'Zarbof to''n — oltin ip bilan', 2),
+('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-3.jpg', 'Ipak ikat — kechki libos uchun', 3),
+('a0000000-0000-4000-8000-000000000002', '/seed/portfolio/u2-4.jpg', 'Marosim to''ni — ipak astarli', 4),
+('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-1.jpg', 'Chyrpy — yopiq ustki libos', 1),
+('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-2.jpg', 'Baxmal ikat mato — yopiq libos uchun', 2),
+('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-3.jpg', 'Munisak — ayollar ustki libosi', 3),
+('a0000000-0000-4000-8000-000000000003', '/seed/portfolio/u3-4.jpg', 'Xorazm ayollar to''ni', 4),
+('a0000000-0000-4000-8000-000000000004', '/seed/portfolio/u4-1.jpg', 'Zamonaviy suzani — qo''lda tikilgan', 1),
+('a0000000-0000-4000-8000-000000000004', '/seed/portfolio/u4-2.jpg', 'Chopon — ipak va paxta', 2),
+('a0000000-0000-4000-8000-000000000004', '/seed/portfolio/u4-3.jpg', 'Chust do''ppisi — ayollar uchun', 3),
+('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-1.jpg', 'Kók ko''ylek — an''anaviy kelin libosi', 1),
+('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-2.jpg', 'Shahrisabz suzanisi — to''y sarposi', 2),
+('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-3.jpg', 'Buxoro suzanisi — marosim uchun', 3),
+('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-4.jpg', 'Katta medalonli suzani', 4),
+('a0000000-0000-4000-8000-000000000005', '/seed/portfolio/u5-5.jpg', 'Kermina suzanisi — qizil naqsh', 5);
 
 -- Sharhlar (trigger reytingni avtomatik yangilaydi)
 insert into public.reviews (usta_id, client_id, rating, comment, created_at) values
@@ -136,10 +136,10 @@ insert into public.orders (id, client_id, usta_id, source, status, total_price, 
 ('d0000000-0000-4000-8000-000000000004', 'c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000004', 'catalog', 'pending', 850000, 'pending', current_date + 14, now() - interval '1 day');
 
 insert into public.order_items (order_id, title, material, image_url, size_note, model_note, price) values
-('d0000000-0000-4000-8000-000000000001', 'Kechki ko''ylak (klassik)', 'Shifon, qora', '/seed/portfolio/u2-1.svg', 'Asosiy o''lchamlarim', 'Yenglari uzun, orqa tomoni yopiq bo''lsin', 2200000),
-('d0000000-0000-4000-8000-000000000002', 'Abaya (klassik)', 'Krep, to''q ko''k', '/seed/portfolio/u3-2.svg', 'Asosiy o''lchamlarim', 'Yon cho''ntaklar qo''shilsin', 950000),
-('d0000000-0000-4000-8000-000000000003', 'Zamonaviy ko''ylak', 'Viskoza, terrakota', '/seed/portfolio/u5-3.svg', 'Asosiy o''lchamlarim', 'Tizza ostidan, belida kamar', 1100000),
-('d0000000-0000-4000-8000-000000000004', 'Ofis ko''ylagi', 'Paxta aralash, kulrang', '/seed/portfolio/u4-1.svg', 'Asosiy o''lchamlarim', 'Klassik yoqali, tugmali', 850000);
+('d0000000-0000-4000-8000-000000000001', 'Bayram to''ni (zarbof)', 'Ipak, zarhal', '/seed/portfolio/u2-1.jpg', 'Asosiy o''lchamlarim', 'Yenglari uzun, orqa tomoni yopiq bo''lsin', 2200000),
+('d0000000-0000-4000-8000-000000000002', 'Yopiq libos (baxmal ikat)', 'Baxmal, ikat naqsh', '/seed/portfolio/u3-2.jpg', 'Asosiy o''lchamlarim', 'Yon cho''ntaklar qo''shilsin', 950000),
+('d0000000-0000-4000-8000-000000000003', 'Milliy ko''ylak (zamonaviy)', 'Atlas, terrakota', '/seed/portfolio/u5-3.jpg', 'Asosiy o''lchamlarim', 'Tizza ostidan, belida kamar', 1100000),
+('d0000000-0000-4000-8000-000000000004', 'Kundalik ko''ylak', 'Paxta aralash, bej', '/seed/portfolio/u4-1.jpg', 'Asosiy o''lchamlarim', 'Klassik yoqali, tugmali', 850000);
 
 -- O'lchamlar
 insert into public.measurements (client_id, label, chest, waist, hips, height, shoulder, sleeve_length, notes, updated_at) values
