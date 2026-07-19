@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import uz.tikuvchi.data.CatalogRepository
 import uz.tikuvchi.data.model.ServiceCategory
 import uz.tikuvchi.data.model.UstaCard
+import uz.tikuvchi.data.reloadOnReconnect
 
 data class HomeUiState(
     val loading: Boolean = true,
@@ -24,7 +25,11 @@ class HomeViewModel : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        load()
+        // Tarmoq qaytganda yoki boshqa ekranda "Qayta urinish" bosilganda
+        reloadOnReconnect({ _state.value.error }, ::load)
+    }
 
     fun load() {
         _state.update { it.copy(loading = true, error = false) }

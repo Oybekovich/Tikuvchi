@@ -15,6 +15,7 @@ import uz.tikuvchi.data.matches
 import uz.tikuvchi.data.model.ServiceCategory
 import uz.tikuvchi.data.model.UstaCard
 import uz.tikuvchi.data.model.UstaSearchRow
+import uz.tikuvchi.data.reloadOnReconnect
 
 data class SearchUiState(
     val loading: Boolean = true,
@@ -35,7 +36,11 @@ class SearchViewModel(initialText: String, initialCategory: Long?) : ViewModel()
     /** Server tomondan kelgan xom qatorlar — filtr o'zgarganda qayta so'ralmaydi. */
     private var rows: List<UstaSearchRow> = emptyList()
 
-    init { load() }
+    init {
+        load()
+        // Tarmoq qaytganda yoki boshqa ekranda "Qayta urinish" bosilganda
+        reloadOnReconnect({ _state.value.error }, ::load)
+    }
 
     fun setText(v: String) = updateQuery { it.copy(text = v) }
     fun setCategory(v: Long?) = updateQuery { it.copy(categoryId = v) }

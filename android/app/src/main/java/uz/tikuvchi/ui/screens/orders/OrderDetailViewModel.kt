@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.tikuvchi.data.OrdersRepository
 import uz.tikuvchi.data.model.OrderDetail
+import uz.tikuvchi.data.reloadOnReconnect
 
 data class OrderDetailUiState(
     val loading: Boolean = true,
@@ -20,7 +21,11 @@ class OrderDetailViewModel(private val orderId: String) : ViewModel() {
     private val _state = MutableStateFlow(OrderDetailUiState())
     val state: StateFlow<OrderDetailUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        load()
+        // Tarmoq qaytganda yoki boshqa ekranda "Qayta urinish" bosilganda
+        reloadOnReconnect({ _state.value.error }, ::load)
+    }
 
     fun load() {
         _state.update { it.copy(loading = true, error = false) }

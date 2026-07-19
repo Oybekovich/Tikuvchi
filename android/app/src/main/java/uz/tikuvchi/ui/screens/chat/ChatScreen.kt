@@ -40,12 +40,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import coil3.compose.AsyncImage
 import uz.tikuvchi.R
+import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.data.model.Message
 import uz.tikuvchi.data.model.MessageType
 import uz.tikuvchi.data.model.PriceOfferStatus
@@ -96,7 +97,7 @@ fun ChatScreen(
         // eski xabarlar yo'qolgan deb o'ylab, qaytadan yozib yubormasligi uchun
         if (s.error && s.messages.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(16.dp)) {
-                ErrorState(onRetry = vm::load)
+                ErrorState(onRetry = Reconnect::request)
             }
             return@Column
         }

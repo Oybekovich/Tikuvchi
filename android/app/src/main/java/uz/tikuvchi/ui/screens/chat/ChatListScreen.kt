@@ -35,14 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
+import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.data.model.ConversationRow
 import uz.tikuvchi.data.model.MessageType
-import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.ErrorState
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink900
@@ -69,7 +70,7 @@ fun ChatListScreen(
             }
 
             s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
-                ErrorState(onRetry = vm::load)
+                ErrorState(onRetry = Reconnect::request)
             }
 
             s.conversations.isEmpty() -> Box(Modifier.fillMaxSize().padding(16.dp)) {

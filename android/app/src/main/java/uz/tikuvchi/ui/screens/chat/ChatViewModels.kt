@@ -11,6 +11,7 @@ import uz.tikuvchi.data.ChatRepository
 import uz.tikuvchi.data.ProfileRepository
 import uz.tikuvchi.data.model.ConversationRow
 import uz.tikuvchi.data.model.Message
+import uz.tikuvchi.data.reloadOnReconnect
 
 data class ChatListUiState(
     val loading: Boolean = true,
@@ -22,7 +23,11 @@ class ChatListViewModel : ViewModel() {
     private val _state = MutableStateFlow(ChatListUiState())
     val state: StateFlow<ChatListUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        load()
+        // Tarmoq qaytganda yoki boshqa ekranda "Qayta urinish" bosilganda
+        reloadOnReconnect({ _state.value.error }, ::load)
+    }
 
     fun load() {
         _state.update { it.copy(loading = true, error = false) }
@@ -53,7 +58,11 @@ class ChatViewModel(private val ustaId: String) : ViewModel() {
     /** Suhbat birinchi xabar yuborilgunga qadar yaratilmaydi. */
     private var conversationId: String? = null
 
-    init { load() }
+    init {
+        load()
+        // Tarmoq qaytganda yoki boshqa ekranda "Qayta urinish" bosilganda
+        reloadOnReconnect({ _state.value.error }, ::load)
+    }
 
     fun setInput(v: String) = _state.update { it.copy(input = v) }
 

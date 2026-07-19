@@ -33,13 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
-import uz.tikuvchi.ui.components.bottomNavSpace
+import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.CategoryCard
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.SearchBar
 import uz.tikuvchi.ui.components.UstaCardItem
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra600
@@ -67,7 +68,7 @@ fun HomeScreen(
             }
 
             s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
-                ErrorState(onRetry = vm::load)
+                ErrorState(onRetry = Reconnect::request)
             }
 
             else -> LazyColumn(

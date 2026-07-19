@@ -1,5 +1,6 @@
 package uz.tikuvchi.ui.screens.search
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -34,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.annotation.DrawableRes
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,13 +45,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import uz.tikuvchi.R
-import uz.tikuvchi.ui.components.bottomNavSpace
+import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.LabeledField
 import uz.tikuvchi.ui.components.SearchBar
 import uz.tikuvchi.ui.components.UstaCardItem
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Gold400
@@ -112,7 +113,7 @@ fun SearchScreen(
             // Xatoni "topilmadi" dan ajratamiz: aks holda ilova tarmoq uzilganida
             // "0 ta usta topildi, filtrlarni o'zgartiring" deb yanglish yo'naltiradi
             s.error -> Box(Modifier.fillMaxSize().padding(16.dp)) {
-                ErrorState(onRetry = vm::load)
+                ErrorState(onRetry = Reconnect::request)
             }
 
             else -> LazyColumn(

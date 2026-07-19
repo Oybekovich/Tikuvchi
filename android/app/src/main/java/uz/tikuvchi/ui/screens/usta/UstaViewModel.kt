@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import uz.tikuvchi.data.CatalogRepository
 import uz.tikuvchi.data.model.ReviewItem
 import uz.tikuvchi.data.model.UstaDetail
+import uz.tikuvchi.data.reloadOnReconnect
 
 data class UstaUiState(
     val loading: Boolean = true,
@@ -25,7 +26,11 @@ class UstaViewModel(private val ustaId: String) : ViewModel() {
     private val _state = MutableStateFlow(UstaUiState())
     val state: StateFlow<UstaUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        load()
+        // Tarmoq qaytganda yoki boshqa ekranda "Qayta urinish" bosilganda
+        reloadOnReconnect({ _state.value.error }, ::load)
+    }
 
     fun load() {
         _state.update { it.copy(loading = true, error = false) }

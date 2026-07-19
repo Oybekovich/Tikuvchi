@@ -45,12 +45,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import uz.tikuvchi.R
+import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.data.model.OrderDetail
 import uz.tikuvchi.data.model.OrderItemDetail
 import uz.tikuvchi.data.model.OrderSource
 import uz.tikuvchi.data.model.OrderStatus
 import uz.tikuvchi.data.model.PaymentStatus
-import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
@@ -59,6 +59,7 @@ import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.PriceTag
 import uz.tikuvchi.ui.components.SecondaryButton
 import uz.tikuvchi.ui.components.StatusChip
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Cream300
 import uz.tikuvchi.ui.theme.Cream50
@@ -94,7 +95,7 @@ fun OrderDetailScreen(
             // Faqat ko'rsatadigan narsa qolmaganda. cancel() ham error qo'yadi —
             // u holda buyurtma o'z joyida turaveradi, butun ekran almashmaydi
             s.error && s.order == null -> Box(Modifier.fillMaxSize().padding(16.dp)) {
-                ErrorState(onRetry = vm::load)
+                ErrorState(onRetry = Reconnect::request)
             }
 
             s.order == null -> Box(Modifier.fillMaxSize().padding(16.dp)) {
