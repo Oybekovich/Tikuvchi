@@ -59,7 +59,13 @@ fun TikuvchiRoot() {
     when (status) {
         null, is SessionStatus.Initializing -> Splash()
         is SessionStatus.Authenticated -> AppNav()
-        // NotAuthenticated yoki RefreshFailure — ikkalasida ham kirish talab qilinadi
+        // RefreshFailure — bu chiqish EMAS. Kutubxona uni faqat ikki holatda
+        // chiqaradi: tarmoqqa yetib bo'lmadi yoki server 5xx qaytardi — ikkalasida
+        // ham sessiya joyida turadi va qayta urinish davom etadi. Bu yerda login
+        // ekraniga o'tkazilsa, tarmoq bir lahzaga uzilganda foydalanuvchi
+        // sababsiz chiqib ketadi, keyin qayta urinish o'tgach yana kiradi.
+        // Token haqiqatan yaroqsiz bo'lsa kutubxona NotAuthenticated beradi.
+        is SessionStatus.RefreshFailure -> AppNav()
         else -> AuthScreen(onAuthenticated = { /* sessionStatus o'zi yangilanadi */ })
     }
 }
