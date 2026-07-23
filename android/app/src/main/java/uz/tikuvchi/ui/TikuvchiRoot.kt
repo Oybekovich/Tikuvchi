@@ -181,9 +181,8 @@ private fun AppNav() {
                 OrderWizardScreen(
                     ustaId = entry.arguments?.getString("id").orEmpty(),
                     onClose = { nav.popBackStack() },
-                    onCreated = {
-                        // Buyurtma yaratilgach ro'yxatga o'tamiz, wizard stack'da qolmasin
-                        nav.navigate(Route.ORDERS) {
+                    onSent = { ustaId, ustaName ->
+                        nav.navigate(Route.chatWith(ustaId, ustaName)) {
                             popUpTo(Route.HOME)
                             launchSingleTop = true
                         }

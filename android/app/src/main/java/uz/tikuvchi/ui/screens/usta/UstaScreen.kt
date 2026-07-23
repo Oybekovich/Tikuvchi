@@ -419,7 +419,7 @@ private fun PortfolioDetailsSheet(
                         state = pagerState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(280.dp),
+                            .height(380.dp),
                     ) { page ->
                         val item = items.getOrNull(page) ?: return@HorizontalPager
                         Box(

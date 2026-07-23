@@ -3,18 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "@/components/Button";
-import PriceTag from "@/components/PriceTag";
 import { IconCheck, IconClose } from "@/components/Icons";
 import { createClient } from "@/lib/supabase/client";
-import { formatDate } from "@/lib/format";
 import { t } from "@/lib/i18n";
-
-type Service = {
-  id: number;
-  title: string;
-  description: string | null;
-  base_price: number;
-};
 
 type Measurement = {
   id: string;
@@ -30,7 +21,6 @@ type Measurement = {
 type Props = {
   ustaId: string;
   ustaName: string;
-  services: Service[];
   measurements: Measurement[];
 };
 
@@ -45,21 +35,28 @@ const NEW_MEASUREMENT_FIELDS = [
   "sleeve_length",
 ] as const;
 
-function defaultReadyDate(): string {
-  const d = new Date();
-  d.setDate(d.getDate() + 14);
-  return d.toISOString().slice(0, 10);
+function addMeasurementDetails(
+  list: string[],
+  m: {
+    chest: number | null;
+    waist: number | null;
+    hips: number | null;
+    height: number | null;
+    shoulder: number | null;
+    sleeve_length: number | null;
+  }
+) {
+  if (m.chest != null) list.push(`Bust: ${m.chest} sm`);
+  if (m.waist != null) list.push(`Bel: ${m.waist} sm`);
+  if (m.hips != null) list.push(`Biklar: ${m.hips} sm`);
+  if (m.height != null) list.push(`Bo'y: ${m.height} sm`);
+  if (m.shoulder != null) list.push(`Yelka eni: ${m.shoulder} sm`);
+  if (m.sleeve_length != null) list.push(`Qol uzunligi: ${m.sleeve_length} sm`);
 }
 
-/**
- * A yo'l (katalog orqali): 3 bosqichli buyurtma yaratish oqimi.
- * To'liq ekranli — pastki tab-navigatsiya AppShell tomonidan yashiriladi,
- * faqat yuqorida progress-stepper, pastda Orqaga/Davom etish tugmalari.
- */
 export default function OrderWizard({
   ustaId,
   ustaName,
-  services,
   measurements,
 }: Props) {
   const router = useRouter();
@@ -67,10 +64,10 @@ export default function OrderWizard({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // 1-bosqich: tur
-  const [serviceId, setServiceId] = useState<number | null>(null);
+  // 1-bosqich: tafsilot
   const [material, setMaterial] = useState("");
   const [modelNote, setModelNote] = useState("");
+  const [suggestedPrice, setSuggestedPrice] = useState("");
 
   // 2-bosqich: o'lcham
   const [measurementId, setMeasurementId] = useState<string | "new" | null>(
@@ -87,13 +84,7 @@ export default function OrderWizard({
   });
   const [sizeNote, setSizeNote] = useState("");
 
-  // 3-bosqich: yakun
-  const [readyDate, setReadyDate] = useState(defaultReadyDate());
-
-  const service = services.find((s) => s.id === serviceId) ?? null;
-
   function validateStep(): string | null {
-    if (step === 0 && !service) return t("orderFlow.selectServiceFirst");
     if (step === 1) {
       if (!measurementId) return t("orderFlow.selectMeasurementFirst");
       if (measurementId === "new" && !newMeasurement.label.trim()) {
@@ -123,7 +114,6 @@ export default function OrderWizard({
   }
 
   async function submit() {
-    if (!service) return;
     setSubmitting(true);
     setError(null);
     const supabase = createClient();
@@ -134,8 +124,9 @@ export default function OrderWizard({
       } = await supabase.auth.getUser();
       if (!user) throw new Error("auth");
 
-      // Yangi o'lcham kiritilgan bo'lsa, avval uni saqlaymiz
+      // Save new measurement if entered
       let measurementLabel = "";
+      const measurementDetails: string[] = [];
       if (measurementId === "new") {
         const values = Object.fromEntries(
           NEW_MEASUREMENT_FIELDS.map((f) => [
@@ -143,44 +134,61 @@ export default function OrderWizard({
             newMeasurement[f] ? Number(newMeasurement[f]) : null,
           ])
         );
-        const { error: mErr } = await supabase.from("measurements").insert({
-          client_id: user.id,
-          label: newMeasurement.label.trim(),
-          ...values,
-        });
+        const { data: saved, error: mErr } = await supabase
+          .from("measurements")
+          .insert({
+            client_id: user.id,
+            label: newMeasurement.label.trim(),
+            ...values,
+          })
+          .select("id, label, chest, waist, hips, height, shoulder, sleeve_length")
+          .single();
         if (mErr) throw mErr;
-        measurementLabel = newMeasurement.label.trim();
+        measurementLabel = saved.label;
+        addMeasurementDetails(measurementDetails, saved);
       } else {
-        measurementLabel =
-          measurements.find((m) => m.id === measurementId)?.label ?? "";
+        const m = measurements.find((m) => m.id === measurementId);
+        if (m) {
+          measurementLabel = m.label;
+          addMeasurementDetails(measurementDetails, m);
+        }
       }
 
-      const { data: order, error: oErr } = await supabase
-        .from("orders")
-        .insert({
-          client_id: user.id,
-          usta_id: ustaId,
-          source: "catalog",
-          status: "pending",
-          total_price: service.base_price,
-          payment_status: "pending",
-          estimated_ready_at: readyDate,
-        })
+      // Build template message
+      const lines: string[] = ["📋 Yangi buyurtma taklifi:"];
+      if (material.trim()) lines.push(`• Mato: ${material.trim()}`);
+      if (modelNote.trim()) lines.push(`• Model: ${modelNote.trim()}`);
+      lines.push(`• O'lcham: ${measurementLabel}`);
+      if (measurementDetails.length > 0) {
+        lines.push(...measurementDetails);
+      }
+      if (sizeNote.trim()) lines.push(`• Izoh: ${sizeNote.trim()}`);
+      if (suggestedPrice.trim()) {
+        lines.push(`• Taklif qilingan narx: ${suggestedPrice.trim()} so'm`);
+      }
+
+      // Ensure conversation exists
+      const { data: conv } = await supabase
+        .from("conversations")
+        .upsert(
+          { client_id: user.id, usta_id: ustaId },
+          { onConflict: "client_id,usta_id", ignoreDuplicates: false }
+        )
         .select("id")
         .single();
-      if (oErr || !order) throw oErr ?? new Error("order");
+      if (!conv) throw new Error("conversation");
 
-      const { error: iErr } = await supabase.from("order_items").insert({
-        order_id: order.id,
-        title: service.title,
-        material: material.trim() || null,
-        size_note: [measurementLabel, sizeNote.trim()].filter(Boolean).join(" — ") || null,
-        model_note: modelNote.trim() || null,
-        price: service.base_price,
+      // Send message
+      const { error: msgErr } = await supabase.from("messages").insert({
+        conversation_id: conv.id,
+        sender_id: user.id,
+        content: lines.join("\n"),
+        message_type: "text",
       });
-      if (iErr) throw iErr;
+      if (msgErr) throw msgErr;
 
-      router.push(`/orders/${order.id}`);
+      // Navigate to chat
+      router.push(`/chat/${ustaId}`);
     } catch {
       setError(t("common.error"));
       setSubmitting(false);
@@ -196,7 +204,6 @@ export default function OrderWizard({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* Yuqori panel: yopish + progress-stepper */}
       <header className="sticky top-0 z-40 border-b border-cream-200 bg-cream-50/95 backdrop-blur">
         <div className="mx-auto max-w-3xl px-3 pb-3 pt-2">
           <div className="flex items-center justify-between">
@@ -212,7 +219,6 @@ export default function OrderWizard({
             </span>
             <span className="w-10" />
           </div>
-          {/* Progress-stepper */}
           <div className="mt-1 flex items-center gap-2">
             {STEPS.map((label, i) => (
               <div key={label} className="flex flex-1 flex-col items-center gap-1">
@@ -237,43 +243,6 @@ export default function OrderWizard({
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-5 pb-32">
         {step === 0 && (
           <section className="space-y-4">
-            <h2 className="text-lg font-extrabold text-ink-900">
-              {t("orderFlow.chooseService")}
-            </h2>
-            <div className="space-y-2">
-              {services.map((s) => {
-                const active = s.id === serviceId;
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => setServiceId(s.id)}
-                    className={`w-full rounded-2xl border-2 bg-white p-4 text-left shadow-card transition-colors ${
-                      active ? "border-terra-600" : "border-transparent hover:border-terra-200"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-bold text-ink-900">{s.title}</p>
-                        {s.description && (
-                          <p className="mt-0.5 text-xs text-ink-500">
-                            {s.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <PriceTag amount={s.base_price} size="sm" />
-                        {active && (
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-terra-600 text-white">
-                            <IconCheck size={14} />
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
             <label className="block">
               <span className="mb-1 block text-sm font-bold text-ink-700">
                 {t("orderFlow.material")}
@@ -295,6 +264,20 @@ export default function OrderWizard({
                 onChange={(e) => setModelNote(e.target.value)}
                 placeholder={t("orderFlow.modelNotePlaceholder")}
                 rows={3}
+                className={inputCls}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-sm font-bold text-ink-700">
+                {t("orderFlow.suggestedPrice")}
+              </span>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={suggestedPrice}
+                onChange={(e) => setSuggestedPrice(e.target.value)}
+                placeholder={t("orderFlow.pricePlaceholder")}
                 className={inputCls}
               />
             </label>
@@ -413,16 +396,18 @@ export default function OrderWizard({
           </section>
         )}
 
-        {step === 2 && service && (
+        {step === 2 && (
           <section className="space-y-4">
             <h2 className="text-lg font-extrabold text-ink-900">
               {t("orderFlow.summary")}
             </h2>
             <div className="space-y-3 rounded-2xl bg-white p-4 shadow-card">
               <Row label={t("orderFlow.usta")} value={ustaName} />
-              <Row label={t("orderFlow.service")} value={service.title} />
               {material.trim() && (
                 <Row label={t("orderFlow.material")} value={material.trim()} />
+              )}
+              {modelNote.trim() && (
+                <Row label={t("orderFlow.modelNote")} value={modelNote.trim()} />
               )}
               <Row
                 label={t("orderFlow.measurement")}
@@ -432,29 +417,20 @@ export default function OrderWizard({
                     : selectedMeasurement?.label ?? "—"
                 }
               />
-              <div className="flex items-center justify-between border-t border-cream-200 pt-3">
-                <span className="text-sm font-bold text-ink-700">
-                  {t("orderFlow.price")}
-                </span>
-                <PriceTag amount={service.base_price} size="lg" />
-              </div>
+              {suggestedPrice.trim() && (
+                <div className="flex items-center justify-between border-t border-cream-200 pt-3">
+                  <span className="text-sm font-bold text-ink-700">
+                    {t("orderFlow.price")}
+                  </span>
+                  <span className="text-sm font-extrabold text-ink-900">
+                    {suggestedPrice.trim()} so'm
+                  </span>
+                </div>
+              )}
             </div>
-
-            <label className="block">
-              <span className="mb-1 block text-sm font-bold text-ink-700">
-                {t("orderFlow.estimatedReady")}
-              </span>
-              <input
-                type="date"
-                value={readyDate}
-                min={new Date().toISOString().slice(0, 10)}
-                onChange={(e) => setReadyDate(e.target.value)}
-                className={inputCls}
-              />
-              <span className="mt-1 block text-xs text-ink-500">
-                {formatDate(readyDate)}
-              </span>
-            </label>
+            <div className="rounded-2xl bg-cream-200 px-4 py-3 text-xs font-medium text-ink-700">
+              {t("orderFlow.chatHint")}
+            </div>
           </section>
         )}
 
@@ -465,7 +441,6 @@ export default function OrderWizard({
         )}
       </main>
 
-      {/* Pastki panel: Orqaga / Davom etish */}
       <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-cream-200 bg-cream-50/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl gap-2 px-4 py-3 pb-safe">
           <Button variant="outline" onClick={back} disabled={submitting} className="flex-1">
@@ -477,7 +452,7 @@ export default function OrderWizard({
             </Button>
           ) : (
             <Button onClick={submit} loading={submitting} className="flex-[2]">
-              {submitting ? t("orderFlow.creating") : t("orderFlow.confirmOrder")}
+              {submitting ? t("orderFlow.sending") : t("orderFlow.confirmOrder")}
             </Button>
           )}
         </div>

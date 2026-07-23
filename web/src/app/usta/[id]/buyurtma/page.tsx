@@ -17,9 +17,7 @@ export default async function BuyurtmaPage({
   const [{ data: usta }, { data: measurements }] = await Promise.all([
     supabase
       .from("usta_profiles")
-      .select(
-        "user_id, profiles!inner(full_name), usta_services(id, title, description, base_price)"
-      )
+      .select("user_id, profiles!inner(full_name)")
       .eq("user_id", id)
       .maybeSingle(),
     supabase
@@ -35,7 +33,6 @@ export default async function BuyurtmaPage({
     <OrderWizard
       ustaId={usta.user_id}
       ustaName={usta.profiles.full_name}
-      services={usta.usta_services}
       measurements={measurements ?? []}
     />
   );
