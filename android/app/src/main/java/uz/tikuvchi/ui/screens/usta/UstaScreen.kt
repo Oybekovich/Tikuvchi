@@ -1,24 +1,26 @@
 package uz.tikuvchi.ui.screens.usta
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,35 +28,39 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.annotation.DrawableRes
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import coil3.compose.AsyncImage
 import uz.tikuvchi.R
+import uz.tikuvchi.data.model.PortfolioImage
 import uz.tikuvchi.data.model.ReviewItem
-import uz.tikuvchi.data.model.ServiceItem
-import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
-import uz.tikuvchi.ui.components.PriceTag
 import uz.tikuvchi.ui.components.PrimaryButton
 import uz.tikuvchi.ui.components.RatingBadge
-import uz.tikuvchi.ui.components.SecondaryButton
+import uz.tikuvchi.ui.theme.Cream100
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink500
@@ -98,10 +104,12 @@ fun UstaScreen(
             else -> {
                 val usta = s.usta!!
                 val name = usta.profiles.fullName
+                var selectedIndex by remember { mutableStateOf(-1) }
+                val portfolioList = remember(usta.portfolio) { usta.portfolio.sortedBy { it.sortOrder } }
                 Box(Modifier.fillMaxSize()) {
                     LazyColumn(
                         contentPadding = PaddingValues(
-                            bottom = 96.dp,
+                            bottom = 24.dp,
                         ),
                     ) {
                         item { Cover(usta.coverImageUrl, usta.ratingAvg, usta.ratingCount) }
@@ -124,12 +132,10 @@ fun UstaScreen(
                                     },
                                     tags = usta.tags,
                                     bio = usta.bio,
+                                    onChat = { onChat(ustaId, name) },
                                 )
                             }
                         }
-
-                        item { Section(stringResource(R.string.usta_services)) }
-                        items2(usta.services) { ServiceRow(it) }
 
                         item { Section(stringResource(R.string.usta_portfolio)) }
                         if (usta.portfolio.isEmpty()) {
@@ -142,15 +148,22 @@ fun UstaScreen(
                             }
                         } else {
                             // Web'dagi kabi 2 ustunli setka
-                            items2(usta.portfolio.sortedBy { it.sortOrder }.chunked(2)) { pair ->
+                            items2(portfolioList.chunked(2)) { pair ->
                                 Row(
                                     Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                 ) {
                                     pair.forEach { item ->
-                                        PortfolioCell(item.imageUrl, item.caption, name, Modifier.weight(1f))
+                                        PortfolioCell(
+                                            item = item,
+                                            name = name,
+                                            onClick = {
+                                                val idx = portfolioList.indexOf(item)
+                                                if (idx >= 0) selectedIndex = idx
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                        )
                                     }
-                                    // Toq sonda oxirgisi yarim kenglikda qolsin
                                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                                 }
                             }
@@ -169,30 +182,19 @@ fun UstaScreen(
                             items2(s.reviews) { ReviewRow(it) }
                         }
                     }
+                }
 
-                    // Yopishqoq CTA
-                    Row(
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .background(Cream50)
-                            .padding(16.dp)
-                            .padding(
-                                bottom = bottomNavSpace(),
-                            ),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        PrimaryButton(
-                            text = stringResource(R.string.usta_order_cta),
-                            onClick = { onOrder(ustaId) },
-                            modifier = Modifier.weight(1f),
-                        )
-                        SecondaryButton(
-                            text = stringResource(R.string.usta_chat_cta),
-                            onClick = { onChat(ustaId, name) },
-                            modifier = Modifier.weight(0.6f),
-                        )
-                    }
+                if (selectedIndex >= 0 && selectedIndex < portfolioList.size) {
+                    PortfolioDetailsSheet(
+                        items = portfolioList,
+                        initialIndex = selectedIndex,
+                        ustaName = name,
+                        onDismiss = { selectedIndex = -1 },
+                        onOrder = {
+                            selectedIndex = -1
+                            onOrder(ustaId)
+                        },
+                    )
                 }
             }
         }
@@ -239,6 +241,7 @@ private fun InfoCard(
     workHours: String?,
     tags: List<String>,
     bio: String?,
+    onChat: () -> Unit,
 ) {
     Column(
         Modifier
@@ -283,6 +286,11 @@ private fun InfoCard(
             Spacer(Modifier.height(12.dp))
             Text(it, style = MaterialTheme.typography.bodyMedium, color = Ink700)
         }
+        Spacer(Modifier.height(16.dp))
+        PrimaryButton(
+            text = stringResource(R.string.usta_chat_cta),
+            onClick = onChat,
+        )
     }
 }
 
@@ -315,46 +323,167 @@ private fun Section(title: String) {
 }
 
 @Composable
-private fun ServiceRow(s: ServiceItem) {
-    Row(
-        Modifier
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(s.title, style = MaterialTheme.typography.titleSmall, color = Ink900)
-            s.description?.let {
-                Text(it, style = MaterialTheme.typography.labelSmall, color = Ink500)
-            }
-        }
-        PriceTag(amount = s.basePrice)
-    }
-}
-
-@Composable
-private fun PortfolioCell(url: String?, caption: String?, name: String, modifier: Modifier = Modifier) {
+private fun PortfolioCell(
+    item: PortfolioImage,
+    name: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White),
     ) {
         AsyncImage(
-            model = imageUrl(url),
-            contentDescription = caption ?: name,
+            model = imageUrl(item.imageUrl),
+            contentDescription = item.caption ?: name,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth().aspectRatio(3f / 4f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(3f / 4f)
+                .clickable(onClick = onClick),
         )
-        caption?.let {
+        item.caption?.let {
             Text(
                 it,
                 style = MaterialTheme.typography.labelSmall,
                 color = Ink500,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun PortfolioDetailsSheet(
+    items: List<PortfolioImage>,
+    initialIndex: Int,
+    ustaName: String,
+    onDismiss: () -> Unit,
+    onOrder: () -> Unit,
+) {
+    val pagerState = rememberPagerState(
+        initialPage = initialIndex,
+        pageCount = { items.size },
+    )
+
+    LaunchedEffect(initialIndex) {
+        pagerState.scrollToPage(initialIndex)
+    }
+
+    val currentItem by remember {
+        derivedStateOf { items.getOrNull(pagerState.currentPage) }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        ),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(onClick = onDismiss),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color.White,
+                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                    )
+                    .clickable(enabled = false, onClick = {}),
+            ) {
+                // Tutqich chizig'i
+                Box(
+                    Modifier
+                        .padding(top = 10.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .width(40.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(Cream200),
+                )
+
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 28.dp),
+                ) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(280.dp),
+                    ) { page ->
+                        val item = items.getOrNull(page) ?: return@HorizontalPager
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Cream100),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            AsyncImage(
+                                model = imageUrl(item.imageUrl),
+                                contentDescription = item.caption ?: ustaName,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+
+                    if (items.size > 1) {
+                        Spacer(Modifier.height(10.dp))
+                        PageIndicator(
+                            pageCount = items.size,
+                            currentPage = pagerState.currentPage,
+                        )
+                    }
+
+                    Spacer(Modifier.height(14.dp))
+                    Text(
+                        text = currentItem?.caption
+                            ?: stringResource(R.string.usta_portfolio_item_fallback, ustaName),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Ink900,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        stringResource(R.string.usta_portfolio_item_hint),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Ink500,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    PrimaryButton(
+                        text = stringResource(R.string.usta_order_cta),
+                        onClick = onOrder,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PageIndicator(pageCount: Int, currentPage: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        repeat(pageCount) { i ->
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .size(if (i == currentPage) 10.dp else 8.dp)
+                    .clip(CircleShape)
+                    .background(if (i == currentPage) Terra600 else Cream200),
             )
         }
     }

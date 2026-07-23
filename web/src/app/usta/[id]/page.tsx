@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/EmptyState";
-import PriceTag from "@/components/PriceTag";
+import PortfolioGallery from "@/components/PortfolioGallery";
 import RatingBadge from "@/components/RatingBadge";
 import ReviewCard, { type ReviewData } from "@/components/ReviewCard";
 import { IconChat, IconClock, IconLocation } from "@/components/Icons";
@@ -29,7 +29,6 @@ export default async function UstaPage({
       `user_id, bio, cover_image_url, rating_avg, rating_count, location_text,
        district, work_hours_start, work_hours_end, tags,
        profiles!inner(full_name, avatar_url),
-       usta_services(id, title, description, base_price),
        portfolio_items(id, image_url, caption, sort_order)`
     )
     .eq("user_id", id)
@@ -68,13 +67,12 @@ export default async function UstaPage({
             rating={usta.rating_avg}
             count={usta.rating_count}
             variant="overlay"
-            // Pastdagi karta hero ustiga -mt-8 (32px) chiqadi — badge shundan yuqorida turishi kerak
             className="absolute bottom-11 left-4"
           />
         </div>
 
         <div className="px-4">
-          {/* Asosiy ma'lumot */}
+          {/* Asosiy ma'lumot va Bio */}
           <section className="-mt-8 relative rounded-2xl bg-white p-4 shadow-card">
             <div className="flex items-center gap-3">
               <Avatar name={name} src={usta.profiles.avatar_url} size="xl" />
@@ -114,28 +112,16 @@ export default async function UstaPage({
                 {usta.bio}
               </p>
             )}
-          </section>
 
-          {/* Xizmatlar */}
-          <section className="mt-6">
-            <h2 className="mb-3 text-base font-extrabold text-ink-900">
-              {t("usta.services")}
-            </h2>
-            <div className="space-y-2">
-              {usta.usta_services.map((s) => (
-                <div
-                  key={s.id}
-                  className="flex items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-card"
-                >
-                  <div className="min-w-0">
-                    <p className="font-bold text-ink-900">{s.title}</p>
-                    {s.description && (
-                      <p className="mt-0.5 text-xs text-ink-500">{s.description}</p>
-                    )}
-                  </div>
-                  <PriceTag amount={s.base_price} size="sm" />
-                </div>
-              ))}
+            {/* Yozish tugmasi biosida */}
+            <div className="mt-4 pt-3 border-t border-cream-200">
+              <Link
+                href={`/chat/${id}`}
+                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-terra-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-terra-700 active:bg-terra-800"
+              >
+                <IconChat size={18} />
+                {t("usta.chatCta")}
+              </Link>
             </div>
           </section>
 
@@ -145,27 +131,7 @@ export default async function UstaPage({
               {t("usta.portfolio")}
             </h2>
             {portfolio.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {portfolio.map((item) => (
-                  <figure
-                    key={item.id}
-                    className="overflow-hidden rounded-2xl bg-white shadow-card"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.image_url}
-                      alt={item.caption ?? name}
-                      loading="lazy"
-                      className="aspect-[3/4] w-full object-cover"
-                    />
-                    {item.caption && (
-                      <figcaption className="px-3 py-2 text-xs font-medium text-ink-500">
-                        {item.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
+              <PortfolioGallery items={portfolio} ustaId={id} ustaName={name} />
             ) : (
               <EmptyState icon={<PhImages size={30} />} title={t("usta.noPortfolio")} />
             )}
@@ -191,26 +157,6 @@ export default async function UstaPage({
           </section>
         </div>
       </main>
-
-      {/* Yopishqoq CTA — pastki nav ustida */}
-      <div className="fixed inset-x-0 bottom-[72px] z-30 px-4 pb-2">
-        <div className="mx-auto flex max-w-3xl gap-2">
-          <Link
-            href={`/usta/${id}/buyurtma`}
-            className="flex flex-1 items-center justify-center rounded-2xl bg-terra-600 px-5 py-3.5 text-base font-bold text-white shadow-lg transition-colors hover:bg-terra-700 active:bg-terra-800"
-          >
-            {t("usta.orderCta")}
-          </Link>
-          <Link
-            href={`/chat/${id}`}
-            aria-label={t("usta.chatCta")}
-            className="flex items-center justify-center gap-2 rounded-2xl border-2 border-terra-600 bg-cream-50 px-5 py-3.5 text-base font-bold text-terra-700 shadow-lg transition-colors hover:bg-terra-50"
-          >
-            <IconChat size={20} />
-            {t("usta.chatCta")}
-          </Link>
-        </div>
-      </div>
     </>
   );
 }

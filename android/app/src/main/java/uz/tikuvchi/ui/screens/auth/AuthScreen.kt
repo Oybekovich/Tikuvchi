@@ -95,6 +95,11 @@ fun AuthScreen(
             Spacer(Modifier.height(24.dp))
 
             if (register) {
+                RegisterRoleToggle(
+                    selected = s.registerRole,
+                    onSelect = vm::setRegisterRole,
+                )
+                Spacer(Modifier.height(16.dp))
                 LabeledField(
                     label = stringResource(R.string.auth_full_name),
                     value = s.fullName,
@@ -210,6 +215,58 @@ fun AuthScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RegisterRoleToggle(
+    selected: RegisterRole,
+    onSelect: (RegisterRole) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(Gold100)
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        RoleOption(
+            text = stringResource(R.string.auth_role_client),
+            selected = selected == RegisterRole.CLIENT,
+            onClick = { onSelect(RegisterRole.CLIENT) },
+            modifier = Modifier.weight(1f),
+        )
+        RoleOption(
+            text = stringResource(R.string.auth_role_usta),
+            selected = selected == RegisterRole.USTA,
+            onClick = { onSelect(RegisterRole.USTA) },
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun RoleOption(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (selected) Color.White else Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(vertical = 11.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = if (selected) Terra700 else Ink700,
+        )
     }
 }
 

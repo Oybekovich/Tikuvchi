@@ -16,12 +16,14 @@ import uz.tikuvchi.data.supabase
 import uz.tikuvchi.util.PHONE_PREFIX
 
 enum class AuthMode { LOGIN, REGISTER }
+enum class RegisterRole { CLIENT, USTA }
 
 /** Xato turi — matnni ekran o'zi strings.xml'dan oladi, ViewModel resurslarni bilmaydi. */
 enum class AuthError { INVALID_CREDENTIALS, EMAIL_TAKEN, GENERIC }
 
 data class AuthUiState(
     val mode: AuthMode = AuthMode.LOGIN,
+    val registerRole: RegisterRole = RegisterRole.CLIENT,
     val fullName: String = "",
     val phone: String = "",
     val email: String = "",
@@ -36,6 +38,7 @@ class AuthViewModel : ViewModel() {
     val state: StateFlow<AuthUiState> = _state.asStateFlow()
 
     fun setMode(mode: AuthMode) = _state.update { it.copy(mode = mode, error = null, checkEmail = false) }
+    fun setRegisterRole(role: RegisterRole) = _state.update { it.copy(registerRole = role) }
     fun setFullName(v: String) = _state.update { it.copy(fullName = v) }
     fun setPhone(v: String) = _state.update { it.copy(phone = v) }
     fun setEmail(v: String) = _state.update { it.copy(email = v) }
@@ -67,7 +70,8 @@ class AuthViewModel : ViewModel() {
                         password = s.password
                         data = buildJsonObject {
                             put("full_name", JsonPrimitive(s.fullName.trim()))
-                            put("role", JsonPrimitive("client"))
+                            // Supabase triggeri ushbu metadata asosida profiles.role ni yaratadi.
+                            put("role", JsonPrimitive(if (s.registerRole == RegisterRole.USTA) "usta" else "client"))
                             put("phone", if (phone.isEmpty()) JsonPrimitive(null as String?) else JsonPrimitive(phone))
                         }
                     }

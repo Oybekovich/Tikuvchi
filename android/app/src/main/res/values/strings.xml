@@ -7,6 +7,8 @@
     <string name="auth_login_subtitle">Hisobingizga kiring</string>
     <string name="auth_register_title">Ro\'yxatdan o\'tish</string>
     <string name="auth_register_subtitle">Bir daqiqada hisob oching</string>
+    <string name="auth_role_client">Mijoz</string>
+    <string name="auth_role_usta">Tikuvchi</string>
     <string name="auth_email">Email</string>
     <string name="auth_email_placeholder">ism@mail.uz</string>
     <string name="auth_password">Parol</string>
@@ -174,6 +176,8 @@
 
     <string name="usta_services">Xizmatlar va narxlar</string>
     <string name="usta_portfolio">Portfolio</string>
+    <string name="usta_portfolio_item_fallback">%1$sning ishi</string>
+    <string name="usta_portfolio_item_hint">Bu model sizga yoqdimi? Buyurtma berib, tafsilotlarni usta bilan kelishing.</string>
     <string name="usta_reviews">Mijozlar sharhlari</string>
     <string name="usta_work_hours">Ish vaqti: %1$s – %2$s</string>
     <string name="usta_order_cta">Buyurtma berish</string>
