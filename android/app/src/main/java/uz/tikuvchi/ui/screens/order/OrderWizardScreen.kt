@@ -48,6 +48,7 @@ import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.LabeledField
 import uz.tikuvchi.ui.components.PrimaryButton
 import uz.tikuvchi.ui.components.SecondaryButton
+import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.theme.Cream200
 import uz.tikuvchi.ui.theme.Cream300
 import uz.tikuvchi.ui.theme.Cream50
@@ -63,7 +64,7 @@ import uz.tikuvchi.ui.theme.Terra700
 fun OrderWizardScreen(
     ustaId: String,
     onClose: () -> Unit,
-    onSent: (ustaId: String, ustaName: String) -> Unit,
+    onCreated: (orderId: String) -> Unit,
 ) {
     val vm: OrderWizardViewModel = viewModel(
         key = ustaId,
@@ -71,12 +72,15 @@ fun OrderWizardScreen(
     )
     val s by vm.state.collectAsStateWithLifecycle()
 
-    fun goBack() { if (vm.back()) onClose() }
+    fun goBack() {
+        if (s.showNewForm) vm.hideNewMeasurementForm()
+        else if (vm.back()) onClose()
+    }
     BackHandler { goBack() }
 
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding().imePadding()) {
         AppHeader(title = stringResource(R.string.order_flow_title), onBack = ::goBack)
-        Stepper(s.step)
+        if (!s.showNewForm) Stepper(s.step)
 
         if (s.loading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -109,34 +113,33 @@ fun OrderWizardScreen(
             }
         }
 
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .padding(
-                    bottom = WindowInsets.navigationBars.asPaddingValues()
-                        .calculateBottomPadding(),
-                ),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            SecondaryButton(
-                text = stringResource(R.string.common_back),
-                onClick = ::goBack,
-                modifier = Modifier.weight(1f),
-            )
-            if (s.step < 2) {
-                PrimaryButton(
-                    text = stringResource(R.string.common_next),
-                    onClick = vm::next,
-                    modifier = Modifier.weight(1.4f),
+        if (!s.showNewForm) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .padding(bottom = bottomNavSpace()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                SecondaryButton(
+                    text = stringResource(R.string.common_back),
+                    onClick = ::goBack,
+                    modifier = Modifier.weight(1f),
                 )
-            } else {
-                PrimaryButton(
-                    text = stringResource(R.string.order_flow_confirm),
-                    onClick = { vm.submit { id, name -> onSent(id, name) } },
-                    loading = s.submitting,
-                    modifier = Modifier.weight(1.4f),
-                )
+                if (s.step < 2) {
+                    PrimaryButton(
+                        text = stringResource(R.string.common_next),
+                        onClick = vm::next,
+                        modifier = Modifier.weight(1.4f),
+                    )
+                } else {
+                    PrimaryButton(
+                        text = stringResource(R.string.order_flow_confirm),
+                        onClick = { vm.submit { id -> onCreated(id) } },
+                        loading = s.submitting,
+                        modifier = Modifier.weight(1.4f),
+                    )
+                }
             }
         }
     }
@@ -200,6 +203,11 @@ private fun StepDetails(s: OrderWizardUiState, vm: OrderWizardViewModel) {
 
 @Composable
 private fun StepSize(s: OrderWizardUiState, vm: OrderWizardViewModel) {
+    if (s.showNewForm) {
+        NewMeasurementForm(s, vm)
+        return
+    }
+
     SectionTitle(stringResource(R.string.order_flow_choose_measurement))
     if (s.measurements.isEmpty()) {
         Text(
@@ -218,83 +226,17 @@ private fun StepSize(s: OrderWizardUiState, vm: OrderWizardViewModel) {
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(if (s.measurementId == NEW_MEASUREMENT) Terra50 else Color.White)
-            .clickable { vm.setMeasurement(NEW_MEASUREMENT) }
+            .background(Terra50)
+            .clickable { vm.showNewMeasurementForm() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(R.string.order_flow_new_measurement),
+            "+  " + stringResource(R.string.order_flow_new_measurement),
             style = MaterialTheme.typography.titleSmall,
-            color = Ink900,
+            color = Terra700,
             modifier = Modifier.weight(1f),
         )
-        if (s.measurementId == NEW_MEASUREMENT) {
-            Icon(painter = painterResource(R.drawable.ic_check), contentDescription = null, tint = Terra600)
-        }
-    }
-
-    if (s.measurementId == NEW_MEASUREMENT) {
-        Spacer(Modifier.height(12.dp))
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
-                .padding(16.dp),
-        ) {
-            LabeledField(
-                label = stringResource(R.string.measurements_label),
-                value = s.newLabel,
-                onValueChange = vm::setNewLabel,
-                placeholder = stringResource(R.string.measurements_label_placeholder),
-            )
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LabeledField(
-                    label = stringResource(R.string.measurements_chest),
-                    value = s.newChest,
-                    onValueChange = vm::setNewChest,
-                    modifier = Modifier.weight(1f),
-                )
-                LabeledField(
-                    label = stringResource(R.string.measurements_waist),
-                    value = s.newWaist,
-                    onValueChange = vm::setNewWaist,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LabeledField(
-                    label = stringResource(R.string.measurements_hips),
-                    value = s.newHips,
-                    onValueChange = vm::setNewHips,
-                    modifier = Modifier.weight(1f),
-                )
-                LabeledField(
-                    label = stringResource(R.string.measurements_height),
-                    value = s.newHeight,
-                    onValueChange = vm::setNewHeight,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LabeledField(
-                    label = stringResource(R.string.measurements_shoulder),
-                    value = s.newShoulder,
-                    onValueChange = vm::setNewShoulder,
-                    modifier = Modifier.weight(1f),
-                )
-                LabeledField(
-                    label = stringResource(R.string.measurements_sleeve_length),
-                    value = s.newSleeveLength,
-                    onValueChange = vm::setNewSleeveLength,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
     }
 
     Spacer(Modifier.height(12.dp))
@@ -304,6 +246,89 @@ private fun StepSize(s: OrderWizardUiState, vm: OrderWizardViewModel) {
         onValueChange = vm::setSizeNote,
         placeholder = stringResource(R.string.order_flow_size_note_placeholder),
     )
+}
+
+@Composable
+private fun NewMeasurementForm(s: OrderWizardUiState, vm: OrderWizardViewModel) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .padding(16.dp),
+    ) {
+        Text(
+            stringResource(R.string.order_flow_new_measurement),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.ExtraBold,
+            color = Ink900,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+
+        LabeledField(
+            label = stringResource(R.string.measurements_label),
+            value = s.newLabel,
+            onValueChange = vm::setNewLabel,
+            placeholder = stringResource(R.string.measurements_label_placeholder),
+        )
+        Spacer(Modifier.height(12.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LabeledField(
+                label = stringResource(R.string.measurements_chest),
+                value = s.newChest,
+                onValueChange = vm::setNewChest,
+                modifier = Modifier.weight(1f),
+            )
+            LabeledField(
+                label = stringResource(R.string.measurements_waist),
+                value = s.newWaist,
+                onValueChange = vm::setNewWaist,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LabeledField(
+                label = stringResource(R.string.measurements_hips),
+                value = s.newHips,
+                onValueChange = vm::setNewHips,
+                modifier = Modifier.weight(1f),
+            )
+            LabeledField(
+                label = stringResource(R.string.measurements_height),
+                value = s.newHeight,
+                onValueChange = vm::setNewHeight,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LabeledField(
+                label = stringResource(R.string.measurements_shoulder),
+                value = s.newShoulder,
+                onValueChange = vm::setNewShoulder,
+                modifier = Modifier.weight(1f),
+            )
+            LabeledField(
+                label = stringResource(R.string.measurements_sleeve_length),
+                value = s.newSleeveLength,
+                onValueChange = vm::setNewSleeveLength,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+        PrimaryButton(
+            text = stringResource(R.string.common_save),
+            onClick = { vm.saveNewMeasurement {} },
+            loading = s.savingNew,
+        )
+        Spacer(Modifier.height(8.dp))
+        SecondaryButton(
+            text = stringResource(R.string.common_cancel),
+            onClick = vm::hideNewMeasurementForm,
+        )
+    }
 }
 
 @Composable

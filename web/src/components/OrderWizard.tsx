@@ -35,25 +35,6 @@ const NEW_MEASUREMENT_FIELDS = [
   "sleeve_length",
 ] as const;
 
-function addMeasurementDetails(
-  list: string[],
-  m: {
-    chest: number | null;
-    waist: number | null;
-    hips: number | null;
-    height: number | null;
-    shoulder: number | null;
-    sleeve_length: number | null;
-  }
-) {
-  if (m.chest != null) list.push(`Bust: ${m.chest} sm`);
-  if (m.waist != null) list.push(`Bel: ${m.waist} sm`);
-  if (m.hips != null) list.push(`Biklar: ${m.hips} sm`);
-  if (m.height != null) list.push(`Bo'y: ${m.height} sm`);
-  if (m.shoulder != null) list.push(`Yelka eni: ${m.shoulder} sm`);
-  if (m.sleeve_length != null) list.push(`Qol uzunligi: ${m.sleeve_length} sm`);
-}
-
 export default function OrderWizard({
   ustaId,
   ustaName,
@@ -125,8 +106,6 @@ export default function OrderWizard({
       if (!user) throw new Error("auth");
 
       // Save new measurement if entered
-      let measurementLabel = "";
-      const measurementDetails: string[] = [];
       if (measurementId === "new") {
         const values = Object.fromEntries(
           NEW_MEASUREMENT_FIELDS.map((f) => [
@@ -134,61 +113,44 @@ export default function OrderWizard({
             newMeasurement[f] ? Number(newMeasurement[f]) : null,
           ])
         );
-        const { data: saved, error: mErr } = await supabase
-          .from("measurements")
-          .insert({
-            client_id: user.id,
-            label: newMeasurement.label.trim(),
-            ...values,
-          })
-          .select("id, label, chest, waist, hips, height, shoulder, sleeve_length")
-          .single();
+        const { error: mErr } = await supabase.from("measurements").insert({
+          client_id: user.id,
+          label: newMeasurement.label.trim(),
+          ...values,
+        });
         if (mErr) throw mErr;
-        measurementLabel = saved.label;
-        addMeasurementDetails(measurementDetails, saved);
-      } else {
-        const m = measurements.find((m) => m.id === measurementId);
-        if (m) {
-          measurementLabel = m.label;
-          addMeasurementDetails(measurementDetails, m);
-        }
       }
 
-      // Build template message
-      const lines: string[] = ["📋 Yangi buyurtma taklifi:"];
-      if (material.trim()) lines.push(`• Mato: ${material.trim()}`);
-      if (modelNote.trim()) lines.push(`• Model: ${modelNote.trim()}`);
-      lines.push(`• O'lcham: ${measurementLabel}`);
-      if (measurementDetails.length > 0) {
-        lines.push(...measurementDetails);
-      }
-      if (sizeNote.trim()) lines.push(`• Izoh: ${sizeNote.trim()}`);
-      if (suggestedPrice.trim()) {
-        lines.push(`• Taklif qilingan narx: ${suggestedPrice.trim()} so'm`);
-      }
+      const price = Number(suggestedPrice) || 0;
 
-      // Ensure conversation exists
-      const { data: conv } = await supabase
-        .from("conversations")
-        .upsert(
-          { client_id: user.id, usta_id: ustaId },
-          { onConflict: "client_id,usta_id", ignoreDuplicates: false }
-        )
+      // Create order
+      const { data: order, error: orderErr } = await supabase
+        .from("orders")
+        .insert({
+          client_id: user.id,
+          usta_id: ustaId,
+          total_price: price,
+          source: "catalog",
+          status: "pending",
+          payment_status: "pending",
+        })
         .select("id")
         .single();
-      if (!conv) throw new Error("conversation");
+      if (orderErr) throw orderErr;
 
-      // Send message
-      const { error: msgErr } = await supabase.from("messages").insert({
-        conversation_id: conv.id,
-        sender_id: user.id,
-        content: lines.join("\n"),
-        message_type: "text",
+      // Create order item
+      const { error: itemErr } = await supabase.from("order_items").insert({
+        order_id: order.id,
+        title: "Buyurtma",
+        material: material.trim() || null,
+        model_note: modelNote.trim() || null,
+        size_note: sizeNote.trim() || null,
+        price: price,
       });
-      if (msgErr) throw msgErr;
+      if (itemErr) throw itemErr;
 
-      // Navigate to chat
-      router.push(`/chat/${ustaId}`);
+      setSubmitting(false);
+      router.push(`/orders/${order.id}`);
     } catch {
       setError(t("common.error"));
       setSubmitting(false);

@@ -34,6 +34,11 @@ export default async function OrderDetailPage({
 
   if (!order) notFound();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isUsta = user?.id === order.usta_id;
+
   const ustaProfile = order.usta_profiles.profiles;
 
   return (
@@ -144,9 +149,11 @@ export default async function OrderDetailPage({
         {/* To'lov holati va amallar */}
         <OrderActions
           orderId={order.id}
+          ustaId={order.usta_id}
           status={order.status}
           paymentStatus={order.payment_status}
           totalPrice={order.total_price}
+          isUsta={isUsta}
         />
       </main>
     </>

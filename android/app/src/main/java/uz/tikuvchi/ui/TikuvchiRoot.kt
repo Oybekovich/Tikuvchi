@@ -10,6 +10,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,12 +26,18 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import uz.tikuvchi.data.ChatUnreadStore
+import uz.tikuvchi.data.ProfileRepository
+import uz.tikuvchi.data.fetchUnreadConversations
 import uz.tikuvchi.data.supabase
 import uz.tikuvchi.ui.components.BottomNav
 import uz.tikuvchi.ui.components.NavTab
+import uz.tikuvchi.ui.components.UstaBottomNav
+import uz.tikuvchi.ui.components.UstaNavTab
 import uz.tikuvchi.ui.screens.auth.AuthScreen
 import uz.tikuvchi.ui.screens.chat.ChatListScreen
 import uz.tikuvchi.ui.screens.chat.ChatScreen
+import uz.tikuvchi.ui.screens.dashboard.DashboardScreen
 import uz.tikuvchi.ui.screens.home.HomeScreen
 import uz.tikuvchi.ui.screens.measurements.MeasurementsScreen
 import uz.tikuvchi.ui.screens.order.OrderWizardScreen
@@ -38,6 +45,7 @@ import uz.tikuvchi.ui.screens.orders.OrderDetailScreen
 import uz.tikuvchi.ui.screens.orders.OrdersScreen
 import uz.tikuvchi.ui.screens.profile.ProfileScreen
 import uz.tikuvchi.ui.screens.search.SearchScreen
+import uz.tikuvchi.ui.screens.shop.ShopScreen
 import uz.tikuvchi.ui.screens.usta.UstaScreen
 import uz.tikuvchi.ui.theme.Terra600
 
@@ -59,19 +67,14 @@ fun TikuvchiRoot() {
     when (status) {
         null, is SessionStatus.Initializing -> Splash()
         is SessionStatus.Authenticated -> AppNav()
-        // RefreshFailure — bu chiqish EMAS. Kutubxona uni faqat ikki holatda
-        // chiqaradi: tarmoqqa yetib bo'lmadi yoki server 5xx qaytardi — ikkalasida
-        // ham sessiya joyida turadi va qayta urinish davom etadi. Bu yerda login
-        // ekraniga o'tkazilsa, tarmoq bir lahzaga uzilganda foydalanuvchi
-        // sababsiz chiqib ketadi, keyin qayta urinish o'tgach yana kiradi.
-        // Token haqiqatan yaroqsiz bo'lsa kutubxona NotAuthenticated beradi.
         is SessionStatus.RefreshFailure -> AppNav()
-        else -> AuthScreen(onAuthenticated = { /* sessionStatus o'zi yangilanadi */ })
+        else -> AuthScreen(onAuthenticated = { })
     }
 }
 
 private object Route {
     const val HOME = "home"
+    const val DASHBOARD = "dashboard"
     const val USTA = "usta/{id}"
     const val SEARCH = "search?q={q}&category={category}"
     const val PROFILE = "profile"
@@ -81,17 +84,13 @@ private object Route {
     const val CHAT_WITH = "chat/{ustaId}?name={name}"
     const val ORDER_NEW = "usta/{id}/buyurtma"
     const val ORDER_DETAIL = "orders/{id}"
+    const val SHOP = "shop"
 
     fun orderDetail(id: String) = "orders/$id"
-
     fun chatWith(ustaId: String, name: String?) =
         "chat/$ustaId?name=${name?.ifBlank { null } ?: "-"}"
-
     fun orderNew(ustaId: String) = "usta/$ustaId/buyurtma"
-
     fun usta(id: String) = "usta/$id"
-
-    /** Bo'sh qiymatlar "-" bilan uzatiladi: NavHost bo'sh string argumentni yo'qotadi. */
     fun search(q: String = "", category: Long? = null) =
         "search?q=${q.ifBlank { "-" }}&category=${category ?: "-"}"
 }
@@ -99,51 +98,60 @@ private object Route {
 @Composable
 private fun AppNav() {
     val nav = rememberNavController()
+    var isUsta by remember { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            val profile = ProfileRepository.me()
+            isUsta = profile?.role == uz.tikuvchi.data.model.UserRole.USTA
+        } catch (_: Exception) {
+            isUsta = false
+        }
+    }
+
+    if (isUsta == null) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Terra600)
+        }
+        return
+    }
+
+    val startRoute = if (isUsta == true) Route.DASHBOARD else Route.HOME
 
     Box(Modifier.fillMaxSize()) {
         NavHost(
             navController = nav,
-            startDestination = Route.HOME,
+            startDestination = startRoute,
             modifier = Modifier.fillMaxSize(),
-            // NavHost'ning o'z sozlamasi — 700 ms lik so'nish. Tab almashtirishda bu
-            // butun ekranni yarim soniyadan ko'proq xiralashtirib turadi va ilova
-            // sekin ishlayotgandek tuyuladi. Qisqa fade kifoya.
             enterTransition = { fadeIn(tween(120)) },
             exitTransition = { fadeOut(tween(90)) },
             popEnterTransition = { fadeIn(tween(120)) },
             popExitTransition = { fadeOut(tween(90)) },
         ) {
+            // ---- Client routes ----
             composable(Route.HOME) {
                 HomeScreen(
-                    onProfile = { nav.navigate(Route.PROFILE) },
                     onSearch = { q -> nav.navigate(Route.search(q = q)) },
                     onCategory = { id -> nav.navigate(Route.search(category = id)) },
                     onUsta = { id -> nav.navigate(Route.usta(id)) },
                 )
             }
 
-            composable(
-                Route.SEARCH,
-                arguments = listOf(
-                    navArgument("q") { type = NavType.StringType; defaultValue = "-" },
-                    navArgument("category") { type = NavType.StringType; defaultValue = "-" },
-                ),
-            ) { entry ->
+            composable(Route.SEARCH, arguments = listOf(
+                navArgument("q") { type = NavType.StringType; defaultValue = "-" },
+                navArgument("category") { type = NavType.StringType; defaultValue = "-" },
+            )) { entry ->
                 val q = entry.arguments?.getString("q").orEmpty()
                 val category = entry.arguments?.getString("category")
                 SearchScreen(
                     initialText = if (q == "-") "" else q,
                     initialCategory = category?.toLongOrNull(),
                     onBack = { nav.popBackStack() },
-                    onProfile = { nav.navigate(Route.PROFILE) },
                     onUsta = { id -> nav.navigate(Route.usta(id)) },
                 )
             }
 
-            composable(
-                Route.USTA,
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { entry ->
+            composable(Route.USTA, arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 UstaScreen(
                     ustaId = entry.arguments?.getString("id").orEmpty(),
                     onBack = { nav.popBackStack() },
@@ -152,21 +160,40 @@ private fun AppNav() {
                 )
             }
 
-            composable(Route.PROFILE) {
-                ProfileScreen(onBack = { nav.popBackStack() })
+            composable(Route.MEASUREMENTS) {
+                MeasurementsScreen()
             }
 
-            composable(Route.ORDERS) {
-                OrdersScreen(
-                    onProfile = { nav.navigate(Route.PROFILE) },
+            // ---- Usta routes ----
+            composable(Route.DASHBOARD) {
+                DashboardScreen(
                     onOrder = { id -> nav.navigate(Route.orderDetail(id)) },
                 )
             }
 
-            composable(
-                Route.ORDER_DETAIL,
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { entry ->
+            composable(Route.SHOP) {
+                ShopScreen()
+            }
+
+            // ---- Shared routes ----
+            composable(Route.PROFILE) {
+                ProfileScreen(
+                    onBack = {
+                        val home = if (isUsta == true) Route.DASHBOARD else Route.HOME
+                        if (!nav.popBackStack(home, inclusive = false)) {
+                            nav.navigate(home) { launchSingleTop = true }
+                        }
+                    },
+                )
+            }
+
+            composable(Route.ORDERS) {
+                OrdersScreen(
+                    onOrder = { id -> nav.navigate(Route.orderDetail(id)) },
+                )
+            }
+
+            composable(Route.ORDER_DETAIL, arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 OrderDetailScreen(
                     orderId = entry.arguments?.getString("id").orEmpty(),
                     onBack = { nav.popBackStack() },
@@ -174,15 +201,12 @@ private fun AppNav() {
                 )
             }
 
-            composable(
-                Route.ORDER_NEW,
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { entry ->
+            composable(Route.ORDER_NEW, arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
                 OrderWizardScreen(
                     ustaId = entry.arguments?.getString("id").orEmpty(),
                     onClose = { nav.popBackStack() },
-                    onSent = { ustaId, ustaName ->
-                        nav.navigate(Route.chatWith(ustaId, ustaName)) {
+                    onCreated = { orderId ->
+                        nav.navigate(Route.orderDetail(orderId)) {
                             popUpTo(Route.HOME)
                             launchSingleTop = true
                         }
@@ -190,26 +214,16 @@ private fun AppNav() {
                 )
             }
 
-            composable(Route.MEASUREMENTS) {
-                MeasurementsScreen(
-                    onProfile = { nav.navigate(Route.PROFILE) },
-                )
-            }
-
             composable(Route.CHAT) {
                 ChatListScreen(
-                    onProfile = { nav.navigate(Route.PROFILE) },
                     onConversation = { ustaId, name -> nav.navigate(Route.chatWith(ustaId, name)) },
                 )
             }
 
-            composable(
-                Route.CHAT_WITH,
-                arguments = listOf(
-                    navArgument("ustaId") { type = NavType.StringType },
-                    navArgument("name") { type = NavType.StringType; defaultValue = "-" },
-                ),
-            ) { entry ->
+            composable(Route.CHAT_WITH, arguments = listOf(
+                navArgument("ustaId") { type = NavType.StringType },
+                navArgument("name") { type = NavType.StringType; defaultValue = "-" },
+            )) { entry ->
                 val name = entry.arguments?.getString("name")
                 ChatScreen(
                     ustaId = entry.arguments?.getString("ustaId").orEmpty(),
@@ -219,28 +233,20 @@ private fun AppNav() {
             }
         }
 
-        NavBar(nav)
+        if (isUsta == true) {
+            UstaNavBar(nav)
+        } else {
+            ClientNavBar(nav)
+        }
     }
 }
 
-/**
- * Ataylab alohida composable: joriy yo'nalish shu yerda o'qiladi, AppNav'da emas.
- * Aks holda har bir o'tishda AppNav qayta tuzilib, NavHost'ning butun ekranlar
- * ro'yxati qaytadan yig'ilardi — panelning o'zi esa shundoq ham yangilanadi.
- */
 @Composable
-private fun BoxScope.NavBar(nav: NavHostController) {
+private fun BoxScope.ClientNavBar(nav: NavHostController) {
     val currentRoute = nav.currentBackStackEntryAsState().value?.destination?.route
-
-    /**
-     * Web'dagi AppShell bilan bir xil: buyurtma sehrgari va chat oynasida
-     * pastki navigatsiya yashiriladi (chatda pastda xabar yozish paneli turadi,
-     * sehrgar esa chalg'itmaslik uchun to'liq ekranli).
-     */
     val showBottomNav = currentRoute != null &&
         currentRoute != Route.ORDER_NEW &&
         currentRoute != Route.CHAT_WITH
-
     if (!showBottomNav) return
 
     val currentTab = when (currentRoute) {
@@ -252,9 +258,13 @@ private fun BoxScope.NavBar(nav: NavHostController) {
         else -> null
     }
 
+    var unreadCount by remember { mutableIntStateOf(0) }
+    LaunchedEffect(currentRoute) { unreadCount = fetchUnreadConversations().size }
+
     BottomNav(
         modifier = Modifier.align(Alignment.BottomCenter),
         current = currentTab,
+        unreadChatCount = unreadCount,
         onSelect = { tab ->
             val route = when (tab) {
                 NavTab.HOME -> Route.HOME
@@ -264,8 +274,47 @@ private fun BoxScope.NavBar(nav: NavHostController) {
                 NavTab.PROFILE -> Route.PROFILE
             }
             nav.navigate(route) {
-                // saveState/restoreState juftligi tab holatini saqlaydi: qaytganda
-                // ro'yxat o'sha joyidan ochiladi, ekran noldan yuklanmaydi
+                popUpTo(nav.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+    )
+}
+
+@Composable
+private fun BoxScope.UstaNavBar(nav: NavHostController) {
+    val currentRoute = nav.currentBackStackEntryAsState().value?.destination?.route
+    val showBottomNav = currentRoute != null &&
+        currentRoute != Route.ORDER_NEW &&
+        currentRoute != Route.CHAT_WITH
+    if (!showBottomNav) return
+
+    val currentTab = when (currentRoute) {
+        Route.DASHBOARD -> UstaNavTab.DASHBOARD
+        Route.ORDERS, Route.ORDER_DETAIL -> UstaNavTab.ORDERS
+        Route.CHAT -> UstaNavTab.CHAT
+        Route.SHOP -> UstaNavTab.SHOP
+        Route.PROFILE -> UstaNavTab.PROFILE
+        else -> null
+    }
+
+    var unreadCount by remember { mutableIntStateOf(0) }
+    LaunchedEffect(currentRoute) { unreadCount = fetchUnreadConversations().size }
+
+    UstaBottomNav(
+        modifier = Modifier.align(Alignment.BottomCenter),
+        current = currentTab,
+        unreadChatCount = unreadCount,
+        onSelect = { tab ->
+            val route = when (tab) {
+                UstaNavTab.DASHBOARD -> Route.DASHBOARD
+                UstaNavTab.ORDERS -> Route.ORDERS
+                UstaNavTab.CHAT -> Route.CHAT
+                UstaNavTab.SHOP -> Route.SHOP
+                UstaNavTab.PROFILE -> Route.PROFILE
+            }
+            nav.navigate(route) {
                 popUpTo(nav.graph.findStartDestination().id) { saveState = true }
                 launchSingleTop = true
                 restoreState = true

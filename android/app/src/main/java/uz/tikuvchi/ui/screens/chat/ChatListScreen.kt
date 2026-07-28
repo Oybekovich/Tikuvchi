@@ -23,7 +23,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,11 +34,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
+import uz.tikuvchi.data.ConversationWithProfile
 import uz.tikuvchi.data.Reconnect
-import uz.tikuvchi.data.model.ConversationRow
 import uz.tikuvchi.data.model.MessageType
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
@@ -48,20 +53,26 @@ import uz.tikuvchi.ui.theme.Cream50
 import uz.tikuvchi.ui.theme.Ink500
 import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Terra600
+import uz.tikuvchi.data.ProfileRepository
 import uz.tikuvchi.util.formatChatTime
 
 @Composable
 fun ChatListScreen(
-    onProfile: () -> Unit,
     onConversation: (id: String, name: String) -> Unit,
     vm: ChatListViewModel = viewModel(),
 ) {
     val s by vm.state.collectAsStateWithLifecycle()
 
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(lifecycle) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            vm.refresh()
+        }
+    }
+
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(
             title = stringResource(R.string.chat_title),
-            onProfile = onProfile,
         )
 
         when {
@@ -81,16 +92,20 @@ fun ChatListScreen(
                 )
             }
 
-            else -> LazyColumn(
-                contentPadding = PaddingValues(
-                    top = 16.dp,
-                    bottom = bottomNavSpace(),
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(s.conversations, key = { it.id }) { c ->
-                    ConversationRowItem(c, Modifier.padding(horizontal = 16.dp)) {
-                        onConversation(c.ustaId, c.usta.profiles.fullName)
+            else -> {
+                val currentUserId = remember { ProfileRepository.currentUserId() }
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        top = 16.dp,
+                        bottom = bottomNavSpace(),
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(s.conversations, key = { it.id }) { c ->
+                        val otherId = if (c.clientId == currentUserId) c.ustaId else c.clientId
+                        ConversationRowItem(c, Modifier.padding(horizontal = 16.dp)) {
+                            onConversation(otherId, c.otherName)
+                        }
                     }
                 }
             }
@@ -100,11 +115,10 @@ fun ChatListScreen(
 
 @Composable
 private fun ConversationRowItem(
-    c: ConversationRow,
+    c: ConversationWithProfile,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val p = c.usta.profiles
     val last = c.last
     val preview = when {
         last == null -> ""
@@ -129,11 +143,12 @@ private fun ConversationRowItem(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Avatar(name = p.fullName, src = p.avatarUrl, size = AvatarSize.LG)
+        Avatar(name = c.otherName, src = c.otherAvatar, size = AvatarSize.LG)
         Column(Modifier.weight(1f)) {
             Text(
-                p.fullName,
+                c.otherName,
                 style = MaterialTheme.typography.titleSmall,
+                fontWeight = if (c.unread) androidx.compose.ui.text.font.FontWeight.ExtraBold else androidx.compose.ui.text.font.FontWeight.SemiBold,
                 color = Ink900,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -154,7 +169,8 @@ private fun ConversationRowItem(
                     Text(
                         preview,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Ink500,
+                        fontWeight = if (c.unread) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal,
+                        color = if (c.unread) Ink900 else Ink500,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )

@@ -95,7 +95,7 @@
     "usta": "Usta",
     "measurement": "O'lcham",
     "price": "Narx",
-    "chatHint": "Buyurtma taklifi usta chatiga yuboriladi va u yerda kelishiladi",
+    "chatHint": "Buyurtma ustaga yuboriladi va qabul qilingandan so'ng tayyorlana boshlanadi",
     "confirmOrder": "Yuborish",
     "sending": "Yuborilmoqda…",
     "loginRequired": "Buyurtma berish uchun avval tizimga kiring",
@@ -118,7 +118,13 @@
     "createdAt": "Berilgan sana: {date}",
     "source_catalog": "Katalog orqali",
     "source_chat_negotiation": "Chat orqali kelishilgan",
-    "notFound": "Buyurtma topilmadi"
+    "accept": "Qabul qilish",
+    "reject": "Rad etish",
+    "rejectConfirm": "Buyurtmani rad etishga ishonchingiz komilmi?",
+    "notFound": "Buyurtma topilmadi",
+    "start": "Ishni boshlash",
+    "markReady": "Tayyor deb belgilash",
+    "markCompleted": "Yakunlangan deb belgilash"
   },
   "orderStatus": {
     "pending": "Kutilmoqda",

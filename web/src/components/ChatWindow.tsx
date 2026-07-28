@@ -11,6 +11,7 @@ import { PhCheck } from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/client";
 import { formatChatTime } from "@/lib/format";
 import { t } from "@/lib/i18n";
+import { useUnreadChat } from "@/hooks/useUnreadChat";
 import type { Tables } from "@/lib/database.types";
 
 type Message = Tables<"messages">;
@@ -43,9 +44,19 @@ export default function ChatWindow({
   const [acceptedOrderId, setAcceptedOrderId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { markConversationRead } = useUnreadChat();
+  const prevConvRef = useRef<string | null>(null);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const supabaseRef = useRef(createClient());
+
+  useEffect(() => {
+    if (conversationId && conversationId !== prevConvRef.current) {
+      prevConvRef.current = conversationId;
+      markConversationRead(conversationId);
+    }
+  }, [conversationId, markConversationRead]);
 
   // Xabarlarni yuklash
   useEffect(() => {

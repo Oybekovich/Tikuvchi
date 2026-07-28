@@ -66,7 +66,6 @@ fun SearchScreen(
     initialText: String,
     initialCategory: Long?,
     onBack: () -> Unit,
-    onProfile: () -> Unit,
     onUsta: (String) -> Unit,
 ) {
     val vm: SearchViewModel = viewModel(
@@ -75,7 +74,7 @@ fun SearchScreen(
     val s by vm.state.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding().imePadding()) {
-        AppHeader(title = stringResource(R.string.search_title), onBack = onBack, onProfile = onProfile)
+        AppHeader(title = stringResource(R.string.search_title), onBack = onBack)
 
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),

@@ -38,12 +38,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.tikuvchi.R
 import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.data.model.OrderRow
+import uz.tikuvchi.data.model.OrderStatus
 import uz.tikuvchi.ui.components.AppHeader
 import uz.tikuvchi.ui.components.Avatar
 import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.PriceTag
+import uz.tikuvchi.ui.components.PrimaryButton
+import uz.tikuvchi.ui.components.SecondaryButton
 import uz.tikuvchi.ui.components.StatusChip
 import uz.tikuvchi.ui.components.bottomNavSpace
 import uz.tikuvchi.ui.theme.Cream200
@@ -57,7 +60,6 @@ import uz.tikuvchi.util.formatOrderNumber
 
 @Composable
 fun OrdersScreen(
-    onProfile: () -> Unit,
     onOrder: (String) -> Unit,
     vm: OrdersViewModel = viewModel(),
 ) {
@@ -66,7 +68,6 @@ fun OrdersScreen(
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(
             title = stringResource(R.string.orders_title),
-            onProfile = onProfile,
         )
 
         // Holat bo'yicha filtr
@@ -113,7 +114,18 @@ fun OrdersScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(s.orders, key = { it.id }) { order ->
-                    OrderCard(order, Modifier.padding(horizontal = 16.dp)) { onOrder(order.id) }
+                    val isUsta = s.userId == order.ustaId
+                    OrderCard(
+                        order = order,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onClick = { onOrder(order.id) },
+                        showActions = isUsta && order.status == OrderStatus.PENDING,
+                        acting = s.acting == order.id,
+                        onAccept = { vm.accept(order.id) },
+                        onCancel = { vm.reject(order.id) },
+                        status = if (isUsta) order.status else null,
+                        onProgress = { to -> vm.progressStatus(order.id, to) },
+                    )
                 }
             }
         }
@@ -136,7 +148,17 @@ private fun Tab(text: String, selected: Boolean, modifier: Modifier, onClick: ()
 }
 
 @Composable
-private fun OrderCard(order: OrderRow, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun OrderCard(
+    order: OrderRow,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    showActions: Boolean = false,
+    acting: Boolean = false,
+    onAccept: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    status: OrderStatus? = null,
+    onProgress: (String) -> Unit = {},
+) {
     val usta = order.usta.profiles
     Column(
         modifier
@@ -185,6 +207,43 @@ private fun OrderCard(order: OrderRow, modifier: Modifier = Modifier, onClick: (
                 style = MaterialTheme.typography.labelSmall,
                 color = Ink500,
             )
+        }
+
+        if (showActions) {
+            Spacer(Modifier.height(12.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                PrimaryButton(
+                    text = stringResource(R.string.order_accept),
+                    onClick = onAccept,
+                    loading = acting,
+                    modifier = Modifier.weight(1f),
+                )
+                SecondaryButton(
+                    text = stringResource(R.string.order_reject),
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+
+        if (status != null && !showActions) {
+            val next = when (status) {
+                OrderStatus.ACCEPTED -> "in_progress" to stringResource(R.string.order_start)
+                OrderStatus.IN_PROGRESS -> "ready" to stringResource(R.string.order_mark_ready)
+                OrderStatus.READY -> "completed" to stringResource(R.string.order_mark_completed)
+                else -> null to null
+            }
+            val nextStatus = next.first
+            val nextLabel = next.second
+            if (nextStatus != null && nextLabel != null) {
+                Spacer(Modifier.height(12.dp))
+                PrimaryButton(
+                    text = nextLabel,
+                    onClick = { onProgress(nextStatus) },
+                    loading = acting,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

@@ -17,49 +17,114 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import uz.tikuvchi.data.model.ConversationRow
 import uz.tikuvchi.data.model.Message
+import uz.tikuvchi.data.model.MessagePreview
+import uz.tikuvchi.data.model.ProfileBrief
 
 object ChatRepository {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun conversations(): List<ConversationRow> = withContext(Dispatchers.IO) {
-        val clientId = ProfileRepository.currentUserId() ?: return@withContext emptyList()
-        supabase.from("conversations")
+    suspend fun conversations(): List<ConversationWithProfile> = withContext(Dispatchers.IO) {
+        val userId = ProfileRepository.currentUserId() ?: return@withContext emptyList()
+        val rows = supabase.from("conversations")
             .select(
                 Columns.raw(
-                    "id, usta_id, last_message_at, " +
+                    "id, client_id, usta_id, last_message_at, " +
                         "usta_profiles!inner(profiles!inner(full_name, avatar_url)), " +
                         "messages(content, message_type, created_at)"
                 )
             ) {
-                filter { eq("client_id", clientId) }
+                filter {
+                    or {
+                        eq("client_id", userId)
+                        eq("usta_id", userId)
+                    }
+                }
                 order("last_message_at", Order.DESCENDING)
-                // Ro'yxatda faqat oxirgi xabar ko'rsatiladi
                 order("created_at", Order.DESCENDING, referencedTable = "messages")
                 limit(1, referencedTable = "messages")
             }
-            .decodeList()
-    }
+            .decodeList<ConversationRow>()
 
-    /** Usta bilan mavjud suhbat. Hali yozishilmagan bo'lsa — null. */
-    suspend fun findConversation(ustaId: String): String? = withContext(Dispatchers.IO) {
-        val clientId = ProfileRepository.currentUserId() ?: return@withContext null
-        supabase.from("conversations")
-            .select(Columns.list("id")) {
+        if (rows.isEmpty()) return@withContext emptyList()
+
+        val otherIds = rows.map { row ->
+            if (row.clientId == userId) row.ustaId else row.clientId
+        }.distinct()
+
+        val others = supabase.from("profiles")
+            .select(Columns.raw("id, full_name, avatar_url")) {
                 filter {
-                    eq("client_id", clientId)
-                    eq("usta_id", ustaId)
+                    or {
+                        otherIds.forEach { eq("id", it) }
+                    }
                 }
             }
-            .decodeSingleOrNull<IdRow>()?.id
+            .decodeList<OtherProfile>()
+
+        val otherMap = others.associateBy { it.id }
+        val convIds = rows.map { it.id }
+
+        val msgs = supabase.from("messages")
+            .select(Columns.raw("conversation_id, created_at")) {
+                filter {
+                    neq("sender_id", userId)
+                    or {
+                        convIds.forEach { eq("conversation_id", it) }
+                    }
+                }
+            }
+            .decodeList<MsgTimestamp>()
+
+        val latestPerConv = mutableMapOf<String, String>()
+        for (msg in msgs) {
+            val prev = latestPerConv[msg.conversationId]
+            if (prev == null || msg.createdAt > prev) {
+                latestPerConv[msg.conversationId] = msg.createdAt
+            }
+        }
+
+        rows.map { row ->
+            val otherId = if (row.clientId == userId) row.ustaId else row.clientId
+            val profile = otherMap[otherId]
+            val latest = latestPerConv[row.id]
+            val lastRead = ChatUnreadStore.getLastRead(row.id)
+            val hasUnread = latest != null && latest > lastRead
+            ConversationWithProfile(
+                id = row.id,
+                clientId = row.clientId,
+                ustaId = row.ustaId,
+                lastMessageAt = row.lastMessageAt,
+                messages = row.messages,
+                otherName = profile?.fullName ?: row.usta.profiles?.fullName ?: "",
+                otherAvatar = profile?.avatarUrl ?: row.usta.profiles?.avatarUrl,
+                unread = hasUnread,
+            )
+        }
     }
 
-    /** Suhbat yo'q bo'lsa yaratadi — birinchi xabar yuborilganda chaqiriladi. */
+    suspend fun findConversation(otherId: String): String? = withContext(Dispatchers.IO) {
+        val userId = ProfileRepository.currentUserId() ?: return@withContext null
+        supabase.from("conversations")
+            .select(Columns.raw("id, client_id, usta_id")) {
+                filter {
+                    or {
+                        eq("client_id", userId)
+                        eq("usta_id", userId)
+                    }
+                }
+            }
+            .decodeList<ConversationLookup>()
+            .firstOrNull {
+                (it.clientId == userId && it.ustaId == otherId) ||
+                    (it.clientId == otherId && it.ustaId == userId)
+            }?.id
+    }
+
     suspend fun ensureConversation(ustaId: String): String = withContext(Dispatchers.IO) {
         val clientId = ProfileRepository.currentUserId() ?: error("Sessiya yo'q")
         supabase.from("conversations")
             .upsert(ConversationInsert(clientId = clientId, ustaId = ustaId)) {
-                // Suhbat allaqachon bo'lsa yangisi yaratilmaydi — o'shanisi qaytadi
                 onConflict = "client_id,usta_id"
                 select(Columns.list("id"))
             }
@@ -90,10 +155,6 @@ object ChatRepository {
                 .decodeSingle()
         }
 
-    /**
-     * Suhbatdagi o'zgarishlar oqimi: yangi xabarlar (INSERT) va taklif holati
-     * o'zgarishlari (UPDATE) — web'dagi ChatWindow obunasi bilan bir xil.
-     */
     fun messageChanges(conversationId: String): Flow<Message> {
         val channel = supabase.channel("messages:$conversationId")
         val filter: io.github.jan.supabase.realtime.PostgresChangeFilter.() -> Unit = {
@@ -118,6 +179,13 @@ object ChatRepository {
     private data class IdRow(val id: String)
 
     @Serializable
+    private data class ConversationLookup(
+        val id: String,
+        @SerialName("client_id") val clientId: String,
+        @SerialName("usta_id") val ustaId: String,
+    )
+
+    @Serializable
     private data class ConversationInsert(
         @SerialName("client_id") val clientId: String,
         @SerialName("usta_id") val ustaId: String,
@@ -130,4 +198,30 @@ object ChatRepository {
         val content: String,
         @SerialName("message_type") val messageType: String = "text",
     )
+
+    @Serializable
+    private data class OtherProfile(
+        val id: String,
+        @SerialName("full_name") val fullName: String,
+        @SerialName("avatar_url") val avatarUrl: String? = null,
+    )
+
+    @Serializable
+    private data class MsgTimestamp(
+        @SerialName("conversation_id") val conversationId: String,
+        @SerialName("created_at") val createdAt: String,
+    )
+}
+
+data class ConversationWithProfile(
+    val id: String,
+    val clientId: String,
+    val ustaId: String,
+    val lastMessageAt: String,
+    val messages: List<MessagePreview>,
+    val otherName: String,
+    val otherAvatar: String?,
+    val unread: Boolean = false,
+) {
+    val last: MessagePreview? get() = messages.firstOrNull()
 }

@@ -7,6 +7,7 @@ import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import coil3.util.DebugLogger
+import uz.tikuvchi.data.ChatUnreadStore
 import uz.tikuvchi.data.Reconnect
 
 /**
@@ -18,6 +19,7 @@ class TikuvchiApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         // Tarmoq qaytganda xato holatidagi ekranlar o'zi yangilanadi
         Reconnect.observe(this)
+        ChatUnreadStore.init(this)
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader =

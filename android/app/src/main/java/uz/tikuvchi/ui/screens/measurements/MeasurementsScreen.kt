@@ -64,7 +64,6 @@ import uz.tikuvchi.util.formatDate
 
 @Composable
 fun MeasurementsScreen(
-    onProfile: () -> Unit,
     vm: MeasurementsViewModel = viewModel(),
 ) {
     val s by vm.state.collectAsStateWithLifecycle()
@@ -73,7 +72,6 @@ fun MeasurementsScreen(
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(
             title = stringResource(R.string.measurements_title),
-            onProfile = onProfile,
         )
 
         when {

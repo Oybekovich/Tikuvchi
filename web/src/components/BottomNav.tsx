@@ -11,6 +11,7 @@ import {
   PhUser,
 } from "@/components/PhosphorIcons";
 import { t } from "@/lib/i18n";
+import { useUnreadChat } from "@/hooks/useUnreadChat";
 
 type Tab = {
   href: string;
@@ -38,6 +39,7 @@ const RIGHT: Tab[] = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { unreadCount } = useUnreadChat();
 
   function isActive(href: string): boolean {
     if (href === "/") return pathname === "/";
@@ -73,7 +75,12 @@ export default function BottomNav() {
           </Link>
 
           {RIGHT.map((tab) => (
-            <SideTab key={tab.href} tab={tab} active={isActive(tab.href)} />
+            <SideTab
+              key={tab.href}
+              tab={tab}
+              active={isActive(tab.href)}
+              badge={tab.href === "/chat" ? unreadCount : 0}
+            />
           ))}
         </div>
       </div>
@@ -82,7 +89,15 @@ export default function BottomNav() {
 }
 
 /** Chetdagi tab: tanlanmagan bo'lsa faqat ikonka, tanlanganda yozuvi kengayadi. */
-function SideTab({ tab, active }: { tab: Tab; active: boolean }) {
+function SideTab({
+  tab,
+  active,
+  badge = 0,
+}: {
+  tab: Tab;
+  active: boolean;
+  badge?: number;
+}) {
   const Icon = tab.icon;
   const label = t(tab.label);
 
@@ -92,11 +107,16 @@ function SideTab({ tab, active }: { tab: Tab; active: boolean }) {
       // Yozuv yashiringanda ham ekran o'quvchisi tabni ayta olishi kerak
       aria-label={label}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center rounded-2xl py-2 transition-all duration-200 ease-out ${
+      className={`relative flex items-center rounded-2xl py-2 transition-all duration-200 ease-out ${
         active ? "bg-terra-50 px-3 text-terra-600" : "px-2.5 text-ink-500"
       }`}
     >
-      <Icon size={22} className="shrink-0" />
+      <span className="relative">
+        <Icon size={22} className="shrink-0" />
+        {badge > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-[10px] w-[10px] rounded-full bg-red-500" />
+        )}
+      </span>
       {/* Fon, ichki bo'shliq va matn kengligi bir vaqtda harakatlanadi —
           aks holda yozuv sakrab chiqqandek ko'rinadi */}
       <span

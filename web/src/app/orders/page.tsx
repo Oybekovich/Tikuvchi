@@ -5,6 +5,7 @@ import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/EmptyState";
 import PriceTag from "@/components/PriceTag";
 import StatusChip from "@/components/StatusChip";
+import OrderCardActions from "@/components/OrderCardActions";
 import {
   PhPackage,
 } from "@/components/PhosphorIcons";
@@ -34,10 +35,11 @@ export default async function OrdersPage({
     .from("orders")
     .select(
       `id, status, payment_status, total_price, estimated_ready_at, created_at, source,
+       usta_id,
        usta_profiles!inner(profiles!inner(full_name, avatar_url)),
        order_items(title)`
     )
-    .eq("client_id", user!.id)
+    .or(`client_id.eq.${user!.id},usta_id.eq.${user!.id}`)
     .in("status", finished ? [...FINISHED_STATUSES] : [...ACTIVE_STATUSES])
     .order("created_at", { ascending: false });
 
@@ -77,43 +79,50 @@ export default async function OrdersPage({
           {orders && orders.length > 0 ? (
             orders.map((order) => {
               const ustaProfile = order.usta_profiles.profiles;
+              const isUsta = user!.id === order.usta_id;
               return (
-                <Link
-                  key={order.id}
-                  href={`/orders/${order.id}`}
-                  className="block rounded-2xl bg-white p-4 shadow-card transition-transform hover:-translate-y-0.5"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-ink-500">
-                      {t("orders.orderNumber")}
-                      {formatOrderNumber(order.id)}
-                    </span>
-                    <StatusChip status={order.status} />
-                  </div>
-                  <div className="mt-3 flex items-center gap-3">
-                    <Avatar
-                      name={ustaProfile.full_name}
-                      src={ustaProfile.avatar_url}
-                      size="md"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-bold text-ink-900">
-                        {order.order_items[0]?.title ?? "—"}
-                      </p>
-                      <p className="text-xs text-ink-500">
-                        {ustaProfile.full_name}
-                      </p>
+                <div key={order.id}>
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="block rounded-2xl bg-white p-4 shadow-card transition-transform hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-ink-500">
+                        {t("orders.orderNumber")}
+                        {formatOrderNumber(order.id)}
+                      </span>
+                      <StatusChip status={order.status} />
                     </div>
-                    <PriceTag amount={order.total_price} size="sm" />
-                  </div>
-                  {order.estimated_ready_at && (
-                    <p className="mt-2 text-xs text-ink-500">
-                      {t("orders.estimatedReady", {
-                        date: formatDate(order.estimated_ready_at),
-                      })}
-                    </p>
+                    <div className="mt-3 flex items-center gap-3">
+                      <Avatar
+                        name={ustaProfile.full_name}
+                        src={ustaProfile.avatar_url}
+                        size="md"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-bold text-ink-900">
+                          {order.order_items[0]?.title ?? "—"}
+                        </p>
+                        <p className="text-xs text-ink-500">
+                          {ustaProfile.full_name}
+                        </p>
+                      </div>
+                      <PriceTag amount={order.total_price} size="sm" />
+                    </div>
+                    {order.estimated_ready_at && (
+                      <p className="mt-2 text-xs text-ink-500">
+                        {t("orders.estimatedReady", {
+                          date: formatDate(order.estimated_ready_at),
+                        })}
+                      </p>
+                    )}
+                  </Link>
+                  {isUsta && order.status !== "cancelled" && order.status !== "completed" && (
+                    <div className="mt-2 px-4">
+                      <OrderCardActions orderId={order.id} status={order.status} />
+                    </div>
                   )}
-                </Link>
+                </div>
               );
             })
           ) : (

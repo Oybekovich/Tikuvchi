@@ -8,14 +8,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.tikuvchi.data.ChatRepository
+import uz.tikuvchi.data.ChatUnreadStore
+import uz.tikuvchi.data.ConversationWithProfile
 import uz.tikuvchi.data.ProfileRepository
-import uz.tikuvchi.data.model.ConversationRow
 import uz.tikuvchi.data.model.Message
 import uz.tikuvchi.data.reloadOnReconnect
 
 data class ChatListUiState(
     val loading: Boolean = true,
-    val conversations: List<ConversationRow> = emptyList(),
+    val conversations: List<ConversationWithProfile> = emptyList(),
     val error: Boolean = false,
 )
 
@@ -38,6 +39,15 @@ class ChatListViewModel : ViewModel() {
             } catch (e: Exception) {
                 _state.update { it.copy(loading = false, error = true) }
             }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                val list = ChatRepository.conversations()
+                _state.update { it.copy(conversations = list) }
+            } catch (_: Exception) {}
         }
     }
 }
@@ -72,6 +82,7 @@ class ChatViewModel(private val ustaId: String) : ViewModel() {
             try {
                 val id = ChatRepository.findConversation(ustaId)
                 conversationId = id
+                if (id != null) ChatUnreadStore.markRead(id)
                 val msgs = if (id != null) ChatRepository.messages(id) else emptyList()
                 _state.update { it.copy(loading = false, messages = msgs) }
                 if (id != null) observe(id)
@@ -134,6 +145,10 @@ class ChatViewModel(private val ustaId: String) : ViewModel() {
                 _state.update { it.copy(sending = false, error = true) }
             }
         }
+    }
+
+    fun markRead() {
+        conversationId?.let { ChatUnreadStore.markRead(it) }
     }
 
     override fun onCleared() {

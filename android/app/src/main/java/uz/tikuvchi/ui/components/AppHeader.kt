@@ -70,12 +70,16 @@ fun AppHeader(
             modifier = Modifier.weight(1f, fill = false).padding(horizontal = 8.dp),
         )
 
-        IconButton(onClick = { onProfile?.invoke() }) {
-            Icon(
-                painter = painterResource(R.drawable.ic_profile),
-                contentDescription = stringResource(R.string.nav_profile),
-                tint = Ink900,
-            )
+        if (onProfile != null) {
+            IconButton(onClick = onProfile) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_profile),
+                    contentDescription = stringResource(R.string.nav_profile),
+                    tint = Ink900,
+                )
+            }
+        } else {
+            Spacer(Modifier.size(48.dp))
         }
     }
     // Header ostidagi ingichka chiziq

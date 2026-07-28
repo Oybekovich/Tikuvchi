@@ -120,7 +120,7 @@
     <string name="measurements_updated_at">Yangilangan: %1$s</string>
     <string name="measurements_delete_confirm">Bu o\'lchamni o\'chirishga ishonchingiz komilmi?</string>
 
-    <string name="orders_title">Buyurtmalarim</string>
+    <string name="orders_title">Buyurtmalar</string>
     <string name="orders_active">Faol</string>
     <string name="orders_finished">Tugallangan</string>
     <string name="orders_empty">Buyurtmalaringiz yo\'q</string>
@@ -140,6 +140,9 @@
     <string name="payment_pending">Kutilmoqda</string>
     <string name="payment_partial">Bo\'nak to\'langan (30%)</string>
     <string name="payment_paid">To\'liq to\'langan</string>
+    <string name="payment_pay_deposit">Bo\'nakni to\'lash — %1$s</string>
+    <string name="payment_pay_rest">Qolgan qismini to\'lash</string>
+    <string name="payment_integration_note">Bu yerda haqiqiy to\'lov tizimi (Payme/Click) hali ulanmagan — namoyish uchun.</string>
 
     <string name="order_status_pending">Kutilmoqda</string>
     <string name="order_status_accepted">Qabul qilindi</string>
@@ -184,4 +187,55 @@
     <string name="usta_no_reviews">Hozircha sharhlar yo\'q</string>
     <string name="usta_no_portfolio">Portfolio hali qo\'shilmagan</string>
     <string name="usta_not_found">Usta topilmadi</string>
+
+    <string name="order_accept">Qabul qilish</string>
+    <string name="order_reject">Rad etish</string>
+    <string name="order_reject_confirm">Buyurtmani rad etishga ishonchingiz komilmi?</string>
+
+    <!-- Usta interface -->
+    <string name="nav_dashboard">Asosiy</string>
+    <string name="nav_shop">Do\'kon</string>
+    <string name="role_usta">Tikuvchi</string>
+
+    <string name="shop_title">Do\'kon boshqaruvi</string>
+    <string name="shop_tab_profile">Profil</string>
+    <string name="shop_tab_services">Xizmatlar</string>
+    <string name="shop_tab_settings">Sozlamalar</string>
+    <string name="shop_save_profile">Profilni saqlash</string>
+    <string name="shop_save_settings">Sozlamalarni saqlash</string>
+    <string name="shop_saved">Saqlandi</string>
+    <string name="shop_bio">Bio</string>
+    <string name="shop_location">Manzil</string>
+    <string name="shop_district">Tuman</string>
+    <string name="shop_work_start">Ish boshlanishi</string>
+    <string name="shop_work_end">Ish tugashi</string>
+    <string name="shop_tags">Teglar (vergul bilan ajrating)</string>
+    <string name="shop_no_services">Xizmatlar yo\'q</string>
+    <string name="shop_no_services_hint">Yangi xizmat qo\'shing va mijozlarga taklif qiling</string>
+    <string name="shop_add_service">+ Yangi xizmat qo\'shish</string>
+    <string name="shop_edit_service">Xizmatni tahrirlash</string>
+    <string name="shop_service_title">Xizmat nomi</string>
+    <string name="shop_service_desc">Tavsif</string>
+    <string name="shop_service_price">Narx (so\'m)</string>
+    <string name="shop_service_saved">Xizmat saqlandi</string>
+    <string name="shop_available">Yangi buyurtmalarni qabul qilaman</string>
+    <string name="shop_visible">Profil mijozlarga ko\'rinadi</string>
+    <string name="shop_gender_segment">Mijozlar segmenti</string>
+    <string name="gender_women">Ayollar</string>
+    <string name="gender_men">Erkaklar</string>
+    <string name="gender_unisex">Unisex</string>
+
+    <string name="dashboard_pending_title">Kutilayotgan buyurtmalar</string>
+    <string name="dashboard_active_orders">Faol</string>
+    <string name="dashboard_pending">Kutilmoqda</string>
+    <string name="dashboard_rating">Reyting</string>
+    <string name="dashboard_no_pending">Kutilayotgan buyurtmalar yo\'q</string>
+    <string name="dashboard_no_pending_hint">Yangi buyurtma kelganda shu yerda ko\'rinadi</string>
+
+    <string name="order_start">Ishni boshlash</string>
+    <string name="order_mark_ready">Tayyor deb belgilash</string>
+    <string name="order_mark_completed">Yakunlangan deb belgilash</string>
+
+    <string name="save">Saqlash</string>
+    <string name="cancel">Bekor qilish</string>
 </resources>

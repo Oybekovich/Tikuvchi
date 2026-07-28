@@ -7,36 +7,38 @@ import { IconCheck } from "@/components/Icons";
 import { createClient } from "@/lib/supabase/client";
 import { depositAmount, nextPaymentStatus } from "@/lib/payments";
 import { formatCurrency } from "@/lib/format";
+import { nextOrderStatus, insertOrderEvent } from "@/lib/orderFlow";
 import { t } from "@/lib/i18n";
 import type { Enums } from "@/lib/database.types";
 
 type Props = {
   orderId: string;
+  ustaId: string;
   status: Enums<"order_status">;
   paymentStatus: Enums<"payment_status">;
   totalPrice: number;
+  isUsta: boolean;
 };
 
 const PAYMENT_STEPS: Enums<"payment_status">[] = ["pending", "partial", "paid"];
 
-/**
- * To'lov holati paneli: Kutilmoqda → Bo'nak to'langan (30%) → To'liq to'langan.
- * Haqiqiy to'lov o'rniga demo tugmalar — Payme/Click uchun joy lib/payments.ts da.
- */
 export default function OrderActions({
   orderId,
   status,
   paymentStatus,
   totalPrice,
+  isUsta,
 }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const [confirmingReject, setConfirmingReject] = useState(false);
 
   const currentIdx = PAYMENT_STEPS.indexOf(paymentStatus);
   const next = nextPaymentStatus(paymentStatus);
-  const cancellable = status === "pending";
   const active = status !== "cancelled";
+  const isPending = status === "pending";
+  const progress = nextOrderStatus(status);
 
   async function advancePayment() {
     if (!next) return;
@@ -50,16 +52,43 @@ export default function OrderActions({
     setBusy(false);
   }
 
-  async function cancelOrder() {
+  async function updateStatus(newStatus: Enums<"order_status">) {
+    setBusy(true);
+    const supabase = createClient();
+    await supabase
+      .from("orders")
+      .update({ status: newStatus })
+      .eq("id", orderId);
+    router.refresh();
+    setBusy(false);
+    setConfirmingCancel(false);
+    setConfirmingReject(false);
+  }
+
+  async function rejectOrder() {
     setBusy(true);
     const supabase = createClient();
     await supabase
       .from("orders")
       .update({ status: "cancelled" })
       .eq("id", orderId);
+    await insertOrderEvent(orderId, "pending", "cancelled");
     router.refresh();
     setBusy(false);
-    setConfirmingCancel(false);
+    setConfirmingReject(false);
+  }
+
+  async function progressOrder() {
+    if (!progress) return;
+    setBusy(true);
+    const supabase = createClient();
+    await supabase
+      .from("orders")
+      .update({ status: progress.next })
+      .eq("id", orderId);
+    await insertOrderEvent(orderId, status, progress.next);
+    router.refresh();
+    setBusy(false);
   }
 
   return (
@@ -112,14 +141,39 @@ export default function OrderActions({
         </p>
       </section>
 
-      {/* Bekor qilish (ikki bosqichli tasdiqlash) */}
-      {cancellable &&
+      {/* Usta: Qabul qilish / Rad etish */}
+      {isUsta && isPending && (
+        <section className="rounded-2xl bg-white p-4 shadow-card">
+          <h2 className="text-sm font-extrabold text-ink-900">
+            {t("orders.title")}
+          </h2>
+          <div className="mt-3 flex gap-2">
+            <Button
+              onClick={() => updateStatus("accepted")}
+              loading={busy}
+              className="flex-1"
+            >
+              {t("orders.accept")}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => setConfirmingReject(true)}
+              className="flex-1"
+            >
+              {t("orders.reject")}
+            </Button>
+          </div>
+        </section>
+      )}
+
+      {/* Mijoz: Bekor qilish */}
+      {!isUsta && isPending &&
         (confirmingCancel ? (
           <div className="flex items-center gap-2 rounded-2xl bg-red-50 p-3">
             <span className="flex-1 text-sm font-semibold text-red-700">
               {t("orders.cancelConfirm")}
             </span>
-            <Button variant="danger" onClick={cancelOrder} loading={busy}>
+            <Button variant="danger" onClick={() => updateStatus("cancelled")} loading={busy}>
               {t("common.confirm")}
             </Button>
             <Button
@@ -139,6 +193,34 @@ export default function OrderActions({
             {t("orders.cancelOrder")}
           </Button>
         ))}
+
+      {/* Usta: ishni davom ettirish (accepted -> in_progress -> ready -> completed) */}
+      {isUsta && active && !isPending && progress && (
+        <section className="rounded-2xl bg-white p-4 shadow-card">
+          <Button onClick={progressOrder} loading={busy} size="lg" className="w-full">
+            {t(progress.labelKey)}
+          </Button>
+        </section>
+      )}
+
+      {/* Rad etish tasdiqlash dialogi */}
+      {confirmingReject && (
+        <div className="flex items-center gap-2 rounded-2xl bg-red-50 p-3">
+          <span className="flex-1 text-sm font-semibold text-red-700">
+            {t("orders.rejectConfirm")}
+          </span>
+          <Button variant="danger" onClick={rejectOrder} loading={busy}>
+            {t("common.confirm")}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setConfirmingReject(false)}
+            disabled={busy}
+          >
+            {t("common.close")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -47,7 +47,6 @@ import uz.tikuvchi.ui.theme.Terra600
 
 @Composable
 fun HomeScreen(
-    onProfile: () -> Unit,
     onSearch: (String) -> Unit,
     onCategory: (Long) -> Unit,
     onUsta: (String) -> Unit,
@@ -60,7 +59,7 @@ fun HomeScreen(
     // enableEdgeToEdge yoqilgani uchun header status bar ostiga kirib ketmasligi
     // kerak; ro'yxat esa pastdagi navigatsiya paneli ostidan silliq chiqadi
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
-        AppHeader(onProfile = onProfile)
+        AppHeader()
 
         when {
             s.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

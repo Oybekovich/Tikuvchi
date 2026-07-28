@@ -23,8 +23,7 @@ export default async function ChatPage({
     supabase
       .from("conversations")
       .select("id")
-      .eq("client_id", user!.id)
-      .eq("usta_id", ustaId)
+      .or(`and(client_id.eq.${user!.id},usta_id.eq.${ustaId}),and(client_id.eq.${ustaId},usta_id.eq.${user!.id})`)
       .maybeSingle(),
   ]);
 

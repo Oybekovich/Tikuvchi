@@ -158,6 +158,51 @@ export type Database = {
           },
         ];
       };
+      order_events: {
+        Row: {
+          changed_by: string | null;
+          comment: string | null;
+          created_at: string;
+          from_status: Database["public"]["Enums"]["order_status"] | null;
+          id: number;
+          order_id: string | null;
+          to_status: Database["public"]["Enums"]["order_status"] | null;
+        };
+        Insert: {
+          changed_by?: string | null;
+          comment?: string | null;
+          created_at?: string;
+          from_status?: Database["public"]["Enums"]["order_status"] | null;
+          id?: never;
+          order_id?: string | null;
+          to_status?: Database["public"]["Enums"]["order_status"] | null;
+        };
+        Update: {
+          changed_by?: string | null;
+          comment?: string | null;
+          created_at?: string;
+          from_status?: Database["public"]["Enums"]["order_status"] | null;
+          id?: never;
+          order_id?: string | null;
+          to_status?: Database["public"]["Enums"]["order_status"] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "order_events_changed_by_fkey";
+            columns: ["changed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       order_items: {
         Row: {
           id: number;

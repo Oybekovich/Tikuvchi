@@ -68,6 +68,17 @@ enum class NavTab(val labelRes: Int, @DrawableRes val icon: Int) {
     PROFILE(R.string.nav_profile, R.drawable.ic_profile),
 }
 
+enum class UstaNavTab(val labelRes: Int, @DrawableRes val icon: Int) {
+    ORDERS(R.string.nav_orders, R.drawable.ic_orders),
+    CHAT(R.string.nav_chat, R.drawable.ic_chat),
+    DASHBOARD(R.string.nav_dashboard, R.drawable.ic_home),
+    SHOP(R.string.nav_shop, R.drawable.ic_needle),
+    PROFILE(R.string.nav_profile, R.drawable.ic_profile),
+}
+
+private val USTA_SIDE_LEFT = listOf(UstaNavTab.ORDERS, UstaNavTab.SHOP)
+private val USTA_SIDE_RIGHT = listOf(UstaNavTab.CHAT, UstaNavTab.PROFILE)
+
 private val SIDE_TABS_LEFT = listOf(NavTab.ORDERS, NavTab.MEASUREMENTS)
 private val SIDE_TABS_RIGHT = listOf(NavTab.CHAT, NavTab.PROFILE)
 
@@ -84,6 +95,60 @@ fun BottomNav(
     current: NavTab?,
     onSelect: (NavTab) -> Unit,
     modifier: Modifier = Modifier,
+    unreadChatCount: Int = 0,
+) {
+    ClientBottomNav(current, onSelect, modifier, unreadChatCount)
+}
+
+@Composable
+fun UstaBottomNav(
+    current: UstaNavTab?,
+    onSelect: (UstaNavTab) -> Unit,
+    modifier: Modifier = Modifier,
+    unreadChatCount: Int = 0,
+) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .shadow(10.dp, RoundedCornerShape(28.dp))
+                .clip(RoundedCornerShape(28.dp))
+                .background(Color.White)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            USTA_SIDE_LEFT.forEach { tab ->
+                UstaSideTab(
+                    tab = tab,
+                    selected = tab == current,
+                    onClick = { onSelect(tab) },
+                )
+            }
+            UstaHomeButton(UstaNavTab.DASHBOARD == current) { onSelect(UstaNavTab.DASHBOARD) }
+            USTA_SIDE_RIGHT.forEach { tab ->
+                UstaSideTab(
+                    tab = tab,
+                    selected = tab == current,
+                    badge = if (tab == UstaNavTab.CHAT) unreadChatCount else 0,
+                    onClick = { onSelect(tab) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ClientBottomNav(
+    current: NavTab?,
+    onSelect: (NavTab) -> Unit,
+    modifier: Modifier = Modifier,
+    unreadChatCount: Int = 0,
 ) {
     Box(
         modifier
@@ -104,11 +169,20 @@ fun BottomNav(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SIDE_TABS_LEFT.forEach { tab ->
-                SideTab(tab, tab == current) { onSelect(tab) }
+                SideTab(
+                    tab = tab,
+                    selected = tab == current,
+                    onClick = { onSelect(tab) },
+                )
             }
             HomeButton(NavTab.HOME == current) { onSelect(NavTab.HOME) }
             SIDE_TABS_RIGHT.forEach { tab ->
-                SideTab(tab, tab == current) { onSelect(tab) }
+                SideTab(
+                    tab = tab,
+                    selected = tab == current,
+                    badge = if (tab == NavTab.CHAT) unreadChatCount else 0,
+                    onClick = { onSelect(tab) },
+                )
             }
         }
     }
@@ -160,9 +234,107 @@ private fun HomeButton(selected: Boolean, onClick: () -> Unit) {
     }
 }
 
+/** Usta markaziy tugmasi */
+@Composable
+private fun UstaHomeButton(selected: Boolean, onClick: () -> Unit) {
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1f else 0.92f,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "ustaHomeScale",
+    )
+    Box(
+        Modifier
+            .size(52.dp)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .shadow(6.dp, CircleShape, clip = false)
+            .clip(CircleShape)
+            .background(Terra600)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(UstaNavTab.DASHBOARD.icon),
+            contentDescription = stringResource(UstaNavTab.DASHBOARD.labelRes),
+            tint = Color.White,
+            modifier = Modifier.size(24.dp),
+        )
+    }
+}
+
+/** Usta chetdagi tab */
+@Composable
+private fun UstaSideTab(tab: UstaNavTab, selected: Boolean, onClick: () -> Unit, badge: Int = 0) {
+    val label = stringResource(tab.labelRes)
+    val spec = tween<Float>(NAV_ANIM_MS, easing = FastOutSlowInEasing)
+    val tint by animateColorAsState(
+        targetValue = if (selected) Terra600 else Ink500,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "ustaTabTint",
+    )
+    val bg by animateColorAsState(
+        targetValue = if (selected) Terra50 else Color.Transparent,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "ustaTabBg",
+    )
+    val sidePad by animateDpAsState(
+        targetValue = if (selected) 12.dp else 10.dp,
+        animationSpec = tween(NAV_ANIM_MS, easing = FastOutSlowInEasing),
+        label = "ustaTabPad",
+    )
+    Row(
+        Modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(bg)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            )
+            .padding(horizontal = sidePad, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.size(22.dp)) {
+            Icon(
+                painter = painterResource(tab.icon),
+                contentDescription = label,
+                tint = tint,
+                modifier = Modifier.size(22.dp),
+            )
+            if (badge > 0) {
+                Box(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFEF4444)),
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = selected,
+            enter = expandHorizontally(tween(NAV_ANIM_MS, easing = FastOutSlowInEasing)) + fadeIn(spec),
+            exit = shrinkHorizontally(tween(NAV_ANIM_MS, easing = FastOutSlowInEasing)) + fadeOut(spec),
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Terra600,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 6.dp),
+            )
+        }
+    }
+}
+
 /** Chetdagi tab: tanlanmagan bo'lsa faqat ikonka, tanlanganda kengayib yozuv chiqadi. */
 @Composable
-private fun SideTab(tab: NavTab, selected: Boolean, onClick: () -> Unit) {
+private fun SideTab(tab: NavTab, selected: Boolean, onClick: () -> Unit, badge: Int = 0) {
     val label = stringResource(tab.labelRes)
     val spec = tween<Float>(NAV_ANIM_MS, easing = FastOutSlowInEasing)
 
@@ -197,13 +369,24 @@ private fun SideTab(tab: NavTab, selected: Boolean, onClick: () -> Unit) {
             .padding(horizontal = sidePad, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            painter = painterResource(tab.icon),
-            // Yozuv yashiringanda ham ekran o'quvchisi tabni ayta olishi kerak
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier.size(22.dp),
-        )
+        Box(modifier = Modifier.size(22.dp)) {
+            Icon(
+                painter = painterResource(tab.icon),
+                // Yozuv yashiringanda ham ekran o'quvchisi tabni ayta olishi kerak
+                contentDescription = label,
+                tint = tint,
+                modifier = Modifier.size(22.dp),
+            )
+            if (badge > 0) {
+                Box(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(androidx.compose.ui.graphics.Color(0xFFEF4444)),
+                )
+            }
+        }
         AnimatedVisibility(
             visible = selected,
             enter = expandHorizontally(tween(NAV_ANIM_MS, easing = FastOutSlowInEasing)) +

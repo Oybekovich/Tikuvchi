@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import uz.tikuvchi.R
+import uz.tikuvchi.data.Payments
 import uz.tikuvchi.data.Reconnect
 import uz.tikuvchi.data.model.OrderDetail
 import uz.tikuvchi.data.model.OrderItemDetail
@@ -57,6 +58,7 @@ import uz.tikuvchi.ui.components.AvatarSize
 import uz.tikuvchi.ui.components.EmptyState
 import uz.tikuvchi.ui.components.ErrorState
 import uz.tikuvchi.ui.components.PriceTag
+import uz.tikuvchi.ui.components.PrimaryButton
 import uz.tikuvchi.ui.components.SecondaryButton
 import uz.tikuvchi.ui.components.StatusChip
 import uz.tikuvchi.ui.components.bottomNavSpace
@@ -68,6 +70,7 @@ import uz.tikuvchi.ui.theme.Ink700
 import uz.tikuvchi.ui.theme.Ink900
 import uz.tikuvchi.ui.theme.Red700
 import uz.tikuvchi.ui.theme.Terra600
+import uz.tikuvchi.util.formatCurrency
 import uz.tikuvchi.util.formatDate
 import uz.tikuvchi.util.formatOrderNumber
 
@@ -83,6 +86,7 @@ fun OrderDetailScreen(
     )
     val s by vm.state.collectAsStateWithLifecycle()
     var confirmCancel by remember { mutableStateOf(false) }
+    var confirmReject by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().background(Cream50).statusBarsPadding()) {
         AppHeader(title = stringResource(R.string.orders_details_title), onBack = onBack)
@@ -143,14 +147,56 @@ fun OrderDetailScreen(
                     Card { StatusStepper(order) }
                     Card { UstaRow(order, onUsta) }
                     Card { Composition(order) }
-                    Card { Payment(order.paymentStatus) }
-
-                    // Faqat "kutilmoqda" holatida bekor qilish mumkin — web'dagi kabi
-                    if (order.status == OrderStatus.PENDING) {
-                        SecondaryButton(
-                            text = stringResource(R.string.orders_cancel_order),
-                            onClick = { confirmCancel = true },
+                    Card {
+                        Payment(
+                            status = order.paymentStatus,
+                            totalPrice = order.totalPrice,
+                            active = order.status != OrderStatus.CANCELLED,
+                            busy = s.acting,
+                            onAdvance = { vm.advancePayment(it) },
                         )
+                    }
+
+                    if (order.status == OrderStatus.PENDING) {
+                        if (vm.isUsta()) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                PrimaryButton(
+                                    text = stringResource(R.string.order_accept),
+                                    onClick = { vm.accept() },
+                                    loading = s.acting,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                SecondaryButton(
+                                    text = stringResource(R.string.order_reject),
+                                    onClick = { confirmReject = true },
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
+                        } else {
+                            SecondaryButton(
+                                text = stringResource(R.string.orders_cancel_order),
+                                onClick = { confirmCancel = true },
+                            )
+                        }
+                    } else if (vm.isUsta()) {
+                        val next = when (order.status) {
+                            OrderStatus.ACCEPTED -> "in_progress" to stringResource(R.string.order_start)
+                            OrderStatus.IN_PROGRESS -> "ready" to stringResource(R.string.order_mark_ready)
+                            OrderStatus.READY -> "completed" to stringResource(R.string.order_mark_completed)
+                            else -> null to null
+                        }
+                        val (nextStatus, nextLabel) = next
+                        if (nextStatus != null && nextLabel != null) {
+                            PrimaryButton(
+                                text = nextLabel,
+                                onClick = { vm.progressStatus(nextStatus) },
+                                loading = s.acting,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
             }
@@ -169,6 +215,25 @@ fun OrderDetailScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmCancel = false }) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            },
+            containerColor = Cream50,
+        )
+    }
+
+    if (confirmReject) {
+        AlertDialog(
+            onDismissRequest = { confirmReject = false },
+            title = { Text(stringResource(R.string.order_reject)) },
+            text = { Text(stringResource(R.string.order_reject_confirm)) },
+            confirmButton = {
+                TextButton(onClick = { confirmReject = false; vm.reject() }) {
+                    Text(stringResource(R.string.common_confirm), color = Red700)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmReject = false }) {
                     Text(stringResource(R.string.common_cancel))
                 }
             },
@@ -305,28 +370,60 @@ private fun ItemRow(item: OrderItemDetail) {
 }
 
 @Composable
-private fun Payment(status: PaymentStatus) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            stringResource(R.string.payment_title),
-            style = MaterialTheme.typography.titleSmall,
-            color = Ink700,
-        )
-        Text(
-            stringResource(
-                when (status) {
-                    PaymentStatus.PENDING -> R.string.payment_pending
-                    PaymentStatus.PARTIAL -> R.string.payment_partial
-                    PaymentStatus.PAID -> R.string.payment_paid
+private fun Payment(
+    status: PaymentStatus,
+    totalPrice: Long,
+    active: Boolean,
+    busy: Boolean,
+    onAdvance: (String) -> Unit,
+) {
+    Column {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                stringResource(R.string.payment_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = Ink700,
+            )
+            Text(
+                stringResource(
+                    when (status) {
+                        PaymentStatus.PENDING -> R.string.payment_pending
+                        PaymentStatus.PARTIAL -> R.string.payment_partial
+                        PaymentStatus.PAID -> R.string.payment_paid
+                    },
+                ),
+                style = MaterialTheme.typography.titleSmall,
+                color = Ink900,
+            )
+        }
+
+        val next = if (active) Payments.nextPaymentStatus(status) else null
+        if (next != null) {
+            Spacer(Modifier.height(12.dp))
+            PrimaryButton(
+                text = if (next == PaymentStatus.PARTIAL) {
+                    stringResource(
+                        R.string.payment_pay_deposit,
+                        formatCurrency(Payments.depositAmount(totalPrice)),
+                    )
+                } else {
+                    stringResource(R.string.payment_pay_rest)
                 },
-            ),
-            style = MaterialTheme.typography.titleSmall,
-            color = Ink900,
-        )
+                onClick = { onAdvance(next.name.lowercase()) },
+                loading = busy,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.payment_integration_note),
+                style = MaterialTheme.typography.labelSmall,
+                color = Ink500,
+            )
+        }
     }
 }
 

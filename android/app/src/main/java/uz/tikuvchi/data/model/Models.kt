@@ -118,9 +118,11 @@ data class UstaCard(
 @Serializable
 data class ConversationRow(
     val id: String,
+    @SerialName("client_id") val clientId: String,
     @SerialName("usta_id") val ustaId: String,
     @SerialName("last_message_at") val lastMessageAt: String,
     @SerialName("usta_profiles") val usta: OrderUsta,
+    @SerialName("profiles") val client: ProfileBrief? = null,
     // So'rovda limit(1) bilan faqat oxirgi xabar olinadi
     val messages: List<MessagePreview> = emptyList(),
 ) {
@@ -144,10 +146,11 @@ data class OrderRow(
     @SerialName("estimated_ready_at") val estimatedReadyAt: String? = null,
     @SerialName("created_at") val createdAt: String,
     val source: OrderSource = OrderSource.CATALOG,
+    @SerialName("usta_id") val ustaId: String = "",
+    @SerialName("client_id") val clientId: String = "",
     @SerialName("usta_profiles") val usta: OrderUsta,
     @SerialName("order_items") val items: List<OrderItemTitle> = emptyList(),
 ) {
-    /** Kartochkada birinchi mahsulot nomi ko'rsatiladi. */
     val title: String get() = items.firstOrNull()?.title ?: "—"
 }
 

@@ -78,6 +78,8 @@ fun ChatScreen(
     val s by vm.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
+    LaunchedEffect(Unit) { vm.markRead() }
+
     // Yangi xabar kelganda pastga tushamiz
     LaunchedEffect(s.messages.size) {
         if (s.messages.isNotEmpty()) listState.animateScrollToItem(s.messages.lastIndex)
