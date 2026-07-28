@@ -7,9 +7,11 @@ kod bitta repozitoriyda, har biri o'z papkasida.
 web/       Next.js ilova → tikuvchi-uz.vercel.app
 android/   Kotlin + Jetpack Compose (mahalliy ilova)
 ios/       Swift (rejalashtirilgan)
+admin/     Next.js — superadmin paneli (alohida ilova, oddiy foydalanuvchi
+           bilmaydi, faqat is_admin=true hisoblar kiradi)
 ```
 
-Uchalasi ham bitta Supabase loyihasidan foydalanadi: ma'lumotlar bazasi,
+Barchasi bitta Supabase loyihasidan foydalanadi: ma'lumotlar bazasi,
 autentifikatsiya va fayl saqlash umumiy. Ya'ni web'da yaratilgan buyurtma
 Android'da ham darhol ko'rinadi.
 
@@ -19,9 +21,10 @@ Har bir papkaning o'z ko'rsatmasi bor:
 
 - [`web/README.md`](web/README.md)
 - [`android/README.md`](android/README.md)
+- [`admin/README.md`](admin/README.md)
 
-Ikkalasi ham Supabase kalitlarini talab qiladi va ular git'ga tushmaydi:
-web uchun `web/.env.local`, Android uchun `android/local.properties`.
+Barchasi Supabase kalitlarini talab qiladi va ular git'ga tushmaydi:
+web/admin uchun `.env.local`, Android uchun `android/local.properties`.
 Namunalar mos papkalarda.
 
 ## Vercel
