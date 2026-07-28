@@ -26,8 +26,6 @@
     <string name="auth_invalid_credentials">Email yoki parol noto\'g\'ri</string>
     <string name="auth_email_taken">Bu email allaqachon ro\'yxatdan o\'tgan</string>
     <string name="auth_check_email">Emailingizga tasdiqlash havolasi yubordik. Pochtangizni tekshiring.</string>
-    <string name="auth_demo_title">Demo hisob</string>
-    <string name="auth_demo_hint">Sinab ko\'rish uchun: mijoz@demo.uz / demo1234</string>
     <string name="auth_generic_error">Kirish amalga oshmadi. Qayta urinib ko\'ring.</string>
 
     <string name="nav_home">Bosh sahifa</string>

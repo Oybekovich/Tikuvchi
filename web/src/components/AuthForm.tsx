@@ -207,15 +207,6 @@ export default function AuthForm({ mode }: Props) {
           </>
         )}
       </p>
-
-      {mode === "login" && (
-        <div className="mt-6 rounded-2xl bg-white p-4 text-center shadow-card">
-          <p className="text-xs font-bold text-ink-500">{t("auth.demoTitle")}</p>
-          <p className="mt-1 text-sm font-semibold text-ink-700">
-            {t("auth.demoHint")}
-          </p>
-        </div>
-      )}
     </main>
   );
 }

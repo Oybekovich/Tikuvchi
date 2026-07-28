@@ -218,8 +218,6 @@
     "invalidCredentials": "Email yoki parol noto'g'ri",
     "emailTaken": "Bu email allaqachon ro'yxatdan o'tgan",
     "checkEmail": "Emailingizga tasdiqlash havolasi yubordik. Pochtangizni tekshiring.",
-    "demoTitle": "Demo hisob",
-    "demoHint": "Sinab ko'rish uchun: mijoz@demo.uz / demo1234",
     "genericError": "Kirish amalga oshmadi. Qayta urinib ko'ring."
   },
   "offline": {

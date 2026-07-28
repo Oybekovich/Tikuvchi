@@ -189,31 +189,6 @@ fun AuthScreen(
                     },
                 )
             }
-
-            if (!register) {
-                Spacer(Modifier.height(24.dp))
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color.White)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        stringResource(R.string.auth_demo_title),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Ink500,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        stringResource(R.string.auth_demo_hint),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Ink700,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
         }
     }
 }
