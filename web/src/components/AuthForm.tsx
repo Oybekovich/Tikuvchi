@@ -84,8 +84,10 @@ export default function AuthForm({ mode }: Props) {
     }
   }
 
+  // Pastdagi qo'shimcha bo'shliq kontentni markazdan biroz yuqoriga suradi —
+  // matematik markaz vizual jihatdan pastroq ko'rinadi (Android bilan bir xil)
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 py-10">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 pt-10 pb-[calc(2.5rem+10dvh)]">
       <div className="mb-8 text-center">
         <span className="inline-flex items-center gap-2 text-2xl font-extrabold tracking-tight text-ink-900">
           <IconScissors size={26} className="text-terra-600" />
