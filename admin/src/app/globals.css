@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  /* Tikuvchi palitrasi — web/src/app/globals.css bilan bir xil (brend izchilligi) */
+  --color-cream-50: #fdfaf5;
+  --color-cream-100: #faf5ec;
+  --color-cream-200: #f3e9da;
+  --color-cream-300: #e9d9c3;
+
+  --color-terra-50: #fbf1ec;
+  --color-terra-100: #f5ddd1;
+  --color-terra-200: #eabfa9;
+  --color-terra-300: #dc9a7b;
+  --color-terra-400: #cd7a55;
+  --color-terra-500: #c0674a;
+  --color-terra-600: #a9533a;
+  --color-terra-700: #8c452f;
+  --color-terra-800: #6f3826;
+  --color-terra-900: #582d20;
+
+  --color-ink-900: #3a2a20;
+  --color-ink-700: #5c4636;
+  --color-ink-500: #82695a;
+  --color-ink-300: #b3a094;
+
+  --color-gold-400: #d9a441;
+  --color-gold-100: #f7e9cd;
+
+  --color-sage-500: #6a7b74;
+
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 1px 3px rgba(88, 45, 32, 0.07),
+    0 4px 14px rgba(88, 45, 32, 0.06);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-cream-100);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  min-height: 100%;
+}
