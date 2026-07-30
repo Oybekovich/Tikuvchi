@@ -1,3 +1,13 @@
+// Bu fayl qo'lda yuritiladi va migratsiyalar bilan MOS bo'lishi shart.
+// Yangi ustun qo'shilganda shu yerga ham qo'shilmasa, TypeScript uni
+// ko'rmaydi va so'rov "column does not exist" xatosi bilan yiqiladi.
+//
+// Ataylab KIRITILMAGAN: profiles.is_admin va profiles.is_blocked —
+// 0007 migratsiyasi ular uchun SELECT huquqini olib tashlagan, ya'ni ilova
+// ularni bevosita o'qiy olmaydi (faqat is_admin() / current_profile_flags()
+// / admin_list_profiles() RPC'lari orqali). Tipga qo'shilsa, kompilyator
+// ruxsat bermaydigan so'rovga yo'l qo'yib yuborardi.
+
 export type Json =
   | string
   | number
@@ -360,7 +370,10 @@ export type Database = {
           comment: string | null;
           created_at: string;
           id: number;
+          image_url: string | null;
+          order_id: string | null;
           rating: number;
+          updated_at: string;
           usta_id: string;
         };
         Insert: {
@@ -368,7 +381,10 @@ export type Database = {
           comment?: string | null;
           created_at?: string;
           id?: never;
+          image_url?: string | null;
+          order_id?: string | null;
           rating: number;
+          updated_at?: string;
           usta_id: string;
         };
         Update: {
@@ -376,10 +392,20 @@ export type Database = {
           comment?: string | null;
           created_at?: string;
           id?: never;
+          image_url?: string | null;
+          order_id?: string | null;
           rating?: number;
+          updated_at?: string;
           usta_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: true;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "reviews_client_id_fkey";
             columns: ["client_id"];
@@ -419,6 +445,7 @@ export type Database = {
       };
       usta_profiles: {
         Row: {
+          available: boolean | null;
           bio: string | null;
           cover_image_url: string | null;
           district: string | null;
@@ -428,10 +455,12 @@ export type Database = {
           rating_count: number;
           tags: string[];
           user_id: string;
+          visible: boolean | null;
           work_hours_end: string | null;
           work_hours_start: string | null;
         };
         Insert: {
+          available?: boolean | null;
           bio?: string | null;
           cover_image_url?: string | null;
           district?: string | null;
@@ -441,10 +470,12 @@ export type Database = {
           rating_count?: number;
           tags?: string[];
           user_id: string;
+          visible?: boolean | null;
           work_hours_end?: string | null;
           work_hours_start?: string | null;
         };
         Update: {
+          available?: boolean | null;
           bio?: string | null;
           cover_image_url?: string | null;
           district?: string | null;
@@ -454,6 +485,7 @@ export type Database = {
           rating_count?: number;
           tags?: string[];
           user_id?: string;
+          visible?: boolean | null;
           work_hours_end?: string | null;
           work_hours_start?: string | null;
         };

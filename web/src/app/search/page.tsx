@@ -72,6 +72,8 @@ export default async function SearchPage({
     .select(
       "user_id, district, bio, cover_image_url, rating_avg, rating_count, tags, profiles!inner(full_name, avatar_url), usta_services(base_price, category_id)"
     )
+    // Yashirilgan usta qidiruvda ham chiqmasin (bosh sahifa bilan bir xil)
+    .eq("visible", true)
     .order("rating_avg", { ascending: false });
 
   if (params.district) query = query.eq("district", params.district);
@@ -88,6 +90,7 @@ export default async function SearchPage({
       supabase
         .from("usta_profiles")
         .select("district")
+        .eq("visible", true)
         .not("district", "is", null),
     ]);
 

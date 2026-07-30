@@ -71,6 +71,7 @@
     "location": "Manzil",
     "orderCta": "Buyurtma berish",
     "chatCta": "Yozish",
+    "notAvailable": "Hozir buyurtma qabul qilmayapti",
     "noReviews": "Hozircha sharhlar yo'q",
     "noPortfolio": "Portfolio hali qo'shilmagan",
     "notFound": "Usta topilmadi"

@@ -24,6 +24,10 @@ export default async function HomePage() {
       .select(
         "user_id, district, cover_image_url, rating_avg, rating_count, tags, profiles!inner(full_name, avatar_url), usta_services(base_price)"
       )
+      // Admin yashirgan (yoki hali tasdiqlanmagan) usta katalogda ko'rinmasin.
+      // Bu filtr faqat katalogda: buyurtma/chat so'rovlaridagi joinlar
+      // cheklanmaydi, aks holda mavjud buyurtmalar yo'qolib qolardi.
+      .eq("visible", true)
       .order("rating_avg", { ascending: false }),
   ]);
 

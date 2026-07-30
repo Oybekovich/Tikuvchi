@@ -27,7 +27,7 @@ export default async function UstaPage({
     .from("usta_profiles")
     .select(
       `user_id, bio, cover_image_url, rating_avg, rating_count, location_text,
-       district, work_hours_start, work_hours_end, tags,
+       district, work_hours_start, work_hours_end, tags, available,
        profiles!inner(full_name, avatar_url),
        portfolio_items(id, image_url, caption, sort_order)`
     )
@@ -113,15 +113,29 @@ export default async function UstaPage({
               </p>
             )}
 
-            {/* Yozish tugmasi biosida */}
-            <div className="mt-4 pt-3 border-t border-cream-200">
+            {/* Asosiy amallar: yozish va buyurtma berish.
+                Avval "Buyurtma berish" faqat portfolio rasmi modalida edi —
+                portfoliosi bo'sh ustaga buyurtma berishning yo'li yo'q edi. */}
+            <div className="mt-4 flex gap-2 border-t border-cream-200 pt-3">
               <Link
                 href={`/chat/${id}`}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-terra-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-terra-700 active:bg-terra-800"
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-terra-600 px-4 py-3 text-sm font-bold text-terra-700 transition-colors hover:bg-terra-50"
               >
                 <IconChat size={18} />
                 {t("usta.chatCta")}
               </Link>
+              {usta.available === false ? (
+                <span className="flex flex-[1.4] items-center justify-center rounded-2xl bg-cream-200 px-4 py-3 text-center text-xs font-bold text-ink-500">
+                  {t("usta.notAvailable")}
+                </span>
+              ) : (
+                <Link
+                  href={`/usta/${id}/buyurtma`}
+                  className="flex flex-[1.4] items-center justify-center rounded-2xl bg-terra-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-terra-700 active:bg-terra-800"
+                >
+                  {t("usta.orderCta")}
+                </Link>
+              )}
             </div>
           </section>
 
