@@ -5,6 +5,7 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import { IconCheck, IconClose } from "@/components/Icons";
 import { createClient } from "@/lib/supabase/client";
+import { formatCurrency } from "@/lib/format";
 import { t } from "@/lib/i18n";
 
 type Measurement = {
@@ -147,7 +148,12 @@ export default function OrderWizard({
         size_note: sizeNote.trim() || null,
         price: price,
       });
-      if (itemErr) throw itemErr;
+      // Tarkibi yozilmagan bo'lsa buyurtmani qoldirmaymiz — aks holda
+      // ro'yxatda bo'sh, ma'nosiz "yetim" buyurtma paydo bo'ladi.
+      if (itemErr) {
+        await supabase.from("orders").delete().eq("id", order.id);
+        throw itemErr;
+      }
 
       setSubmitting(false);
       router.push(`/orders/${order.id}`);
@@ -385,7 +391,7 @@ export default function OrderWizard({
                     {t("orderFlow.price")}
                   </span>
                   <span className="text-sm font-extrabold text-ink-900">
-                    {suggestedPrice.trim()} so'm
+                    {formatCurrency(Number(suggestedPrice) || 0)}
                   </span>
                 </div>
               )}

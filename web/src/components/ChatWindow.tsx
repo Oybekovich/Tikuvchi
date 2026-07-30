@@ -17,9 +17,12 @@ import type { Tables } from "@/lib/database.types";
 type Message = Tables<"messages">;
 
 type Props = {
-  ustaId: string;
-  ustaName: string;
-  ustaAvatarUrl: string | null;
+  /** Suhbatdosh — mijoz yoki usta bo'lishi mumkin */
+  peerId: string;
+  peerName: string;
+  peerAvatarUrl: string | null;
+  /** Sahifani ochgan odam shu suhbatda usta rolida */
+  viewerIsUsta: boolean;
   initialConversationId: string | null;
   currentUserId: string;
 };
@@ -29,12 +32,17 @@ type Props = {
  * B yo'l: usta yuborgan narx taklifi qabul qilinsa, avtomatik buyurtma yaratiladi.
  */
 export default function ChatWindow({
-  ustaId,
-  ustaName,
-  ustaAvatarUrl,
+  peerId,
+  peerName,
+  peerAvatarUrl,
+  viewerIsUsta,
   initialConversationId,
   currentUserId,
 }: Props) {
+  // Suhbat juftligi rolga qarab aniqlanadi — conversations jadvalida
+  // client_id/usta_id qat'iy tartibda turadi.
+  const clientId = viewerIsUsta ? peerId : currentUserId;
+  const ustaId = viewerIsUsta ? currentUserId : peerId;
   const [conversationId, setConversationId] = useState(initialConversationId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(Boolean(initialConversationId));
@@ -132,7 +140,7 @@ export default function ChatWindow({
     const { data, error: convErr } = await supabase
       .from("conversations")
       .upsert(
-        { client_id: currentUserId, usta_id: ustaId },
+        { client_id: clientId, usta_id: ustaId },
         { onConflict: "client_id,usta_id" }
       )
       .select("id")
@@ -140,7 +148,7 @@ export default function ChatWindow({
     if (convErr || !data) throw convErr ?? new Error("conversation");
     setConversationId(data.id);
     return data.id;
-  }, [conversationId, currentUserId, ustaId]);
+  }, [conversationId, clientId, ustaId]);
 
   async function sendText() {
     const content = input.trim();
@@ -212,17 +220,32 @@ export default function ChatWindow({
     }
   }
 
-  /** Narx taklifini qabul qilish → xabar holati + avtomatik buyurtma */
+  /**
+   * Narx taklifiga javob → xabar holati + qabul qilinsa avtomatik buyurtma.
+   *
+   * Taklif holati `pending` bo'lgani shart qilib qo'yiladi: tugma ikki marta
+   * bosilsa yoki ikkinchi qurilmadan javob berilsa, ikkinchi so'rov 0 qatorni
+   * o'zgartiradi va bitta taklif uchun ikkita buyurtma yaratilmaydi.
+   */
   async function respondToOffer(msg: Message, accept: boolean) {
+    if (respondingTo) return;
     setRespondingTo(msg.id);
     setError(null);
     const supabase = supabaseRef.current;
     try {
-      const { error: updErr } = await supabase
+      const { data: updated, error: updErr } = await supabase
         .from("messages")
         .update({ price_offer_status: accept ? "accepted" : "declined" })
-        .eq("id", msg.id);
+        .eq("id", msg.id)
+        .eq("price_offer_status", "pending")
+        .select("id");
       if (updErr) throw updErr;
+
+      // Allaqachon javob berilgan — hech narsa yaratmaymiz
+      if (!updated || updated.length === 0) {
+        setError(t("chat.offerAlreadyAnswered"));
+        return;
+      }
 
       setMessages((prev) =>
         prev.map((m) =>
@@ -239,7 +262,7 @@ export default function ChatWindow({
         const { data: order, error: ordErr } = await supabase
           .from("orders")
           .insert({
-            client_id: currentUserId,
+            client_id: clientId,
             usta_id: ustaId,
             source: "chat_negotiation",
             status: "accepted",
@@ -251,11 +274,16 @@ export default function ChatWindow({
           .single();
         if (ordErr || !order) throw ordErr ?? new Error("order");
 
-        await supabase.from("order_items").insert({
+        const { error: itemErr } = await supabase.from("order_items").insert({
           order_id: order.id,
           title: msg.price_offer_note ?? t("chat.priceOffer"),
           price: msg.price_offer_amount,
         });
+        // Tarkibsiz "yetim" buyurtma qolib ketmasligi uchun tozalaymiz
+        if (itemErr) {
+          await supabase.from("orders").delete().eq("id", order.id);
+          throw itemErr;
+        }
 
         setAcceptedOrderId(order.id);
       }
@@ -268,7 +296,7 @@ export default function ChatWindow({
 
   return (
     <div className="flex h-dvh flex-col">
-      <AppHeader back backHref="/chat" title={ustaName} />
+      <AppHeader back backHref="/chat" title={peerName} />
 
       <main className="mx-auto w-full max-w-3xl flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {loading ? (
@@ -284,7 +312,7 @@ export default function ChatWindow({
                 className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}
               >
                 {!mine && (
-                  <Avatar name={ustaName} src={ustaAvatarUrl} size="sm" />
+                  <Avatar name={peerName} src={peerAvatarUrl} size="sm" />
                 )}
                 <div className={`max-w-[80%] ${mine ? "items-end" : "items-start"}`}>
                   {msg.message_type === "price_offer" &&

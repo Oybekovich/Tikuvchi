@@ -34,7 +34,7 @@ export default async function ChatListPage() {
 
   const convList = (conversations ?? []) as ConvRaw[];
 
-  let profileMap: Record<string, { id: string; full_name: string; avatar_url: string | null }> = {};
+  const profileMap: Record<string, { id: string; full_name: string; avatar_url: string | null }> = {};
   if (convList.length > 0) {
     const otherIds = convList.map((c) =>
       c.client_id === user.id ? c.usta_id : c.client_id

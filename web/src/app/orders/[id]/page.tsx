@@ -25,7 +25,8 @@ export default async function OrderDetailPage({
   const { data: order } = await supabase
     .from("orders")
     .select(
-      `id, status, payment_status, source, total_price, estimated_ready_at, created_at, usta_id,
+      `id, status, payment_status, source, total_price, estimated_ready_at, created_at,
+       usta_id, client_id,
        usta_profiles!inner(district, profiles!inner(full_name, avatar_url)),
        order_items(id, title, material, image_url, size_note, model_note, price)`
     )
@@ -39,7 +40,24 @@ export default async function OrderDetailPage({
   } = await supabase.auth.getUser();
   const isUsta = user?.id === order.usta_id;
 
-  const ustaProfile = order.usta_profiles.profiles;
+  // Kartochkada suhbatdosh turishi kerak: mijoz ustani ko'radi, usta esa
+  // mijozni — o'z ismini emas.
+  let peerId = order.usta_id;
+  let peerName = order.usta_profiles.profiles.full_name;
+  let peerAvatarUrl = order.usta_profiles.profiles.avatar_url;
+  let peerSubtitle = order.usta_profiles.district;
+
+  if (isUsta) {
+    const { data: client } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .eq("id", order.client_id)
+      .maybeSingle();
+    peerId = order.client_id;
+    peerName = client?.full_name ?? "—";
+    peerAvatarUrl = client?.avatar_url ?? null;
+    peerSubtitle = t("orders.client");
+  }
 
   return (
     <>
@@ -71,29 +89,35 @@ export default async function OrderDetailPage({
           )}
         </section>
 
-        {/* Usta kartasi */}
+        {/* Suhbatdosh kartasi */}
         <div className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-card">
-          <Link
-            href={`/usta/${order.usta_id}`}
-            className="flex min-w-0 flex-1 items-center gap-3"
-          >
-            <Avatar
-              name={ustaProfile.full_name}
-              src={ustaProfile.avatar_url}
-              size="lg"
-            />
-            <div className="min-w-0 flex-1">
-              <p className="font-bold text-ink-900">{ustaProfile.full_name}</p>
-              {order.usta_profiles.district && (
-                <p className="text-xs text-ink-500">
-                  {order.usta_profiles.district}
-                </p>
-              )}
+          {isUsta ? (
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <Avatar name={peerName} src={peerAvatarUrl} size="lg" />
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-ink-900">{peerName}</p>
+                {peerSubtitle && (
+                  <p className="text-xs text-ink-500">{peerSubtitle}</p>
+                )}
+              </div>
             </div>
-            <IconChevronRight size={18} className="text-ink-300" />
-          </Link>
+          ) : (
+            <Link
+              href={`/usta/${order.usta_id}`}
+              className="flex min-w-0 flex-1 items-center gap-3"
+            >
+              <Avatar name={peerName} src={peerAvatarUrl} size="lg" />
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-ink-900">{peerName}</p>
+                {peerSubtitle && (
+                  <p className="text-xs text-ink-500">{peerSubtitle}</p>
+                )}
+              </div>
+              <IconChevronRight size={18} className="text-ink-300" />
+            </Link>
+          )}
           <Link
-            href={`/chat/${order.usta_id}`}
+            href={`/chat/${peerId}`}
             aria-label={t("usta.chatCta")}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terra-50 text-terra-700 hover:bg-terra-100"
           >
@@ -149,7 +173,6 @@ export default async function OrderDetailPage({
         {/* To'lov holati va amallar */}
         <OrderActions
           orderId={order.id}
-          ustaId={order.usta_id}
           status={order.status}
           paymentStatus={order.payment_status}
           totalPrice={order.total_price}

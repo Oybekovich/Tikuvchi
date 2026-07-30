@@ -124,7 +124,12 @@
     "notFound": "Buyurtma topilmadi",
     "start": "Ishni boshlash",
     "markReady": "Tayyor deb belgilash",
-    "markCompleted": "Yakunlangan deb belgilash"
+    "client": "Mijoz",
+    "newRequest": "Yangi buyurtma",
+    "confirmReceived": "Qabul qilib oldim",
+    "confirmReceivedHint": "Buyurtmani olganingizni tasdiqlang — shundan keyin buyurtma yakunlanadi",
+    "waitingClientConfirm": "Buyurtma tayyor. Mijoz qabul qilganini tasdiqlashini kutilmoqda.",
+    "staleError": "Buyurtma holati o'zgargan — sahifa yangilandi."
   },
   "orderStatus": {
     "pending": "Kutilmoqda",
@@ -144,9 +149,10 @@
     "pending": "Kutilmoqda",
     "partial": "Bo'nak to'langan (30%)",
     "paid": "To'liq to'langan",
-    "payDeposit": "Bo'nak to'lash (demo)",
-    "payRest": "To'liq to'lash (demo)",
-    "integrationNote": "Payme / Click integratsiyasi keyingi bosqichda qo'shiladi"
+    "markDeposit": "Bo'nak olindi deb belgilash",
+    "markPaid": "To'liq to'landi deb belgilash",
+    "ustaNote": "To'lovni siz belgilaysiz — pul sizga to'g'ridan-to'g'ri to'lanadi",
+    "clientNote": "To'lov holatini usta belgilaydi"
   },
   "chat": {
     "title": "Suhbatlar",
@@ -164,6 +170,7 @@
     "offerAccepted": "Taklif qabul qilindi",
     "offerDeclined": "Taklif rad etildi",
     "offerAcceptedInfo": "Buyurtma yaratildi — \"Buyurtmalar\" bo'limida kuzating",
+    "offerAlreadyAnswered": "Bu taklifga allaqachon javob berilgan",
     "photo": "Rasm",
     "notFound": "Suhbat topilmadi"
   },

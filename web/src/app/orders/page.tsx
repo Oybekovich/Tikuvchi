@@ -6,9 +6,7 @@ import EmptyState from "@/components/EmptyState";
 import PriceTag from "@/components/PriceTag";
 import StatusChip from "@/components/StatusChip";
 import OrderCardActions from "@/components/OrderCardActions";
-import {
-  PhPackage,
-} from "@/components/PhosphorIcons";
+import { PhPackage } from "@/components/PhosphorIcons";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatOrderNumber } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -30,18 +28,46 @@ export default async function OrdersPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) return null;
 
   const { data: orders } = await supabase
     .from("orders")
     .select(
       `id, status, payment_status, total_price, estimated_ready_at, created_at, source,
-       usta_id,
+       usta_id, client_id,
        usta_profiles!inner(profiles!inner(full_name, avatar_url)),
        order_items(title)`
     )
-    .or(`client_id.eq.${user!.id},usta_id.eq.${user!.id}`)
+    .or(`client_id.eq.${user.id},usta_id.eq.${user.id}`)
     .in("status", finished ? [...FINISHED_STATUSES] : [...ACTIVE_STATUSES])
     .order("created_at", { ascending: false });
+
+  const orderList = orders ?? [];
+
+  // Usta o'z buyurtmalarini ko'rganda kartochkada MIJOZning ismi turishi
+  // kerak — o'z ismi emas. Usta profili so'rovda allaqachon bor, mijoz
+  // profillari alohida tortiladi.
+  const clientIds = Array.from(
+    new Set(
+      orderList
+        .filter((o) => o.usta_id === user.id && o.client_id !== user.id)
+        .map((o) => o.client_id)
+    )
+  );
+
+  const clientMap: Record<
+    string,
+    { full_name: string; avatar_url: string | null }
+  > = {};
+  if (clientIds.length > 0) {
+    const { data: clients } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .in("id", clientIds);
+    for (const c of clients ?? []) {
+      clientMap[c.id] = { full_name: c.full_name, avatar_url: c.avatar_url };
+    }
+  }
 
   return (
     <>
@@ -76,10 +102,15 @@ export default async function OrdersPage({
         </div>
 
         <div className="mt-4 space-y-3">
-          {orders && orders.length > 0 ? (
-            orders.map((order) => {
-              const ustaProfile = order.usta_profiles.profiles;
-              const isUsta = user!.id === order.usta_id;
+          {orderList.length > 0 ? (
+            orderList.map((order) => {
+              const isUsta = user.id === order.usta_id;
+              const counterparty = isUsta
+                ? clientMap[order.client_id]
+                : order.usta_profiles.profiles;
+              const name = counterparty?.full_name ?? "—";
+              const avatarUrl = counterparty?.avatar_url ?? null;
+
               return (
                 <div key={order.id}>
                   <Link
@@ -94,17 +125,13 @@ export default async function OrdersPage({
                       <StatusChip status={order.status} />
                     </div>
                     <div className="mt-3 flex items-center gap-3">
-                      <Avatar
-                        name={ustaProfile.full_name}
-                        src={ustaProfile.avatar_url}
-                        size="md"
-                      />
+                      <Avatar name={name} src={avatarUrl} size="md" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-bold text-ink-900">
                           {order.order_items[0]?.title ?? "—"}
                         </p>
                         <p className="text-xs text-ink-500">
-                          {ustaProfile.full_name}
+                          {isUsta ? `${t("orders.client")}: ${name}` : name}
                         </p>
                       </div>
                       <PriceTag amount={order.total_price} size="sm" />
@@ -117,11 +144,16 @@ export default async function OrdersPage({
                       </p>
                     )}
                   </Link>
-                  {isUsta && order.status !== "cancelled" && order.status !== "completed" && (
-                    <div className="mt-2 px-4">
-                      <OrderCardActions orderId={order.id} status={order.status} />
-                    </div>
-                  )}
+                  {order.status !== "cancelled" &&
+                    order.status !== "completed" && (
+                      <div className="mt-2 px-4">
+                        <OrderCardActions
+                          orderId={order.id}
+                          status={order.status}
+                          isUsta={isUsta}
+                        />
+                      </div>
+                    )}
                 </div>
               );
             })
