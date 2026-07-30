@@ -7,9 +7,29 @@ import Button from "@/components/Button";
 import { IconScissors } from "@/components/Icons";
 import { createClient } from "@/lib/supabase/client";
 import { PHONE_PREFIX, formatPhone } from "@/lib/format";
+import {
+  type ValidationError,
+  validateEmail,
+  validateFullName,
+  validatePassword,
+  validatePhone,
+} from "@/lib/validation";
 import { t } from "@/lib/i18n";
 
 type Props = { mode: "login" | "register" };
+
+type FieldName = "fullName" | "phone" | "email" | "password";
+type Errors = Partial<Record<FieldName, ValidationError | null>>;
+
+/** Maydon ostidagi xato satri — brauzerning inglizcha oynasi o'rniga */
+function FieldError({ error }: { error: ValidationError | null | undefined }) {
+  if (!error) return null;
+  return (
+    <span className="mt-1 block text-xs font-semibold text-red-700">
+      {t(error.key, error.vars)}
+    </span>
+  );
+}
 
 /** Kirish / ro'yxatdan o'tish formasi (email + parol, keyinchalik telefon-OTP uchun joy) */
 export default function AuthForm({ mode }: Props) {
@@ -24,15 +44,52 @@ export default function AuthForm({ mode }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Errors>({});
+  // Xatolarni faqat birinchi yuborishdan keyin ko'rsatamiz — yozayotgan
+  // paytda darrov qizarish bezovta qiladi
+  const [checked, setChecked] = useState(false);
 
   const inputCls =
-    "w-full rounded-xl border border-cream-200 bg-white px-3.5 py-3 text-sm text-ink-900 outline-none focus:border-terra-400";
+    "w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-ink-900 outline-none focus:border-terra-400";
+  const fieldCls = (name: FieldName) =>
+    `${inputCls} ${errors[name] ? "border-red-400" : "border-cream-200"}`;
+
+  function collectErrors(): Errors {
+    const next: Errors = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+    if (mode === "register") {
+      next.fullName = validateFullName(fullName);
+      next.phone = validatePhone(phone);
+    }
+    return next;
+  }
+
+  /** Yuborishdan keyin har o'zgarishda qayta tekshiramiz */
+  function revalidate(patch: Partial<Record<FieldName, string>>) {
+    if (!checked) return;
+    setErrors((prev) => {
+      const next = { ...prev };
+      if ("email" in patch) next.email = validateEmail(patch.email!);
+      if ("password" in patch) next.password = validatePassword(patch.password!);
+      if ("fullName" in patch) next.fullName = validateFullName(patch.fullName!);
+      if ("phone" in patch) next.phone = validatePhone(patch.phone!);
+      return next;
+    });
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
+    setChecked(true);
     setError(null);
     setInfo(null);
+
+    const found = collectErrors();
+    setErrors(found);
+    if (Object.values(found).some(Boolean)) return;
+
+    setBusy(true);
     const supabase = createClient();
 
     try {
@@ -101,7 +158,9 @@ export default function AuthForm({ mode }: Props) {
         </p>
       </div>
 
-      <form onSubmit={submit} className="space-y-3">
+      {/* noValidate: brauzerning inglizcha tekshiruv oynasi o'chiriladi,
+          xabarlar o'zbekcha va maydon ostida ko'rsatiladi */}
+      <form onSubmit={submit} noValidate className="space-y-3">
         {mode === "register" && (
           <>
             <label className="block">
@@ -110,12 +169,16 @@ export default function AuthForm({ mode }: Props) {
               </span>
               <input
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                  revalidate({ fullName: e.target.value });
+                }}
                 placeholder="Ism familiya"
                 autoComplete="name"
-                className={inputCls}
+                aria-invalid={Boolean(errors.fullName)}
+                className={fieldCls("fullName")}
               />
+              <FieldError error={errors.fullName} />
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-bold text-ink-500">
@@ -123,7 +186,11 @@ export default function AuthForm({ mode }: Props) {
               </span>
               <input
                 value={phone}
-                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                onChange={(e) => {
+                  const next = formatPhone(e.target.value);
+                  setPhone(next);
+                  revalidate({ phone: next });
+                }}
                 onFocus={() => {
                   if (!phone) setPhone(PHONE_PREFIX);
                 }}
@@ -134,8 +201,10 @@ export default function AuthForm({ mode }: Props) {
                 placeholder="+998 90 123 45 67"
                 inputMode="tel"
                 autoComplete="tel"
-                className={inputCls}
+                aria-invalid={Boolean(errors.phone)}
+                className={fieldCls("phone")}
               />
+              <FieldError error={errors.phone} />
             </label>
           </>
         )}
@@ -144,15 +213,21 @@ export default function AuthForm({ mode }: Props) {
             {t("auth.email")}
           </span>
           <input
+            // type="email" mobil klaviaturani to'g'ri ochadi; tekshiruvni
+            // esa formadagi noValidate o'chiradi
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            onChange={(e) => {
+              setEmail(e.target.value);
+              revalidate({ email: e.target.value });
+            }}
             placeholder="ism@mail.uz"
             inputMode="email"
             autoComplete="email"
-            className={inputCls}
+            aria-invalid={Boolean(errors.email)}
+            className={fieldCls("email")}
           />
+          <FieldError error={errors.email} />
         </label>
         <label className="block">
           <span className="mb-1 block text-xs font-bold text-ink-500">
@@ -161,13 +236,16 @@ export default function AuthForm({ mode }: Props) {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              revalidate({ password: e.target.value });
+            }}
             placeholder={t("auth.passwordMin")}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
-            className={inputCls}
+            aria-invalid={Boolean(errors.password)}
+            className={fieldCls("password")}
           />
+          <FieldError error={errors.password} />
         </label>
 
         {error && (
