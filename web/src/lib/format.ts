@@ -76,28 +76,79 @@ const UZ_MONTHS = [
   "dekabr",
 ];
 
-/** Sana: 16-iyul, 2026 */
-export function formatDate(value: string | Date): string {
-  const d = typeof value === "string" ? new Date(value) : value;
-  return `${d.getDate()}-${UZ_MONTHS[d.getMonth()]}, ${d.getFullYear()}`;
+/** Faqat sana: "2026-07-19" (timestamptz emas) */
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Barcha sana va vaqtlar Toshkent vaqtida ko'rsatiladi.
+ *
+ * Sabab: sahifalar serverda render qilinadi (Vercel — UTC), foydalanuvchi
+ * esa O'zbekistonda (UTC+5). Mahalliy vaqtga tayanilsa, Toshkent bo'yicha
+ * kechasi 02:00 da yaratilgan buyurtma serverda BIR KUN OLDIN ko'rinadi.
+ * Android ham qurilma vaqtida, ya'ni Toshkentda formatlaydi — natijalar
+ * bir xil bo'lishi shart (docs/01).
+ */
+const TASHKENT = "Asia/Tashkent";
+
+function tashkentParts(d: Date): { day: number; month: number; year: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TASHKENT,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(d);
+  const get = (type: string) =>
+    Number(parts.find((p) => p.type === type)?.value ?? 0);
+  return { day: get("day"), month: get("month") - 1, year: get("year") };
 }
 
-/** Chat ro'yxati uchun qisqa vaqt: bugun bo'lsa soat, aks holda sana */
+/**
+ * Sana: 16-iyul, 2026
+ *
+ * DB'da sana ustunlari ikki xil turda: `timestamptz` va oddiy `date`
+ * (masalan `orders.estimated_ready_at`). Sof sana — bu kalendar sanasi,
+ * unda vaqt mintaqasi umuman yo'q, shuning uchun matnning o'zidan
+ * o'qiladi: `new Date("2026-07-19")` uni UTC yarim tuni deb talqin qilib,
+ * UTC'dan orqadagi mintaqada bir kunga orqaga surib yuboradi.
+ */
+export function formatDate(value: string | Date): string {
+  if (typeof value === "string" && DATE_ONLY.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    return `${day}-${UZ_MONTHS[month - 1]}, ${year}`;
+  }
+  const d = typeof value === "string" ? new Date(value) : value;
+  const { day, month, year } = tashkentParts(d);
+  return `${day}-${UZ_MONTHS[month]}, ${year}`;
+}
+
+/**
+ * Chat ro'yxati uchun qisqa vaqt: bugun bo'lsa soat, aks holda sana.
+ * Kun chegarasi ham Toshkent vaqtida hisoblanadi — aks holda server
+ * (UTC) va foydalanuvchining qurilmasi "bugun"ni har xil tushunadi.
+ */
 export function formatChatTime(value: string): string {
   const d = new Date(value);
   const now = new Date();
-  const sameDay = d.toDateString() === now.toDateString();
-  if (sameDay) {
-    return d.toLocaleTimeString("uz-UZ", {
+
+  const kun = (x: Date) => {
+    const { day, month, year } = tashkentParts(x);
+    return `${year}-${month}-${day}`;
+  };
+
+  if (kun(d) === kun(now)) {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: TASHKENT,
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-    });
+    }).format(d);
   }
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  if (d.toDateString() === yesterday.toDateString()) return t("common.yesterday");
-  return `${d.getDate()}-${UZ_MONTHS[d.getMonth()]}`;
+
+  const kecha = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  if (kun(d) === kun(kecha)) return t("common.yesterday");
+
+  const { day, month } = tashkentParts(d);
+  return `${day}-${UZ_MONTHS[month]}`;
 }
 
 /** Ish vaqtini "09:00" ko'rinishiga keltiradi (DB'da "09:00:00") */

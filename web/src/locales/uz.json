@@ -65,6 +65,8 @@
     "aboutTitle": "Usta haqida",
     "services": "Xizmatlar va narxlar",
     "portfolio": "Portfolio",
+    "portfolioItemFallback": "{name} ishi",
+    "portfolioItemHint": "Shunga o'xshash buyurtma bermoqchimisiz?",
     "reviews": "Mijozlar sharhlari",
     "reviewsCount": "{count} ta sharh",
     "workHours": "Ish vaqti: {start} – {end}",
