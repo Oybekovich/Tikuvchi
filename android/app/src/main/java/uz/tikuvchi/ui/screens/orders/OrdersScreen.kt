@@ -123,7 +123,8 @@ fun OrdersScreen(
                         acting = s.acting == order.id,
                         onAccept = { vm.accept(order.id) },
                         onCancel = { vm.reject(order.id) },
-                        status = if (isUsta) order.status else null,
+                        status = order.status,
+                        isUsta = isUsta,
                         onProgress = { to -> vm.progressStatus(order.id, to) },
                     )
                 }
@@ -157,6 +158,7 @@ private fun OrderCard(
     onAccept: () -> Unit = {},
     onCancel: () -> Unit = {},
     status: OrderStatus? = null,
+    isUsta: Boolean = false,
     onProgress: (String) -> Unit = {},
 ) {
     val usta = order.usta.profiles
@@ -227,10 +229,16 @@ private fun OrderCard(
         }
 
         if (status != null && !showActions) {
-            val next = when (status) {
-                OrderStatus.ACCEPTED -> "in_progress" to stringResource(R.string.order_start)
-                OrderStatus.IN_PROGRESS -> "ready" to stringResource(R.string.order_mark_ready)
-                OrderStatus.READY -> "completed" to stringResource(R.string.order_mark_completed)
+            // Usta ishni "tayyor"gacha olib boradi, yakunlashni MIJOZ
+            // tasdiqlaydi. Buni baza triggeri ham majburlaydi
+            // (0008_role_guards.sql) — usta ready->completed qila olmaydi.
+            val next = when {
+                isUsta && status == OrderStatus.ACCEPTED ->
+                    "in_progress" to stringResource(R.string.order_start)
+                isUsta && status == OrderStatus.IN_PROGRESS ->
+                    "ready" to stringResource(R.string.order_mark_ready)
+                !isUsta && status == OrderStatus.READY ->
+                    "completed" to stringResource(R.string.order_confirm_received)
                 else -> null to null
             }
             val nextStatus = next.first

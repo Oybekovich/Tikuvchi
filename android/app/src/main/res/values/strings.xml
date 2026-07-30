@@ -233,6 +233,8 @@
     <string name="order_start">Ishni boshlash</string>
     <string name="order_mark_ready">Tayyor deb belgilash</string>
     <string name="order_mark_completed">Yakunlangan deb belgilash</string>
+    <string name="order_confirm_received">Qabul qilib oldim</string>
+    <string name="order_waiting_client_confirm">Mijoz qabul qilganini tasdiqlashi kutilmoqda</string>
 
     <string name="save">Saqlash</string>
     <string name="cancel">Bekor qilish</string>

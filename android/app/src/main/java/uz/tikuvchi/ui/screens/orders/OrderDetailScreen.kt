@@ -151,7 +151,9 @@ fun OrderDetailScreen(
                         Payment(
                             status = order.paymentStatus,
                             totalPrice = order.totalPrice,
-                            active = order.status != OrderStatus.CANCELLED,
+                            // To'lovni faqat usta belgilaydi — pulni u oladi.
+                            // Mijozga tugma ko'rsatilsa, baza uni rad etadi.
+                            active = order.status != OrderStatus.CANCELLED && vm.isUsta(),
                             busy = s.acting,
                             onAdvance = { vm.advancePayment(it) },
                         )
@@ -181,11 +183,18 @@ fun OrderDetailScreen(
                                 onClick = { confirmCancel = true },
                             )
                         }
-                    } else if (vm.isUsta()) {
-                        val next = when (order.status) {
-                            OrderStatus.ACCEPTED -> "in_progress" to stringResource(R.string.order_start)
-                            OrderStatus.IN_PROGRESS -> "ready" to stringResource(R.string.order_mark_ready)
-                            OrderStatus.READY -> "completed" to stringResource(R.string.order_mark_completed)
+                    } else {
+                        // Usta "tayyor"gacha olib boradi, yakunlashni mijoz
+                        // tasdiqlaydi (0008_role_guards.sql triggeri ham
+                        // shuni majburlaydi).
+                        val isUsta = vm.isUsta()
+                        val next = when {
+                            isUsta && order.status == OrderStatus.ACCEPTED ->
+                                "in_progress" to stringResource(R.string.order_start)
+                            isUsta && order.status == OrderStatus.IN_PROGRESS ->
+                                "ready" to stringResource(R.string.order_mark_ready)
+                            !isUsta && order.status == OrderStatus.READY ->
+                                "completed" to stringResource(R.string.order_confirm_received)
                             else -> null to null
                         }
                         val (nextStatus, nextLabel) = next
@@ -195,6 +204,12 @@ fun OrderDetailScreen(
                                 onClick = { vm.progressStatus(nextStatus) },
                                 loading = s.acting,
                                 modifier = Modifier.fillMaxWidth(),
+                            )
+                        } else if (isUsta && order.status == OrderStatus.READY) {
+                            Text(
+                                stringResource(R.string.order_waiting_client_confirm),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Ink500,
                             )
                         }
                     }
