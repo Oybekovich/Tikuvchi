@@ -30,7 +30,9 @@ export default function PriceOfferBubble({
   onDecline,
 }: Props) {
   return (
-    <div className="w-72 max-w-full overflow-hidden rounded-2xl border border-terra-200 bg-white shadow-card">
+    // 336px ekranda puffak `max-w-[80%]` ichida 230px ga siqiladi — qat'iy
+    // `w-72` (288px) o'sha yerda toshib ketardi
+    <div className="w-[min(18rem,100%)] overflow-hidden rounded-2xl border border-terra-200 bg-white shadow-card">
       <div className="flex items-center gap-2 bg-terra-50 px-4 py-2.5">
         <IconTag size={16} className="text-terra-600" />
         <span className="text-sm font-bold text-terra-800">
@@ -50,7 +52,9 @@ export default function PriceOfferBubble({
       </div>
       <div className="border-t border-cream-200 px-4 py-3">
         {status === "pending" && canRespond ? (
-          <div className="flex gap-2">
+          // "Qabul qilish" + "Rad etish" yonma-yon 235px talab qiladi —
+          // tor ekranda ustma-ust turadi
+          <div className="flex flex-col gap-2 xs:flex-row">
             <Button
               onClick={onAccept}
               loading={responding}

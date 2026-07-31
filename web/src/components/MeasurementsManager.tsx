@@ -245,7 +245,10 @@ export default function MeasurementsManager({
               </div>
             </div>
 
-            <dl className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
+            {/* 336px da uch ustunda katakcha 80px bo'lib, "Yelka kengligi"
+                ikki qatorga tushadi va qatorlar balandligi notekis bo'ladi
+                (62px va 47px). Tor ekranda ikkita ustun yetarli. */}
+            <dl className="mt-2 grid grid-cols-2 gap-2 xs:grid-cols-3 sm:grid-cols-6">
               {NUMERIC_FIELDS.map((field) =>
                 m[field] !== null ? (
                   <div key={field} className="rounded-xl bg-cream-100 px-2 py-1.5 text-center">

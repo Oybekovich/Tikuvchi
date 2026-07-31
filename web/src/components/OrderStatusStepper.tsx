@@ -27,8 +27,11 @@ function progressFor(status: Enums<"order_status">): {
 
 /**
  * 3 bosqichli holat ko'rsatkichi: Qabul qilindi → Tayyorlanmoqda → Tayyor.
- * Yorliqlar har doim bitta qatorda, ustma-ust tushmaydi (har biriga alohida
- * grid ustuni, nowrap + kichik shrift).
+ *
+ * Har bir yorliqqa alohida grid ustuni tegadi. 336px li ekranda ustun eni
+ * 85px ga tushadi, "Tayyorlanmoqda" esa 87px — shuning uchun `nowrap` faqat
+ * `xs` dan yuqorida qo'llanadi: tor ekranda yorliq ikki qatorga bo'linadi,
+ * kesilib qolmaydi.
  */
 export default function OrderStatusStepper({
   status,
@@ -69,15 +72,15 @@ export default function OrderStatusStepper({
           })}
         </div>
       </div>
-      {/* Yorliqlar: alohida ustunlar, bir qator, qisqartirilmaydi */}
-      <div className="mt-2 grid grid-cols-3">
+      {/* Yorliqlar: alohida ustunlar; tor ekranda ikki qatorga bo'linadi */}
+      <div className="mt-2 grid grid-cols-3 items-start gap-1">
         {STEPS.map((step, i) => {
           const done = isDone(i);
           const active = i === activeIdx && status !== "cancelled";
           return (
             <span
               key={step}
-              className={`whitespace-nowrap text-center text-[11px] font-semibold sm:text-xs ${
+              className={`text-center text-[10px] font-semibold leading-tight tracking-tight xs:whitespace-nowrap xs:text-[11px] xs:tracking-normal sm:text-xs ${
                 done || active ? "text-terra-700" : "text-ink-500"
               }`}
             >

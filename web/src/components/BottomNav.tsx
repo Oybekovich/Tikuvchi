@@ -118,11 +118,18 @@ function SideTab({
         )}
       </span>
       {/* Fon, ichki bo'shliq va matn kengligi bir vaqtda harakatlanadi —
-          aks holda yozuv sakrab chiqqandek ko'rinadi */}
+          aks holda yozuv sakrab chiqqandek ko'rinadi.
+
+          `xs` (384px) dan tor ekranda yozuv umuman chiqmaydi: besh element
+          yorliq bilan birga 376px dan boshlab sig'adi, undan pastda panel
+          toshib ketardi (336px da 56px, 360px da 16px). Ikonkalar o'z
+          joyida qoladi, `aria-label` esa har doim o'qiladi. */}
       <span
         aria-hidden
         className={`overflow-hidden whitespace-nowrap text-[11px] font-bold leading-none transition-all duration-200 ease-out ${
-          active ? "ms-1.5 max-w-28 opacity-100" : "ms-0 max-w-0 opacity-0"
+          active
+            ? "ms-0 max-w-0 opacity-0 xs:ms-1.5 xs:max-w-28 xs:opacity-100"
+            : "ms-0 max-w-0 opacity-0"
         }`}
       >
         {label}

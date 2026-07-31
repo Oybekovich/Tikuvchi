@@ -30,6 +30,12 @@
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
+  /* Tailwind'ning eng kichik nuqtasi 40rem (640px) — u telefonlar orasidagi
+     farqni ushlamaydi. `xs` 384px da turadi: brauzerda o'lchanganicha, pastki
+     paneldagi faol tab yorlig'i bilan birga aynan 376px dan sig'adi, shuning
+     uchun chegara sal yuqoriroqqa — zaxira bilan — qo'yilgan. */
+  --breakpoint-xs: 24rem;
+
   --shadow-card: 0 1px 3px rgba(88, 45, 32, 0.07),
     0 4px 14px rgba(88, 45, 32, 0.06);
   --shadow-nav: 0 -2px 12px rgba(88, 45, 32, 0.08);
