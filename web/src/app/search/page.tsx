@@ -102,7 +102,7 @@ export default async function SearchPage({
   return (
     <>
       <AppHeader back backHref="/" />
-      <main className="mx-auto max-w-3xl px-4 pt-4 pb-6">
+      <main className="mx-auto max-w-5xl px-4 pt-4 pb-6 md:px-6">
         <h1 className="sr-only">{t("search.title")}</h1>
         <Suspense>
           <SearchBar />
@@ -115,7 +115,7 @@ export default async function SearchPage({
 
         <div className="mt-3">
           {results.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
               {results.map((u) => (
                 <UstaCard key={u.user_id} usta={u} />
               ))}

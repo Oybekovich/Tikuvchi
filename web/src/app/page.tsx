@@ -34,7 +34,10 @@ export default async function HomePage() {
   return (
     <>
       <AppHeader />
-      <main className="mx-auto max-w-3xl px-4 pt-4">
+      {/* Ro'yxatli sahifalar `max-w-5xl` (1024px): keng ekranda uchta karta
+          sig'adi va ular siqilmaydi. 1280px sinab ko'rilganda karta 292px ga
+          tushib, sakkiz ismdan oltitasi kesilib ketardi. */}
+      <main className="mx-auto max-w-5xl px-4 pt-4 md:px-6">
         {/* Qidiruv paneli — header ostida, uni almashtirmaydi */}
         <Suspense>
           <SearchBar />
@@ -58,7 +61,7 @@ export default async function HomePage() {
             {t("home.featured")}
           </h2>
           {ustas && ustas.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
               {ustas.map((u) => (
                 <UstaCard key={u.user_id} usta={u} />
               ))}

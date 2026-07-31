@@ -74,7 +74,10 @@ export default function AppHeader({ back = false, backHref = "/", title }: Props
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-cream-200 bg-cream-50/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-3">
+        {/* Ro'yxatli sahifalar kontenti bilan bir xil kenglik (`max-w-5xl`) —
+            aks holda keng ekranda logo va profil ikonkasi kontentdan
+            ichkarida qolib, tekislanmagandek ko'rinardi. */}
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-3 md:px-6">
           {back ? (
             <button
               onClick={goBack}

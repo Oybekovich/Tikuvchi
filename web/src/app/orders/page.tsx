@@ -72,13 +72,13 @@ export default async function OrdersPage({
   return (
     <>
       <AppHeader />
-      <main className="mx-auto max-w-3xl px-4 pt-4 pb-6">
+      <main className="mx-auto max-w-5xl px-4 pt-4 pb-6 md:px-6">
         <h1 className="text-xl font-extrabold text-ink-900">
           {t("orders.title")}
         </h1>
 
-        {/* Holat bo'yicha filtr */}
-        <div className="mt-3 flex gap-2 rounded-2xl bg-cream-200 p-1">
+        {/* Holat bo'yicha filtr — ikki tab keng ekranda cho'zilib ketmasin */}
+        <div className="mt-3 flex gap-2 rounded-2xl bg-cream-200 p-1 sm:max-w-sm">
           {[
             { href: "/orders", label: t("orders.active"), active: !finished },
             {
@@ -101,7 +101,16 @@ export default async function OrdersPage({
           ))}
         </div>
 
-        <div className="mt-4 space-y-3">
+        {/* Bo'sh holat kartasi grid ichida cho'zilib ketmasligi uchun grid
+            faqat buyurtmalar bo'lganda qo'llanadi. Buyurtma kartasi usta
+            kartasidan zichroq, shuning uchun ko'pi bilan ikki ustun. */}
+        <div
+          className={
+            orderList.length > 0
+              ? "mt-4 grid items-start gap-3 md:grid-cols-2 md:gap-4"
+              : "mt-4"
+          }
+        >
           {orderList.length > 0 ? (
             orderList.map((order) => {
               const isUsta = user.id === order.usta_id;

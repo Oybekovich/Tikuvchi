@@ -44,11 +44,16 @@ export default function UstaCard({ usta }: { usta: UstaCardData }) {
             size="lg"
           />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="truncate text-base font-bold text-ink-900">
+            {/* Uch ustunli gridda karta ~315px bo'ladi va bitta qatorga
+                sig'maydigan ismlar chiqadi ("Nafisa Abdullayeva"). Kesish
+                o'rniga ikkinchi qatorga o'tkazamiz — reyting yorlig'i esa
+                yuqoriga tekislanadi, aks holda ism uzayganda u pastga
+                siljib ketardi. */}
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="line-clamp-2 text-base font-bold text-ink-900">
                 {usta.profiles.full_name}
               </h3>
-              <RatingBadge rating={usta.rating_avg} />
+              <RatingBadge rating={usta.rating_avg} className="shrink-0" />
             </div>
             {usta.district && (
               <p className="mt-0.5 flex items-center gap-1 text-sm text-ink-500">
