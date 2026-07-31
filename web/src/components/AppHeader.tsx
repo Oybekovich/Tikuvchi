@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   IconBack,
@@ -18,7 +18,9 @@ import {
 } from "@/components/Icons";
 import { signOut } from "@/lib/auth";
 import { useUser } from "@/lib/useUser";
+import { isActivePath } from "@/lib/nav";
 import { t } from "@/lib/i18n";
+import { useUnreadChat } from "@/hooks/useUnreadChat";
 
 type Props = {
   /** Ichki sahifalarda orqaga strelka ko'rsatiladi */
@@ -48,13 +50,26 @@ const MENU_ITEMS = [
 ] as const;
 
 /**
- * Yagona umumiy header: chapda hamburger (bosh sahifalar) yoki orqaga strelka
- * (ichki sahifalar), markazda logo, o'ngda profil ikonkasi.
+ * Desktop menyusida "Profil" yo'q — u o'ngdagi ikonkada turadi va ikki marta
+ * ko'rsatish joyni behuda egallardi.
+ */
+const DESKTOP_NAV = MENU_ITEMS.filter((item) => item.href !== "/profile");
+
+/**
+ * Yagona umumiy header.
+ *
+ *  - `< md`: chapda hamburger (bosh sahifalar) yoki orqaga strelka (ichki
+ *    sahifalar), markazda logo yoki sahifa sarlavhasi, o'ngda profil.
+ *  - `>= md`: chapda logo, markazda gorizontal menyu, o'ngda profil. Pastki
+ *    suzuvchi panel bu kenglikda yashiriladi, shuning uchun navigatsiya shu
+ *    yerga ko'chadi va hamburger kerak bo'lmaydi.
  */
 export default function AppHeader({ back = false, backHref = "/", title }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useUser();
+  const { unreadCount } = useUnreadChat();
 
   function goBack() {
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -78,47 +93,99 @@ export default function AppHeader({ back = false, backHref = "/", title }: Props
             aks holda keng ekranda logo va profil ikonkasi kontentdan
             ichkarida qolib, tekislanmagandek ko'rinardi. */}
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-3 md:px-6">
-          {back ? (
-            <button
-              onClick={goBack}
-              aria-label={t("common.back")}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-ink-900 hover:bg-cream-200 active:bg-cream-300"
+          {/* Chap tomon: orqaga/hamburger + desktopdagi logo */}
+          <div className="flex items-center gap-1 md:gap-3">
+            {back ? (
+              <button
+                onClick={goBack}
+                aria-label={t("common.back")}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-900 hover:bg-cream-200 active:bg-cream-300"
+              >
+                <IconBack />
+              </button>
+            ) : (
+              <button
+                onClick={() => setMenuOpen(true)}
+                aria-label={t("menu.title")}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-900 hover:bg-cream-200 active:bg-cream-300 md:hidden"
+              >
+                <IconMenu />
+              </button>
+            )}
+            <Link
+              href="/"
+              aria-label={t("app.name")}
+              className="hidden md:inline-flex"
             >
-              <IconBack />
-            </button>
-          ) : (
-            <button
-              onClick={() => setMenuOpen(true)}
-              aria-label={t("menu.title")}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-ink-900 hover:bg-cream-200 active:bg-cream-300"
-            >
-              <IconMenu />
-            </button>
-          )}
+              <Logo />
+            </Link>
+          </div>
 
+          {/* Markaz — faqat telefonda: logo yoki sahifa sarlavhasi */}
           {title ? (
-            <span className="max-w-[60%] truncate text-base font-bold text-ink-900">
+            <span className="max-w-[60%] truncate text-base font-bold text-ink-900 md:hidden">
               {title}
             </span>
           ) : (
-            <Link href="/" aria-label={t("app.name")}>
+            <Link href="/" aria-label={t("app.name")} className="md:hidden">
               <Logo />
             </Link>
           )}
 
+          {/* Desktop navigatsiyasi */}
+          <nav
+            aria-label={t("menu.title")}
+            className="hidden md:flex md:items-center md:gap-0.5 lg:gap-1"
+          >
+            {DESKTOP_NAV.map(({ href, label }) => {
+              const active = isActivePath(pathname, href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative rounded-xl px-2.5 py-2 text-sm font-bold transition-colors lg:px-3 ${
+                    active
+                      ? "bg-terra-50 text-terra-700"
+                      : "text-ink-500 hover:bg-cream-200 hover:text-ink-900"
+                  }`}
+                >
+                  {t(label)}
+                  {href === "/chat" && unreadCount > 0 && (
+                    <span
+                      aria-hidden
+                      className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+
           <Link
             href={user ? "/profile" : "/auth/login"}
             aria-label={t("nav.profile")}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-ink-900 hover:bg-cream-200 active:bg-cream-300"
+            aria-current={isActivePath(pathname, "/profile") ? "page" : undefined}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-cream-200 active:bg-cream-300 ${
+              isActivePath(pathname, "/profile")
+                ? "bg-terra-50 text-terra-700"
+                : "text-ink-900"
+            }`}
           >
             <IconUser />
           </Link>
         </div>
       </header>
 
-      {/* Yon menyu (drawer) */}
+      {/* Yon menyu (drawer) — faqat telefonda. `md:hidden` kerak: drawer ochiq
+          turganda oyna kengaytirilsa, u desktop menyusi ustida osilib
+          qolmasligi uchun. */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+        <div
+          className="fixed inset-0 z-50 md:hidden"
+          role="dialog"
+          aria-modal="true"
+        >
           <div
             className="absolute inset-0 bg-ink-900/40"
             onClick={() => setMenuOpen(false)}

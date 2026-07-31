@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
@@ -22,7 +30,12 @@ function saveReadMap(map: ReadMap) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
 }
 
-export function useUnreadChat() {
+/**
+ * Hisoblashning o'zi. To'g'ridan-to'g'ri chaqirilmaydi — har chaqiruv alohida
+ * Realtime kanali va alohida boshlang'ich so'rov ochadi. Sahifada bitta nusxa
+ * bo'lishi uchun `UnreadChatProvider` orqali tarqatiladi.
+ */
+function useUnreadChatState() {
   const [unreadConvs, setUnreadConvs] = useState<string[]>([]);
   const supabaseRef = useRef(createClient());
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -158,4 +171,33 @@ export function useUnreadChat() {
     markConversationRead,
     isUnread,
   };
+}
+
+type UnreadChat = ReturnType<typeof useUnreadChatState>;
+
+const UnreadChatContext = createContext<UnreadChat | null>(null);
+
+/**
+ * Butun ilova uchun bitta hisob-kitob va bitta Realtime obunasi.
+ *
+ * O'qilmagan xabar belgisi bir nechta joyda kerak: pastki panel (telefon),
+ * header menyusi (desktop), suhbatlar ro'yxati va suhbat oynasi. Har biri
+ * hookni o'zi chaqirsa, shuncha kanal ochilardi — shuning uchun holat
+ * `AppShell` darajasida bir marta olinadi.
+ */
+export function UnreadChatProvider({ children }: { children: ReactNode }) {
+  const value = useUnreadChatState();
+  return (
+    <UnreadChatContext.Provider value={value}>
+      {children}
+    </UnreadChatContext.Provider>
+  );
+}
+
+export function useUnreadChat(): UnreadChat {
+  const ctx = useContext(UnreadChatContext);
+  if (!ctx) {
+    throw new Error("useUnreadChat faqat UnreadChatProvider ichida ishlaydi");
+  }
+  return ctx;
 }

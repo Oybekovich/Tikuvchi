@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import BottomNav from "@/components/BottomNav";
+import { UnreadChatProvider } from "@/hooks/useUnreadChat";
 
 /**
  * Pastki tab-navigatsiya qaysi sahifalarda yashirilishini boshqaradi:
@@ -20,11 +21,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
     pathname === "/offline";
 
   return (
-    <>
-      {/* Panel endi kontent ustida suzadi, shuning uchun pastda ko'proq
-          bo'shliq kerak — aks holda oxirgi element panel ostida qolib ketadi */}
-      <div className={hideNav ? "min-h-dvh" : "min-h-dvh pb-24"}>{children}</div>
+    <UnreadChatProvider>
+      {/* Panel kontent ustida suzadi, shuning uchun pastda ko'proq bo'shliq
+          kerak — aks holda oxirgi element panel ostida qolib ketadi.
+          `md` dan boshlab panel yashiriladi (navigatsiya header'ga ko'chadi),
+          shuning uchun bu bo'shliq ham kichrayadi. */}
+      <div className={hideNav ? "min-h-dvh" : "min-h-dvh pb-24 md:pb-10"}>
+        {children}
+      </div>
       {!hideNav && <BottomNav />}
-    </>
+    </UnreadChatProvider>
   );
 }

@@ -26,15 +26,19 @@ export default function UstaCard({ usta }: { usta: UstaCardData }) {
       className="block overflow-hidden rounded-2xl bg-white shadow-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
     >
       {/* Cover lentasi — Android'dagi UstaCardItem bilan bir xil balandlik.
-          Rasmi yo'q ustada butunlay tashlab ketiladi: bo'sh to'rtburchak
-          hech narsa qo'shmaydi, faqat kartani cho'zadi. */}
-      {usta.cover_image_url && (
+          Rasmi yo'q ustada gradient chiziq qoladi: ilgari lenta butunlay
+          tashlab ketilardi va uch ustunli gridda bunday kartalar qator
+          balandligiga cho'zilib, ostida bo'sh joy qolardi. Gradient usta
+          profilidagi hero bilan bir xil. */}
+      {usta.cover_image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={usta.cover_image_url}
           alt=""
           className="h-[88px] w-full bg-cream-200 object-cover"
         />
+      ) : (
+        <div className="h-[88px] w-full bg-gradient-to-br from-terra-200 to-terra-400" />
       )}
       <div className="p-4">
         <div className="flex items-start gap-3">

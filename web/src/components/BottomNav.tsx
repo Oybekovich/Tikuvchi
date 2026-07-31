@@ -11,6 +11,7 @@ import {
   PhUser,
 } from "@/components/PhosphorIcons";
 import { t } from "@/lib/i18n";
+import { isActivePath } from "@/lib/nav";
 import { useUnreadChat } from "@/hooks/useUnreadChat";
 
 type Tab = {
@@ -41,19 +42,16 @@ export default function BottomNav() {
   const pathname = usePathname();
   const { unreadCount } = useUnreadChat();
 
-  function isActive(href: string): boolean {
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(href + "/");
-  }
-
+  const isActive = (href: string) => isActivePath(pathname, href);
   const homeActive = isActive("/");
 
   return (
     <nav
       aria-label={t("menu.title")}
       // Panel kontent ustida suzadi; nav butun kenglikni egallagani uchun
-      // bosishlar faqat qutining o'ziga tushishi kerak
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-safe"
+      // bosishlar faqat qutining o'ziga tushishi kerak.
+      // `md:hidden` — o'sha kenglikdan navigatsiya header ichiga ko'chadi.
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-safe md:hidden"
     >
       <div className="mx-auto max-w-md px-4 pb-3">
         <div className="pointer-events-auto flex items-center justify-evenly rounded-[28px] bg-white p-2 shadow-float">
