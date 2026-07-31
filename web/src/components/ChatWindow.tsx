@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import AppHeader from "@/components/AppHeader";
 import Avatar from "@/components/Avatar";
 import PriceOfferBubble from "@/components/PriceOfferBubble";
 import { Spinner } from "@/components/Button";
@@ -30,6 +29,10 @@ type Props = {
 /**
  * Chat oynasi: matn, rasm va narx-taklif kartalari, Supabase Realtime bilan.
  * B yo'l: usta yuborgan narx taklifi qabul qilinsa, avtomatik buyurtma yaratiladi.
+ *
+ * Komponent o'z header'ini chizmaydi va balandligini o'rab turgan elementdan
+ * oladi (`h-full`): telefonda u ekranning header'dan qolgan qismini
+ * egallaydi, `lg` da esa suhbatlar ro'yxati yonidagi o'ng panel bo'ladi.
  */
 export default function ChatWindow({
   peerId,
@@ -295,8 +298,14 @@ export default function ChatWindow({
   }
 
   return (
-    <div className="flex h-dvh flex-col">
-      <AppHeader back backHref="/chat" title={peerName} />
+    <div className="flex h-full min-h-0 flex-col">
+      {/* Suhbatdosh nomi. Telefonda u sahifa header'ida turadi; `lg` da
+          header'ni navigatsiya egallaydi, shuning uchun nom shu panelga
+          ko'chadi. */}
+      <div className="hidden shrink-0 items-center gap-3 border-b border-cream-200 px-4 py-3 lg:flex">
+        <Avatar name={peerName} src={peerAvatarUrl} size="md" />
+        <span className="truncate font-bold text-ink-900">{peerName}</span>
+      </div>
 
       <main className="mx-auto w-full max-w-3xl flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {loading ? (
@@ -374,7 +383,7 @@ export default function ChatWindow({
       </main>
 
       {/* Xabar yozish paneli */}
-      <footer className="border-t border-cream-200 bg-cream-50">
+      <footer className="shrink-0 border-t border-cream-200 bg-cream-50">
         <div className="mx-auto flex max-w-3xl items-center gap-2 px-3 py-2.5 pb-safe">
           <input
             ref={fileRef}

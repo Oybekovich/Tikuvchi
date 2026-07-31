@@ -161,6 +161,8 @@
     "title": "Suhbatlar",
     "empty": "Suhbatlaringiz yo'q",
     "emptyHint": "Usta profilidan \"Yozish\" tugmasini bosing",
+    "selectConversation": "Suhbatni tanlang",
+    "selectConversationHint": "Chapdagi ro'yxatdan suhbatdoshni tanlang",
     "inputPlaceholder": "Xabar yozing…",
     "send": "Yuborish",
     "sendImage": "Rasm yuborish",

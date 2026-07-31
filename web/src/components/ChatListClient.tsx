@@ -7,28 +7,26 @@ import { formatChatTime } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { useUnreadChat } from "@/hooks/useUnreadChat";
 
-type ConvRaw = {
-  id: string;
-  client_id: string;
-  usta_id: string;
-  last_message_at: string;
-  messages: { content: string | null; message_type: string; created_at: string }[];
-};
-
-type Profile = { id: string; full_name: string; avatar_url: string | null };
+import type { ChatProfile, ConversationRow } from "@/lib/chat";
 
 export default function ChatListClient({
   conversations,
   profileMap,
   userId,
+  activePeerId,
+  variant = "page",
 }: {
-  conversations: ConvRaw[];
-  profileMap: Record<string, Profile>;
+  conversations: ConversationRow[];
+  profileMap: Record<string, ChatProfile>;
   userId: string;
+  /** Ikki panelli ko'rinishda ochiq turgan suhbat ajratib ko'rsatiladi */
+  activePeerId?: string;
+  /** `page` — alohida sahifa; `pane` — suhbat oynasi yonidagi yon panel */
+  variant?: "page" | "pane";
 }) {
   const { isUnread } = useUnreadChat();
 
-  function otherProfile(conv: ConvRaw): Profile | undefined {
+  function otherProfile(conv: ConversationRow): ChatProfile | undefined {
     const otherId = conv.client_id === userId ? conv.usta_id : conv.client_id;
     return profileMap[otherId];
   }
@@ -58,17 +56,21 @@ export default function ChatListClient({
   }
 
   return (
-    <div className="mt-4 space-y-2">
+    <div className={variant === "pane" ? "space-y-2 p-3" : "mt-4 space-y-2"}>
       {conversations.map((conv) => {
         const profile = otherProfile(conv);
         const last = conv.messages[0];
         const otherId = conv.client_id === userId ? conv.usta_id : conv.client_id;
         const unread = isUnread(conv.id);
+        const active = otherId === activePeerId;
         return (
           <Link
             key={conv.id}
             href={`/chat/${otherId}`}
-            className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-card transition-transform hover:-translate-y-0.5"
+            aria-current={active ? "page" : undefined}
+            className={`flex items-center gap-3 rounded-2xl p-4 shadow-card transition-transform hover:-translate-y-0.5 ${
+              active ? "bg-terra-50 ring-2 ring-terra-300" : "bg-white"
+            }`}
           >
             <Avatar
               name={profile?.full_name ?? ""}
