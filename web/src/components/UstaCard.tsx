@@ -21,9 +21,13 @@ export default function UstaCard({ usta }: { usta: UstaCardData }) {
     : null;
 
   return (
+    // Gridda kartalar qator balandligiga cho'ziladi. `flex flex-col` bo'lmasa
+    // ichki kontent tepada yig'ilib qolib, narx qatori har bir kartada boshqa
+    // balandlikda turardi (o'lchanganda 26px farq, birida ostida 42px bo'sh
+    // joy). Endi narx qatori har doim kartaning pastida.
     <Link
       href={`/usta/${usta.user_id}`}
-      className="block overflow-hidden rounded-2xl bg-white shadow-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
+      className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
     >
       {/* Cover lentasi — Android'dagi UstaCardItem bilan bir xil balandlik.
           Rasmi yo'q ustada gradient chiziq qoladi: ilgari lenta butunlay
@@ -40,8 +44,8 @@ export default function UstaCard({ usta }: { usta: UstaCardData }) {
       ) : (
         <div className="h-[88px] w-full bg-gradient-to-br from-terra-200 to-terra-400" />
       )}
-      <div className="p-4">
-        <div className="flex items-start gap-3">
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-3 flex items-start gap-3">
           <Avatar
             name={usta.profiles.full_name}
             src={usta.profiles.avatar_url}
@@ -78,7 +82,7 @@ export default function UstaCard({ usta }: { usta: UstaCardData }) {
           </div>
         </div>
         {minPrice !== null && (
-          <div className="mt-3 flex items-center justify-between border-t border-cream-200 pt-3">
+          <div className="mt-auto flex items-center justify-between border-t border-cream-200 pt-3">
             <PriceTag amount={minPrice} from size="sm" />
             <IconChevronRight size={18} className="text-ink-300" />
           </div>
