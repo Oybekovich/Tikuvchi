@@ -50,125 +50,137 @@ export default async function UstaPage({
   return (
     <>
       <AppHeader back backHref="/" />
-      <main className="mx-auto max-w-3xl pb-28">
-        {/* Hero cover — reyting badge pastki chap burchakda, yarim shaffof fonda */}
-        <div className="relative h-52 overflow-hidden sm:h-64 sm:rounded-b-3xl">
-          {usta.cover_image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={usta.cover_image_url}
-              alt={name}
-              className="h-full w-full object-cover"
+      <main className="mx-auto max-w-5xl pb-28 md:pb-10">
+        {/* Hero cover — reyting badge pastki chap burchakda, yarim shaffof
+            fonda. Telefonda ekran chetigacha cho'ziladi; `md` dan boshlab
+            ichki bo'shliqqa kirib, to'liq yumaloqlanadi. */}
+        <div className="px-0 md:px-6">
+          <div className="relative h-52 overflow-hidden sm:h-64 sm:rounded-b-3xl md:h-72 md:rounded-2xl">
+            {usta.cover_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={usta.cover_image_url}
+                alt={name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full bg-gradient-to-br from-terra-200 to-terra-400" />
+            )}
+            <RatingBadge
+              rating={usta.rating_avg}
+              count={usta.rating_count}
+              variant="overlay"
+              className="absolute bottom-11 left-4"
             />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-terra-200 to-terra-400" />
-          )}
-          <RatingBadge
-            rating={usta.rating_avg}
-            count={usta.rating_count}
-            variant="overlay"
-            className="absolute bottom-11 left-4"
-          />
+          </div>
         </div>
 
-        <div className="px-4">
-          {/* Asosiy ma'lumot va Bio */}
-          <section className="-mt-8 relative rounded-2xl bg-white p-4 shadow-card">
-            <div className="flex items-center gap-3">
-              <Avatar name={name} src={usta.profiles.avatar_url} size="xl" />
-              <div className="min-w-0">
-                <h1 className="text-xl font-extrabold text-ink-900">{name}</h1>
-                {usta.location_text && (
-                  <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-500">
-                    <IconLocation size={15} />
-                    {usta.location_text}
-                  </p>
-                )}
-                {usta.work_hours_start && usta.work_hours_end && (
-                  <p className="mt-0.5 flex items-center gap-1.5 text-sm text-ink-500">
-                    <IconClock size={15} />
-                    {t("usta.workHours", {
-                      start: formatTime(usta.work_hours_start),
-                      end: formatTime(usta.work_hours_end),
-                    })}
-                  </p>
-                )}
+        <div className="px-4 md:px-6">
+          {/* `lg` dan ikki ustun: chapda usta haqidagi karta va asosiy
+              amallar — sahifa aylanganda ular yonda turadi, chunki o'ng ustun
+              (portfolio + sharhlar) ancha uzun. Undan pastda hammasi bitta
+              ustunda, ya'ni telefon ko'rinishi o'zgarmaydi. */}
+          <div className="lg:grid lg:grid-cols-[20rem_1fr] lg:items-start lg:gap-6">
+            {/* Asosiy ma'lumot va Bio */}
+            <section className="-mt-8 relative rounded-2xl bg-white p-4 shadow-card lg:sticky lg:top-20">
+              <div className="flex items-center gap-3">
+                <Avatar name={name} src={usta.profiles.avatar_url} size="xl" />
+                <div className="min-w-0">
+                  <h1 className="text-xl font-extrabold text-ink-900">{name}</h1>
+                  {usta.location_text && (
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-500">
+                      <IconLocation size={15} />
+                      {usta.location_text}
+                    </p>
+                  )}
+                  {usta.work_hours_start && usta.work_hours_end && (
+                    <p className="mt-0.5 flex items-center gap-1.5 text-sm text-ink-500">
+                      <IconClock size={15} />
+                      {t("usta.workHours", {
+                        start: formatTime(usta.work_hours_start),
+                        end: formatTime(usta.work_hours_end),
+                      })}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-            {usta.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {usta.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-cream-200 px-3 py-1 text-xs font-semibold text-ink-700"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-            {usta.bio && (
-              <p className="mt-3 text-sm leading-relaxed text-ink-700">
-                {usta.bio}
-              </p>
-            )}
-
-            {/* Asosiy amallar: yozish va buyurtma berish.
-                Avval "Buyurtma berish" faqat portfolio rasmi modalida edi —
-                portfoliosi bo'sh ustaga buyurtma berishning yo'li yo'q edi. */}
-            <div className="mt-4 flex gap-2 border-t border-cream-200 pt-3">
-              <Link
-                href={`/chat/${id}`}
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-terra-600 px-4 py-3 text-sm font-bold text-terra-700 transition-colors hover:bg-terra-50"
-              >
-                <IconChat size={18} />
-                {t("usta.chatCta")}
-              </Link>
-              {usta.available === false ? (
-                <span className="flex flex-[1.4] items-center justify-center rounded-2xl bg-cream-200 px-4 py-3 text-center text-xs font-bold text-ink-500">
-                  {t("usta.notAvailable")}
-                </span>
-              ) : (
-                <Link
-                  href={`/usta/${id}/buyurtma`}
-                  className="flex flex-[1.4] items-center justify-center rounded-2xl bg-terra-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-terra-700 active:bg-terra-800"
-                >
-                  {t("usta.orderCta")}
-                </Link>
+              {usta.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {usta.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-cream-200 px-3 py-1 text-xs font-semibold text-ink-700"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               )}
-            </div>
-          </section>
+              {usta.bio && (
+                <p className="mt-3 text-sm leading-relaxed text-ink-700">
+                  {usta.bio}
+                </p>
+              )}
 
-          {/* Portfolio */}
-          <section className="mt-6">
-            <h2 className="mb-3 text-base font-extrabold text-ink-900">
-              {t("usta.portfolio")}
-            </h2>
-            {portfolio.length > 0 ? (
-              <PortfolioGallery items={portfolio} ustaId={id} ustaName={name} />
-            ) : (
-              <EmptyState icon={<PhImages size={30} />} title={t("usta.noPortfolio")} />
-            )}
-          </section>
-
-          {/* Sharhlar */}
-          <section className="mt-6">
-            <h2 className="mb-3 text-base font-extrabold text-ink-900">
-              {t("usta.reviews")}{" "}
-              <span className="text-sm font-semibold text-ink-500">
-                {t("usta.reviewsCount", { count: usta.rating_count })}
-              </span>
-            </h2>
-            {reviews && reviews.length > 0 ? (
-              <div className="space-y-3">
-                {(reviews as unknown as ReviewData[]).map((r) => (
-                  <ReviewCard key={r.id} review={r} />
-                ))}
+              {/* Asosiy amallar: yozish va buyurtma berish.
+                  Avval "Buyurtma berish" faqat portfolio rasmi modalida edi —
+                  portfoliosi bo'sh ustaga buyurtma berishning yo'li yo'q edi. */}
+              <div className="mt-4 flex gap-2 border-t border-cream-200 pt-3">
+                <Link
+                  href={`/chat/${id}`}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-terra-600 px-4 py-3 text-sm font-bold text-terra-700 transition-colors hover:bg-terra-50"
+                >
+                  <IconChat size={18} />
+                  {t("usta.chatCta")}
+                </Link>
+                {usta.available === false ? (
+                  <span className="flex flex-[1.4] items-center justify-center rounded-2xl bg-cream-200 px-4 py-3 text-center text-xs font-bold text-ink-500">
+                    {t("usta.notAvailable")}
+                  </span>
+                ) : (
+                  <Link
+                    href={`/usta/${id}/buyurtma`}
+                    className="flex flex-[1.4] items-center justify-center rounded-2xl bg-terra-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-terra-700 active:bg-terra-800"
+                  >
+                    {t("usta.orderCta")}
+                  </Link>
+                )}
               </div>
-            ) : (
-              <EmptyState icon={<PhChat size={30} />} title={t("usta.noReviews")} />
-            )}
-          </section>
+            </section>
+
+            <div className="lg:min-w-0">
+              {/* Portfolio */}
+              <section className="mt-6 lg:mt-0">
+                <h2 className="mb-3 text-base font-extrabold text-ink-900">
+                  {t("usta.portfolio")}
+                </h2>
+                {portfolio.length > 0 ? (
+                  <PortfolioGallery items={portfolio} ustaId={id} ustaName={name} />
+                ) : (
+                  <EmptyState icon={<PhImages size={30} />} title={t("usta.noPortfolio")} />
+                )}
+              </section>
+
+              {/* Sharhlar */}
+              <section className="mt-6">
+                <h2 className="mb-3 text-base font-extrabold text-ink-900">
+                  {t("usta.reviews")}{" "}
+                  <span className="text-sm font-semibold text-ink-500">
+                    {t("usta.reviewsCount", { count: usta.rating_count })}
+                  </span>
+                </h2>
+                {reviews && reviews.length > 0 ? (
+                  <div className="space-y-3">
+                    {(reviews as unknown as ReviewData[]).map((r) => (
+                      <ReviewCard key={r.id} review={r} />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState icon={<PhChat size={30} />} title={t("usta.noReviews")} />
+                )}
+              </section>
+            </div>
+          </div>
         </div>
       </main>
     </>
